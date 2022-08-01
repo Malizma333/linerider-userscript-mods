@@ -1,6 +1,6 @@
 # linerider-userscript-mods
 
-Userscript mods for Line Rider. May potentially end up being unmaintained.
+A collection of other userscript mods.
 
 ## Usage
 
@@ -9,7 +9,3 @@ Userscript mods for Line Rider. May potentially end up being unmaintained.
 3. You have to install `custom-tools-api.user.js` before any of the other tool mods will work
 
 Here's a video explaining how to install mods: https://streamable.com/v4wzx
-
-## Shade and Slice Example Usage
-
-https://www.youtube.com/watch?v=lh2Fe_XKetM
