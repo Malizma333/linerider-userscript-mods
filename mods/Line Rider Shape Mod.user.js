@@ -131,10 +131,7 @@ class ShapeMod {
       }
 
       const selectToolState = getSelectToolState(this.store.getState())
-
-      //console.log(this.store.getState())
-      //console.log(this.store.getState().toolState[SELECT_TOOL])
-
+      
       let selectedPoints = selectToolState.selectedPoints
 
       if (!selectToolState.multi) {
@@ -276,8 +273,6 @@ function main () {
   window.registerCustomSetting(ShapeModComponent)
 }
 
-// Initializes mod
-
 if (window.registerCustomSetting) {
   main()
 } else {
@@ -287,8 +282,6 @@ if (window.registerCustomSetting) {
     main()
   }
 }
-
-// Utility functions can go here
 
 function* genShape(line, { sides = 3 } = {}) {
     const { V2 } = window
