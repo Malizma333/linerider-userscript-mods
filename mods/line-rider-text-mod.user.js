@@ -136,6 +136,7 @@ function main () {
     onActivate () {
       if (this.state.active) {
         this.setState({ active: false })
+        this.setState({ text: "" })
       } else {
         this.setState({ active: true })
       }
@@ -186,7 +187,7 @@ function main () {
           this.state.fontFile != null && create('div', null, 'Loaded: ' + this.state.fontName),
           this.state.fontFile != null && create('div', null,
                  "Text: ",
-                 create('input', { style: { width: '3em' }, type: 'text',
+                 create('input', { style: { width: '88%' }, type: 'text',
                  value: this.state.text,
                  onChange: create => this.setState({ text: create.target.value })
               })
