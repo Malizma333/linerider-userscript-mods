@@ -187,7 +187,7 @@ function main () {
           this.state.fontFile != null && create('div', null, 'Loaded: ' + this.state.fontName),
           this.state.fontFile != null && create('div', null,
                  "Text: ",
-                 create('input', { style: { width: '88%' }, type: 'text',
+                 create('textArea', { style: { width: '88%' }, type: 'text',
                  value: this.state.text,
                  onChange: create => this.setState({ text: create.target.value })
               })
@@ -234,13 +234,16 @@ function* genLines ({ text = "", fontFile = null } = {}) {
       var spacing = 0;
 
       for(const c of text) {
+          if(c == '\n') {
+              offset = V2.from(camPos.x, offset.y + fontStyle.lineHeight);
+              spacing = 0;
+              continue;
+          }
 
           offset.x += spacing;
 
           //skip characters not in the font
           if(!fontFile.hasOwnProperty(c)) continue;
-
-          offset.y = camPos.y - fontFile[c].charHeight;
 
           //check for custom y offsets of letters like p and q
           if(fontStyle.yOffset.hasOwnProperty(c)) {
@@ -251,8 +254,8 @@ function* genLines ({ text = "", fontFile = null } = {}) {
 
           for(const line of fontFile[c]) {
               yield {
-                  p1: V2.from(line.x1 + offset.x, line.y1 + offset.y),
-                  p2: V2.from(line.x2 + offset.x, line.y2 + offset.y)
+                  p1: V2.from(line.x1 + offset.x, line.y1 + offset.y - fontFile[c].charHeight),
+                  p2: V2.from(line.x2 + offset.x, line.y2 + offset.y - fontFile[c].charHeight)
               }
           }
       }
