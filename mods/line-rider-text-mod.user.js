@@ -241,12 +241,13 @@ function* genLines ({ text = "", fontFile = null } = {}) {
               continue;
           }
 
-          charOffset = V2.from(0, -fontFile[c].charHeight);
           offset.x += spacing;
 
           //skip characters not in the font
           if(!fontFile.hasOwnProperty(c)) continue;
-
+        
+          charOffset = V2.from(0, -fontFile[c].charHeight);
+        
           //check for custom y offsets of letters like p and q
           if(fontStyle.yOffset.hasOwnProperty(c)) {
               charOffset.y += fontStyle.yOffset[c];
