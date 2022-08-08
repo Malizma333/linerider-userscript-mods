@@ -231,6 +231,7 @@ function* genLines ({ text = "", fontFile = null } = {}) {
       const fontStyle = fontFile.style;
 
       var offset = V2.from(camPos.x, camPos.y);
+      var charOffset = V2.from(0,0);
       var spacing = 0;
 
       for(const c of text) {
@@ -240,6 +241,7 @@ function* genLines ({ text = "", fontFile = null } = {}) {
               continue;
           }
 
+          charOffset = V2.from(0, -fontFile[c].charHeight);
           offset.x += spacing;
 
           //skip characters not in the font
@@ -247,15 +249,15 @@ function* genLines ({ text = "", fontFile = null } = {}) {
 
           //check for custom y offsets of letters like p and q
           if(fontStyle.yOffset.hasOwnProperty(c)) {
-              offset.y += fontStyle.yOffset[c];
+              charOffset.y += fontStyle.yOffset[c];
           }
 
           spacing = fontFile[c].charWidth + fontStyle.spacing;
 
           for(const line of fontFile[c]) {
               yield {
-                  p1: V2.from(line.x1 + offset.x, line.y1 + offset.y - fontFile[c].charHeight),
-                  p2: V2.from(line.x2 + offset.x, line.y2 + offset.y - fontFile[c].charHeight)
+                  p1: V2.from(line.x1 + offset.x, line.y1 + offset.y + charOffset.y),
+                  p2: V2.from(line.x2 + offset.x, line.y2 + offset.y + charOffset.y)
               }
           }
       }
