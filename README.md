@@ -15,3 +15,11 @@ Here's a video explaining how to install mods: https://streamable.com/v4wzx
 ### Template Userscript Mod
 
 Has a basic example of how to write a mod for new Line Rider mod developers. The mod itself generates a rectangle.
+
+### Shape Userscript Mod
+
+Generates a regular polygon, based on a selected line as the radius and a given number of sides.
+
+### Text Userscript Mod
+
+Generates text typed in a text box. Needs a font json file, which can be found in the font folder.
