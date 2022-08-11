@@ -8,6 +8,7 @@
 // @match        https://*.official-linerider.com/*
 // @match        http://localhost:8000/*
 // @grant        none
+// @downloadURL  https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-improved-api.user.js
 // ==/UserScript==
 
 // jshint asi: true
