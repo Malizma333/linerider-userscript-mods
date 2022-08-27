@@ -23,3 +23,7 @@ Generates a regular polygon, based on a selected line as the radius and a given 
 ### Text Userscript Mod
 
 Generates text typed in a text box. Needs a font json file, which can be found in the font folder.
+
+### Font Generator Userscript Mod
+
+Assists in creating a custom font out of line selections to be used in the text generator. Has different style options like spacing, line height, and Y-offsets.
