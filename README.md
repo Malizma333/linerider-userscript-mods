@@ -26,4 +26,4 @@ Generates text typed in a text box. Needs a font json file, which can be found i
 
 ### Font Generator Userscript Mod
 
-Assists in creating a custom font out of line selections to be used in the text generator. Has different style options like spacing, line height, and Y-offsets.
+Assists in creating a custom font out of line selections to be used in the text generator. Has different style options like spacing, line height, and Y-offsets. WARNING: Reloading the page resets the stored font data!
