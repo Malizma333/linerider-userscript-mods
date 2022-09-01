@@ -5,7 +5,7 @@ A collection of other userscript mods.
 ## Usage
 
 1. You need to install the [Tampermonkey browser extension](https://tampermonkey.net/)
-2. You have to install `custom-tools-api.user.js` from the main branch or `improved-api.user.js` from the mods folder to get the other mods to work
+2. You have to install `custom-tools-api.user.js` from the main branch or `line-rider-improved-api.user.js` from the mods folder to get the other mods to work
 3. To install mods from this repo, click on any mod file and then click "Raw" to bring up the tampermonkey install page
 
 Here's a video explaining how to install mods: https://streamable.com/v4wzx
