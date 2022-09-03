@@ -31,3 +31,7 @@ Assists in creating a custom font out of line selections to be used in the text 
 ### Spiral Mod
 
 Generates some neat spiral-like patterns when given an offset and a length.
+
+### Image Mod
+
+Generates an image from any supported image file format. Be careful about rendering larger images as it may crash the site.
