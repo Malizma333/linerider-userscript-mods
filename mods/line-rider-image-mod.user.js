@@ -3,7 +3,7 @@
 // @name         Line Rider Image Mod
 // @author       Malizma
 // @description  Adds the ability to import images
-// @version      1.0
+// @version      1.1
 
 // @namespace    http://tampermonkey.net/
 // @match        https://www.linerider.com/*
@@ -33,10 +33,9 @@ const getSimulatorCommittedTrack = state => state.simulator.committedEngine
 const getSimulatorLayers = track => track.engine.state.layers.buffer
 
 class ImageMod {
-  constructor (store, initState, modComponent) {
+  constructor (store, initState) {
     this.store = store
     this.state = initState
-    this.modComponent = modComponent
 
     this.changed = false
 
@@ -130,7 +129,9 @@ function main () {
         imageData: null
       }
 
-      this.imageMod = new ImageMod(store, this.state, this)
+      this.message = "text";
+
+      this.imageMod = new ImageMod(store, this.state)
     }
 
     componentWillUpdate (nextProps, nextState) {
@@ -149,7 +150,7 @@ function main () {
                let image = document.getElementById('output');
                image.onload = function() {
 
-                   if(image.width * image.height > 65536) {
+                   if(image.width > 256 || image.height > 256) {
                        resolve(null);
                    }
 
@@ -186,12 +187,17 @@ function main () {
                   'Image: ',
                   create('input', {type: 'file',
                   onChange: create => this.onFileChange().then(result => {
+                      if(result === null) this.message = "Image too large";
                       this.setState({ imageData : result });
-                      console.log("Loaded image successfully");
-                  }).catch(err => {console.log("Error when parsing: Invalid image file"); console.log(err);})
+                      this.message = "Image loaded";
+                  }).catch(err => {
+                      console.log("Error when parsing: Invalid image file");
+                      console.log(err);
+                  })
               }),
-              create('img', { id: 'output', style: { display: 'none' } })
+              create('img', { id: 'output', style: { display: 'none' } }),
           ),
+          create('div', null, this.message),
           create('button', { style: { float: 'left' }, onClick: () => this.onCommit() },
             'Commit'
           )
@@ -227,7 +233,6 @@ function* genLines ({ imageData = null } = {}, layerArr) {
 
     const { V2 } = window
     const camPos = window.store.getState().camera.editorPosition;
-    let pos = V2.from(camPos.x, camPos.y);
 
     for(let yOff = 0; yOff < imageData.height; yOff++) {
         for(let xOff = 0; xOff < imageData.width; xOff++) {
@@ -245,8 +250,8 @@ function* genLines ({ imageData = null } = {}, layerArr) {
             }
 
             yield {
-                p1: V2.from(xOff + pos.x + 0.01, yOff + pos.y),
-                p2: V2.from(xOff + pos.x, yOff + pos.y + 0.01),
+                p1: V2.from(xOff * 2 + camPos.x, yOff * 2 + camPos.y),
+                p2: V2.from(xOff * 2 + camPos.x, yOff * 2 + camPos.y + 0.01),
                 layer: index
             }
         }
@@ -287,9 +292,10 @@ function hasColor(layerArr, color) {
 }
 
 function rgbToHex(color) {
-    let rHex = (8 * Math.floor(color[0] / 8)).toString(16);
-    let gHex = (8 * Math.floor(color[1] / 8)).toString(16);
-    let bHex = (8 * Math.floor(color[2] / 8)).toString(16);
+    let clamp = 16;
+    let rHex = (clamp * Math.floor(color[0] / clamp)).toString(16);
+    let gHex = (clamp * Math.floor(color[1] / clamp)).toString(16);
+    let bHex = (clamp * Math.floor(color[2] / clamp)).toString(16);
 
     rHex = rHex.length == 1 ? "0" + rHex : rHex;
     gHex = gHex.length == 1 ? "0" + gHex : gHex;
