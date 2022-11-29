@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Line Rider Improved Mod API
 // @namespace    http://tampermonkey.net/
-// @version      0.6
+// @version      1.0
 // @description  Renders mod components for linerider.com mods
 // @author       Malizma
 // @match        https://www.linerider.com/*
