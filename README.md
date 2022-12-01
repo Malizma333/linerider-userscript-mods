@@ -35,3 +35,7 @@ Generates some neat spiral-like patterns when given an offset and a length.
 ### Image Mod
 
 Generates an image from any supported image file format. Be careful about rendering larger images as it may crash the site.
+
+### Maze Mod
+
+Generates a green-line maze given a width and height. Best paired with a WASD controller.
