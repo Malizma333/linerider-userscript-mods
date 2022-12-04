@@ -3,7 +3,7 @@
 // @name         Line Rider Image Mod
 // @author       Malizma
 // @description  Adds the ability to import images
-// @version      1.1
+// @version      1.2
 
 // @namespace    http://tampermonkey.net/
 // @match        https://www.linerider.com/*
@@ -11,6 +11,7 @@
 // @match        http://localhost:8000/*
 // @grant        none
 // @downloadURL  https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-image-mod.user.js
+// @updateURL    https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-image-mod.user.js
 // ==/UserScript==
 
 const updateLines = (linesToRemove, linesToAdd, name) => ({
@@ -19,7 +20,13 @@ const updateLines = (linesToRemove, linesToAdd, name) => ({
 })
 
 const addLines = (line) => updateLines(null, line, 'ADD_LINES')
+
 const addLayer = () => ({ type: 'ADD_LAYER' })
+
+const renameLayer = (id, name) => ({
+  type: 'RENAME_LAYER',
+  payload: {id, name}
+})
 
 const commitTrackChanges = () => ({
   type: 'COMMIT_TRACK_CHANGES'
@@ -79,33 +86,45 @@ class ImageMod {
           }
 
           if(this.state.active) {
-              let myLines = [];
-              let layerArr = getSimulatorLayers(getSimulatorCommittedTrack(this.store.getState()));
+              let lineArr = [];
+              let layerArr = [];
+              let layerBuffer = getSimulatorLayers(this.track);
 
-              for(let {id, color} of genLayers(this.state, layerArr)) {
-                  this.store.dispatch(addLayer());
-                  layerArr[layerArr.length - 1] = {
-                      id: layerArr.length - 1,
-                      name: color,
-                      editable: true,
-                      visible: true
+              if(!layerBuffer) return;
+
+              let bufferLen = layerBuffer.length;
+
+              for(let {type, color, x1, y1, x2, y2, layer} of genLines(this.state)) {
+                  if(type == "layer") {
+                      layerArr.push({
+                          name: color,
+                          editable: true,
+                          visible: true
+                      })
+                  } else {
+                      lineArr.push({
+                          layer: layer + bufferLen,
+                          x1: x1,
+                          y1: y1,
+                          x2: x2,
+                          y2: y2,
+                          type: 2
+                      })
                   }
               }
 
-              for (let { p1, p2, layer } of genLines(this.state, layerArr)) {
-                  myLines.push({
-                      layer: layer,
-                      x1: p1.x,
-                      y1: p1.y,
-                      x2: p2.x,
-                      y2: p2.y,
-                      type: 2
-                  })
+              if(layerArr.length > 0) {
+                  for(let i = 0; i < layerArr.length; i++) {
+                      this.store.dispatch(addLayer());
+                      this.store.dispatch(renameLayer(bufferLen, layerArr[i].name));
+                      bufferLen++;
+                  }
+                  this.changed = true;
               }
 
-              if (myLines.length > 0) {
-                  this.store.dispatch(addLines(myLines))
-                  this.changed = true
+              if (lineArr.length > 0) {
+                  this.store.dispatch(addLines(lineArr));
+                  this.changed = true;
               }
           }
       }
@@ -126,10 +145,11 @@ function main () {
 
       this.state = {
         active: false,
-        imageData: null
+        imageData: null,
+        clamping: 4
       }
 
-      this.message = "text";
+      this.message = "";
 
       this.imageMod = new ImageMod(store, this.state)
     }
@@ -149,13 +169,10 @@ function main () {
                let dataURL = fileReader.result;
                let image = document.getElementById('output');
                image.onload = function() {
-
-                   if(image.width > 256 || image.height > 256) {
-                       resolve(null);
-                   }
-
                    const canvas = document.createElement('canvas');
                    const ctx = canvas.getContext('2d');
+                   canvas.width = image.width;
+                   canvas.height = image.height;
                    ctx.drawImage(image, 0, 0);
                    resolve(ctx.getImageData(0, 0, image.width, image.height));
                }
@@ -165,13 +182,27 @@ function main () {
        });
     }
 
-      onActivate () {
-          if (this.state.active) {
-              this.setState({ active: false })
-          } else {
-              this.setState({ active: true })
-          }
+    renderSlider (key, title, props) {
+      props = {
+        ...props,
+        value: this.state[key],
+        onChange: create => this.setState({ [key]: parseFloat(create.target.value) })
       }
+
+      return create('div', null,
+        title,
+        create('input', { style: { width: '3em' }, type: 'number', ...props }),
+        create('input', { type: 'range', ...props, onFocus: create => create.target.blur() })
+      )
+    }
+
+    onActivate () {
+        if (this.state.active) {
+            this.setState({ active: false })
+        } else {
+            this.setState({ active: true })
+        }
+    }
 
     onCommit () {
       const committed = this.imageMod.commit();
@@ -187,14 +218,14 @@ function main () {
                   'Image: ',
                   create('input', {type: 'file',
                   onChange: create => this.onFileChange().then(result => {
-                      if(result === null) this.message = "Image too large";
                       this.setState({ imageData : result });
-                      this.message = "Image loaded";
+                      this.message = "Image Loaded";
                   }).catch(err => {
-                      console.log("Error when parsing: Invalid image file");
+                      this.message = "Invalid Image File";
                       console.log(err);
                   })
               }),
+              this.renderSlider('clamping', 'Color Clamp', { min: 1, max: 4, step: 1 }),
               create('img', { id: 'output', style: { display: 'none' } }),
           ),
           create('div', null, this.message),
@@ -228,74 +259,70 @@ if (window.registerCustomSetting) {
   }
 }
 
-function* genLines ({ imageData = null } = {}, layerArr) {
+function* genLines ({ imageData = null, clamping = 4 } = {}) {
     if(imageData == null) return;
 
     const { V2 } = window
     const camPos = window.store.getState().camera.editorPosition;
 
-    for(let yOff = 0; yOff < imageData.height; yOff++) {
-        for(let xOff = 0; xOff < imageData.width; xOff++) {
-            let colorArray = [0,0,0];
-
-            for(let i = 0; i < 3; i++) {
-                colorArray[i] = imageData.data[i + xOff * 4 + yOff * imageData.width * 4];
-            }
-
-            let currentColor = rgbToHex(colorArray);
-            let index = hasColor(layerArr, currentColor);
-
-            if(index === -1) {
-                continue;
-            }
-
-            yield {
-                p1: V2.from(xOff * 2 + camPos.x, yOff * 2 + camPos.y),
-                p2: V2.from(xOff * 2 + camPos.x, yOff * 2 + camPos.y + 0.01),
-                layer: index
-            }
-        }
-    }
-}
-
-function* genLayers({ imageData = null } = {}, layerArr) {
-    if(imageData == null) return;
+    let colorArray = [];
+    let lastColor = null;
+    let currentLine = null;
 
     for(let yOff = 0; yOff < imageData.height; yOff++) {
         for(let xOff = 0; xOff < imageData.width; xOff++) {
-            let colorArray = [0,0,0];
+            let color = [0,0,0];
 
             for(let i = 0; i < 3; i++) {
-                colorArray[i] = imageData.data[i + xOff * 4 + yOff * imageData.width * 4];
+                color[i] = imageData.data[i + xOff * 4 + yOff * imageData.width * 4];
             }
 
-            let currentColor = rgbToHex(colorArray);
-            let index = hasColor(layerArr, currentColor);
+            let currentColor = rgbToHex(color, clamping);
+            let index = colorArray.indexOf(currentColor);
 
             if(index === -1) {
+                colorArray.push(currentColor);
+                index = colorArray.length - 1;
                 yield {
-                    color: currentColor
+                    type: "layer",
+                    color: currentColor,
+                    x1: null,
+                    y1: null,
+                    x2: null,
+                    y2: null,
+                    layer: null
                 }
             }
+
+            if(lastColor != currentColor || xOff == 0) {
+                if(currentLine) {
+                    yield currentLine;
+                }
+                currentLine = {
+                    type: "line",
+                    color: null,
+                    x1: (xOff - 1) * 2 + camPos.x,
+                    y1: yOff * 2 + camPos.y,
+                    x2: xOff * 2 + camPos.x,
+                    y2: yOff * 2 + camPos.y + 0.01,
+                    layer: index
+                }
+            } else {
+                currentLine.x2 = xOff * 2 + camPos.x;
+            }
+
+            lastColor = currentColor;
         }
     }
+
+    yield currentLine;
 }
 
-function hasColor(layerArr, color) {
-    for(let layer of layerArr) {
-        if(layer.name == color) {
-            return layer.id;
-        }
-    }
-
-    return -1;
-}
-
-function rgbToHex(color) {
-    let clamp = 16;
-    let rHex = (clamp * Math.floor(color[0] / clamp)).toString(16);
-    let gHex = (clamp * Math.floor(color[1] / clamp)).toString(16);
-    let bHex = (clamp * Math.floor(color[2] / clamp)).toString(16);
+function rgbToHex(color, clamp) {
+    let powerClamp = Math.pow(2, clamp+3);
+    let rHex = (powerClamp * Math.floor(color[0] / powerClamp)).toString(16);
+    let gHex = (powerClamp * Math.floor(color[1] / powerClamp)).toString(16);
+    let bHex = (powerClamp * Math.floor(color[2] / powerClamp)).toString(16);
 
     rHex = rHex.length == 1 ? "0" + rHex : rHex;
     gHex = gHex.length == 1 ? "0" + gHex : gHex;
