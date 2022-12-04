@@ -11,7 +11,7 @@
 // @match        http://localhost:8000/*
 // @grant        none
 // @downloadURL  https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-shape-mod.user.js
-
+// @updateURL    https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-shape-mod.user.js
 // ==/UserScript==
 
 const SELECT_TOOL = 'SELECT_TOOL'
