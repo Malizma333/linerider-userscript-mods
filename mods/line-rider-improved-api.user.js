@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Line Rider Improved Mod API
 // @namespace    http://tampermonkey.net/
-// @version      1.0
+// @version      1.1
 // @description  Renders mod components for linerider.com mods
 // @author       Malizma
 // @match        https://www.linerider.com/*
@@ -9,6 +9,7 @@
 // @match        http://localhost:8000/*
 // @grant        none
 // @downloadURL  https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-improved-api.user.js
+// @updateURL    https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-improved-api.user.js
 // ==/UserScript==
 
 // jshint asi: true
@@ -41,13 +42,15 @@ function main () {
       flexDirection: 'column',
       alignItems: 'flex-start',
       textAlign: 'left',
-      transition: 'opacity 225ms cubic-bezier(0.4, 0, 0.2, 1) 0ms'
+      transition: 'opacity 225ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
+      width: '100%'
   }
 
   const boxStyle = {
       display: 'flex',
       flexDirection: 'column-reverse',
-      padding: 8
+      padding: 8,
+      width: '100%'
   }
 
   store.subscribe(() => {
@@ -176,10 +179,10 @@ function main () {
                 Object.assign(settingsContainer.style, {
                     position: 'fixed',
                     width : '200px',
-                    height: '16%',
+                    height: '150px',
                     overflowY: 'auto',
                     overflowX: 'hidden',
-                    top: '70%',
+                    bottom: '15%',
                     right: '8px',
                     border: '1px solid black',
                     backgroundColor: '#ffffff',
@@ -188,6 +191,59 @@ function main () {
                 })
             }
         }
+
+        class Settings extends React.Component {
+            constructor (props) {
+                super(props)
+
+                this.state = {
+                    divWidth: 200,
+                    divHeight: 150
+                }
+            }
+
+            componentWillUpdate (nextProps, nextState) {
+                Object.assign(settingsContainer.style, {
+                    width: this.state.divWidth + 'px',
+                    height: this.state.divHeight + 'px'
+                })
+            }
+
+            render () {
+                return e('div', null,
+                    e('div', null,
+                      'Window Width ',
+                      e('input', { style: { width: '3.3em' }, type: 'number',
+                        min: 200, max: 300, step: 1,
+                        value: this.state.divWidth,
+                        onChange: e => {
+                            let w = parseFloat(e.target.value);
+                            if(200 <= w && w <= 300) {
+                                this.setState({ divWidth: w })
+                            }
+                        }
+                      })
+                    ),
+                    e('div', null,
+                      'Window Height ',
+                      e('input', { style: { width: '3.3em' }, type: 'number',
+                        min: 150, max: 250, step: 1,
+                        value: this.state.divHeight,
+                        onChange: e => {
+                            let h = parseFloat(e.target.value);
+                            if(150 <= h && h <= 250) {
+                                this.setState({ divHeight: h })
+                            }
+                        }
+                      })
+                    )
+                )
+            }
+        }
+
+        this.setState((prevState) => ({
+            customSettings: [...prevState.customSettings, Settings]
+        }))
 
         if (typeof window.onCustomToolsApiReady === 'function') {
             window.onCustomToolsApiReady()
@@ -198,9 +254,9 @@ function main () {
         const activeSetting = this.state.customSettings[this.state.activeSetting];
 
         return e('div', { style: rootStyle },
-        this.state.customSettings.length > 0 && e('div', null,
+        this.state.customSettings.length > 1 && e('div', {style: {width: '100%'}},
             e('select', {
-            style: {textAlign: 'center', width : '200px'},
+            style: {textAlign: 'center', width: '100%'},
             value: this.state.activeSetting,
             onChange: e => this.setState({ activeSetting : e.target.value })},
              e('option', {value: null}, '- Select Mod -'),
