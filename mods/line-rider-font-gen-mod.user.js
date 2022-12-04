@@ -10,7 +10,8 @@
 // @match        https://*.official-linerider.com/*
 // @match        http://localhost:8000/*
 // @grant        none
-
+// @downloadURL  https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-font-gen-mod.user.js
+// @updateURL    https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-font-gen-mod.user.js
 // ==/UserScript==
 
 const SELECT_TOOL = 'SELECT_TOOL'
