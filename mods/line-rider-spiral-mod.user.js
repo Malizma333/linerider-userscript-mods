@@ -11,7 +11,7 @@
 // @match        http://localhost:8000/*
 // @grant        none
 // @downloadURL  https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-spiral-mod.user.js
-
+// @updateURL  https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-spiral-mod.user.js
 // ==/UserScript==
 
 // Utility functions called towards source code
