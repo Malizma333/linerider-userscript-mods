@@ -34,8 +34,16 @@ Generates some neat spiral-like patterns when given an offset and a length.
 
 ### Image Mod
 
-Generates an image from any supported image file format. Be careful about rendering larger images as it may crash the site.
+Generates an image from any supported image file format. Includes clamping feature for limiting number of layersBe careful about rendering larger images as it may crash the site.
 
 ### Maze Mod
 
 Generates a green-line maze given a width and height. Best paired with a WASD controller.
+
+### Tree Mod
+
+Generates a recursive, randomized tree structure based on range of branches, size, and iterations
+
+### Geometrize Image Mod
+
+Converts a Geometrize Desktop json export into line rider. Only works with Geometrize Desktop, with the only shape set to lines.
