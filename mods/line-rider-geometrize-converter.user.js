@@ -10,7 +10,8 @@
 // @match        https://*.official-linerider.com/*
 // @match        http://localhost:8000/*
 // @grant        none
-
+// @downloadURL  https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-geometrize-converter.user.js
+// @updateURL    https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-geometrize-converter.user.js
 // ==/UserScript==
 
 const updateLines = (linesToRemove, linesToAdd, name) => ({
