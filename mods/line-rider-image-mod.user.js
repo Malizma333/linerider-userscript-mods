@@ -3,7 +3,7 @@
 // @name         Line Rider Image Mod
 // @author       Malizma
 // @description  Adds the ability to import images
-// @version      1.2
+// @version      1.3
 
 // @namespace    http://tampermonkey.net/
 // @match        https://www.linerider.com/*
@@ -37,7 +37,7 @@ const revertTrackChanges = () => ({
 })
 
 const getSimulatorCommittedTrack = state => state.simulator.committedEngine
-const getSimulatorLayers = track => track.engine.state.layers.buffer
+const getSimulatorLayers = state => state.simulator.engine.engine.state.layers.buffer
 
 class ImageMod {
   constructor (store, initState) {
@@ -47,6 +47,7 @@ class ImageMod {
     this.changed = false
 
     this.track = this.store.getState().simulator.committedEngine
+    this.layers = this.store.getState().simulator.engine.engine.state.layers.buffer
     this.camPos = this.store.getState().camera.editorPosition
 
     store.subscribeImmediate(() => {
@@ -78,8 +79,14 @@ class ImageMod {
           shouldUpdate = true
       }
 
-      if (shouldUpdate) {
+      const layers = getSimulatorLayers(this.store.getState())
 
+      if (layers && this.layers !== layers) {
+          this.layers = layers
+          shouldUpdate = true
+      }
+
+      if (shouldUpdate) {
           if (this.changed) {
               this.store.dispatch(revertTrackChanges())
               this.changed = false
@@ -88,11 +95,7 @@ class ImageMod {
           if(this.state.active) {
               let lineArr = [];
               let layerArr = [];
-              let layerBuffer = getSimulatorLayers(this.track);
-
-              if(!layerBuffer) return;
-
-              let bufferLen = layerBuffer.length;
+              let bufferLen = this.layers.length;
 
               for(let {type, color, x1, y1, x2, y2, layer} of genLines(this.state)) {
                   if(type == "layer") {
@@ -146,7 +149,7 @@ function main () {
       this.state = {
         active: false,
         imageData: null,
-        clamping: 4
+        clamping: 1
       }
 
       this.message = "";
@@ -186,7 +189,10 @@ function main () {
       props = {
         ...props,
         value: this.state[key],
-        onChange: create => this.setState({ [key]: parseFloat(create.target.value) })
+        onChange: create => {
+            let v = parseFloat(create.target.value);
+            props.min <= v && v <= props.max && this.setState({ [key]: v });
+        }
       }
 
       return create('div', null,
@@ -225,7 +231,7 @@ function main () {
                       console.log(err);
                   })
               }),
-              this.renderSlider('clamping', 'Color Clamp', { min: 1, max: 4, step: 1 }),
+              this.renderSlider('clamping', 'Color Clamp', { min: 1, max: 3, step: 1 }),
               create('img', { id: 'output', style: { display: 'none' } }),
           ),
           create('div', null, this.message),
@@ -259,7 +265,7 @@ if (window.registerCustomSetting) {
   }
 }
 
-function* genLines ({ imageData = null, clamping = 4 } = {}) {
+function* genLines ({ imageData = null, clamping = 1 } = {}) {
     if(imageData == null) return;
 
     const { V2 } = window
@@ -319,10 +325,9 @@ function* genLines ({ imageData = null, clamping = 4 } = {}) {
 }
 
 function rgbToHex(color, clamp) {
-    let powerClamp = Math.pow(2, clamp+3);
-    let rHex = (powerClamp * Math.floor(color[0] / powerClamp)).toString(16);
-    let gHex = (powerClamp * Math.floor(color[1] / powerClamp)).toString(16);
-    let bHex = (powerClamp * Math.floor(color[2] / powerClamp)).toString(16);
+    let rHex = (color[0] & (-16 << clamp)).toString(16);
+    let gHex = (color[1] & (-16 << clamp)).toString(16);
+    let bHex = (color[2] & (-16 << clamp)).toString(16);
 
     rHex = rHex.length == 1 ? "0" + rHex : rHex;
     gHex = gHex.length == 1 ? "0" + gHex : gHex;
