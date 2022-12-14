@@ -11,6 +11,8 @@
 // @match        http://localhost:8000/*
 // @require      https://cdnjs.cloudflare.com/ajax/libs/mathjs/9.2.0/math.js
 // @grant        none
+// @downloadURL  https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-graph-mod.user.js
+// @updateURL    https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-graph-mod.user.js
 // ==/UserScript==
 
 const updateLines = (linesToRemove, linesToAdd, name) => ({
