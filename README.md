@@ -8,7 +8,7 @@ A collection of other userscript mods.
 2. You have to install `custom-tools-api.user.js` from the main branch or `line-rider-improved-api.user.js` from the mods folder to get the other mods to work
 3. To install mods from this repo, click on any mod file and then click "Raw" to bring up the tampermonkey install page
 
-Here's a video explaining how to install mods: https://streamable.com/v4wzx
+Here's a video showing how to install mods: https://streamable.com/v4wzx
 
 ## Mods
 
@@ -42,8 +42,12 @@ Generates a green-line maze given a width and height. Best paired with a WASD co
 
 ### Tree Mod
 
-Generates a recursive, randomized tree structure based on range of branches, size, and iterations
+Generates a recursive, randomized tree structure based on range of branches, size, and iterations.
 
 ### Geometrize Image Mod
 
 Converts a Geometrize Desktop json export into line rider. Only works with Geometrize Desktop, with the only shape set to lines.
+
+### Graph Mod
+
+Generates a graph given a correctly formatted function of x.
