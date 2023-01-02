@@ -3,12 +3,13 @@
 // @name         Line Rider Graph Mod
 // @author       Malizma
 // @description  Adds the ability to generate graphs from equations
-// @version      1.0
+// @version      1.1
 
 // @namespace    http://tampermonkey.net/
 // @match        https://www.linerider.com/*
 // @match        https://*.official-linerider.com/*
 // @match        http://localhost:8000/*
+// @match        https://square-rider.surge.sh/*
 // @require      https://cdnjs.cloudflare.com/ajax/libs/mathjs/9.2.0/math.js
 // @grant        none
 // @downloadURL  https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-graph-mod.user.js
@@ -128,7 +129,9 @@ function main () {
         domainN: 10,
         rangeM: -10,
         rangeN: 10,
-        step: .1
+        step: .1,
+        centerCamera: true,
+        connectDots: false
       }
 
       this.graphMod = new GraphMod(store, this.state)
@@ -136,6 +139,18 @@ function main () {
 
     componentWillUpdate (nextProps, nextState) {
       this.graphMod.onUpdate(nextState)
+    }
+
+    renderCheckbox (key, props) {
+      props = {
+        ...props,
+        checked: this.state[key],
+        onChange: create => this.setState({ [key]: create.target.checked })
+      }
+      return create('div', null,
+        key,
+        create('input', { type: 'checkbox', ...props })
+      )
     }
 
     renderSlider (key, title, props) {
@@ -183,6 +198,8 @@ function main () {
               this.renderSlider('rangeM', 'Min: ', { min: -100, max: this.state.rangeN, step: 1 }),
               this.renderSlider('rangeN', 'Max: ', { min: -100, max: 100, step: 1 }),
               this.renderSlider('step', 'Step', { min: 0.01, max: 5, step: 0.1 }),
+              this.renderCheckbox('centerCamera'),
+              this.renderCheckbox('connectDots'),
           ),
           create('button', { style: { float: 'left' }, onClick: () => this.onCommit() },
             'Commit'
@@ -214,9 +231,11 @@ if (window.registerCustomSetting) {
   }
 }
 
-function* genLines ({ func = "", domainM = -10, domainN = 10, rangeM = -10, rangeN = 10, step = 0.1} = {}) {
+function* genLines ({ func = "", domainM = -10, domainN = 10, rangeM = -10, rangeN = 10, step = 0.1, centerCamera = true, connectDots = false} = {}) {
     const { V2 } = window;
     const camPos = window.store.getState().camera.editorPosition;
+    const offset = centerCamera ? camPos : V2.from(0,0);
+    let lastPos = null;
 
     if(step <= 0) {
         return;
@@ -238,10 +257,19 @@ function* genLines ({ func = "", domainM = -10, domainN = 10, rangeM = -10, rang
             }
 
             if(rangeM <= y && y <= rangeN) {
-                yield {
-                    p1: V2.from(x + camPos.x, camPos.y - y + .1),
-                    p2: V2.from(x + camPos.x, camPos.y - y)
+                if(connectDots && lastPos) {
+                    yield {
+                        p1: V2.from(x + offset.x, offset.y - y + .1),
+                        p2: V2.from(lastPos.x + offset.x, offset.y - lastPos.y)
+                    }
+                } else {
+                    yield {
+                        p1: V2.from(x + offset.x, offset.y - y + .1),
+                        p2: V2.from(x + offset.x, offset.y - y)
+                    }
                 }
+
+                lastPos = V2.from(x, y);
             }
         }
     } catch(e) {
