@@ -3,7 +3,7 @@
 // @name         Line Rider Image Mod
 // @author       Malizma
 // @description  Adds the ability to import images
-// @version      1.3
+// @version      1.4
 
 // @namespace    http://tampermonkey.net/
 // @match        https://www.linerider.com/*
@@ -277,9 +277,9 @@ function* genLines ({ imageData = null, clamping = 1 } = {}) {
 
     for(let yOff = 0; yOff < imageData.height; yOff++) {
         for(let xOff = 0; xOff < imageData.width; xOff++) {
-            let color = [0,0,0];
+            let color = [0,0,0,255];
 
-            for(let i = 0; i < 3; i++) {
+            for(let i = 0; i < 4; i++) {
                 color[i] = imageData.data[i + xOff * 4 + yOff * imageData.width * 4];
             }
 
@@ -325,9 +325,10 @@ function* genLines ({ imageData = null, clamping = 1 } = {}) {
 }
 
 function rgbToHex(color, clamp) {
-    let rHex = (color[0] & (-16 << clamp)).toString(16);
-    let gHex = (color[1] & (-16 << clamp)).toString(16);
-    let bHex = (color[2] & (-16 << clamp)).toString(16);
+    let p = color[3]/256;
+    let rHex = Math.floor(255 - p * (255 - (color[0] & (-16 << clamp)))).toString(16);
+    let gHex = Math.floor(255 - p * (255 - (color[1] & (-16 << clamp)))).toString(16);
+    let bHex = Math.floor(255 - p * (255 - (color[2] & (-16 << clamp)))).toString(16);
 
     rHex = rHex.length == 1 ? "0" + rHex : rHex;
     gHex = gHex.length == 1 ? "0" + gHex : gHex;
