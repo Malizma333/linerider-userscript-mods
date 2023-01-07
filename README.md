@@ -20,7 +20,7 @@ Has a basic example of how to write a mod for new Line Rider mod developers. The
 
 Generates a regular polygon, based on a selected line as the radius and a given number of sides.
 
-### Text Mod
+### Text Mod (Warning: Non-user friendly, recommend using the svg mod linked [here](https://github.com/Conqu3red/linerider-userscript-mods/blob/master/mods/svg-mod.user.js))
 
 Generates text typed in a text box. Needs a font json file, which can be found in the font folder.
 
