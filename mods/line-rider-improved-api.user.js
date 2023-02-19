@@ -1,12 +1,13 @@
 // ==UserScript==
 // @name         Line Rider Improved Mod API
 // @namespace    http://tampermonkey.net/
-// @version      1.1
+// @version      1.2
 // @description  Renders mod components for linerider.com mods
 // @author       Malizma
 // @match        https://www.linerider.com/*
 // @match        https://*.official-linerider.com/*
 // @match        http://localhost:8000/*
+// @match        https://square-rider.surge.sh/*
 // @grant        none
 // @downloadURL  https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-improved-api.user.js
 // @updateURL    https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-improved-api.user.js
@@ -192,59 +193,6 @@ function main () {
             }
         }
 
-        class Settings extends React.Component {
-            constructor (props) {
-                super(props)
-
-                this.state = {
-                    divWidth: 200,
-                    divHeight: 150
-                }
-            }
-
-            componentWillUpdate (nextProps, nextState) {
-                Object.assign(settingsContainer.style, {
-                    width: this.state.divWidth + 'px',
-                    height: this.state.divHeight + 'px'
-                })
-            }
-
-            render () {
-                return e('div', null,
-                    e('div', null,
-                      'Window Width ',
-                      e('input', { style: { width: '3.3em' }, type: 'number',
-                        min: 200, max: 300, step: 1,
-                        value: this.state.divWidth,
-                        onChange: e => {
-                            let w = parseFloat(e.target.value);
-                            if(200 <= w && w <= 300) {
-                                this.setState({ divWidth: w })
-                            }
-                        }
-                      })
-                    ),
-                    e('div', null,
-                      'Window Height ',
-                      e('input', { style: { width: '3.3em' }, type: 'number',
-                        min: 150, max: 250, step: 1,
-                        value: this.state.divHeight,
-                        onChange: e => {
-                            let h = parseFloat(e.target.value);
-                            if(150 <= h && h <= 250) {
-                                this.setState({ divHeight: h })
-                            }
-                        }
-                      })
-                    )
-                )
-            }
-        }
-
-        this.setState((prevState) => ({
-            customSettings: [...prevState.customSettings, Settings]
-        }))
-
         if (typeof window.onCustomToolsApiReady === 'function') {
             window.onCustomToolsApiReady()
         }
@@ -270,7 +218,7 @@ function main () {
     }
   }
 
-    const settingsContainer = document.createElement('div')
+  const settingsContainer = document.createElement('div')
 
     document.getElementById('content').appendChild(settingsContainer)
 
@@ -278,6 +226,73 @@ function main () {
         e(CustomSettingsContainer),
         settingsContainer
     )
+
+  class Settings extends React.Component {
+      constructor (props) {
+          super(props)
+
+          let windowPreferences = localStorage.getItem("windowPreferences")
+
+          if(windowPreferences) {
+              this.state = JSON.parse(windowPreferences)
+          } else {
+              this.state = {
+                  divWidth: 200,
+                  divHeight: 150
+              }
+          }
+      }
+
+      componentWillUpdate (nextProps, nextState) {
+          Object.assign(settingsContainer.style, {
+              width: nextState.divWidth + 'px',
+              height: nextState.divHeight + 'px'
+          })
+      }
+
+      render () {
+          return e('div', null,
+                   e('div', null,
+                     'Window Width ',
+                     e('input', { style: { width: '3.3em' }, type: 'number',
+                                 min: 200, max: 300, step: 1,
+                                 value: this.state.divWidth,
+                                 onChange: e => {
+                                     let w = parseFloat(e.target.value);
+                                     if(200 <= w && w <= 300) {
+                                         this.setState({ divWidth: w })
+                                         localStorage.setItem("windowPreferences", JSON.stringify(this.state))
+                                     }
+                                 }
+                                })
+                    ),
+                   e('div', null,
+                     'Window Height ',
+                     e('input', { style: { width: '3.3em' }, type: 'number',
+                                 min: 150, max: 250, step: 1,
+                                 value: this.state.divHeight,
+                                 onChange: e => {
+                                     let h = parseFloat(e.target.value);
+                                     if(150 <= h && h <= 250) {
+                                         this.setState({ divHeight: h })
+                                         localStorage.setItem("windowPreferences", JSON.stringify(this.state))
+                                     }
+                                 }
+                                })))
+      }
+    }
+
+    window.registerCustomSetting(Settings)
+
+    let windowPreferences = localStorage.getItem("windowPreferences")
+
+    if(windowPreferences) {
+        let parsedPreferences = JSON.parse(windowPreferences);
+        Object.assign(settingsContainer.style, {
+            width: parsedPreferences.divWidth + 'px',
+            height: parsedPreferences.divHeight + 'px'
+        })
+    }
 }
 
 if (window.store) {
