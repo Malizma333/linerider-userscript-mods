@@ -1,6 +1,6 @@
 # linerider-userscript-mods
 
-A collection of other userscript mods.
+A collection of tampermonkey userscripts that modify linerider.com
 
 ## Usage
 
