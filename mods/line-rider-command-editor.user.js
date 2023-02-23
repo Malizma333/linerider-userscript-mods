@@ -11,6 +11,8 @@
 // @require      https://raw.githubusercontent.com/Malizma333/line-rider-command-editor-userscript/master/commandEditorClass.js
 // @require      https://raw.githubusercontent.com/Malizma333/line-rider-command-editor-userscript/master/styles.js
 // @require      https://raw.githubusercontent.com/Malizma333/line-rider-command-editor-userscript/master/main.js
+// @downloadURL  https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-command-editor.user.js
+// @updateURL    https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-command-editor.user.js
 // ==/UserScript==
 
 // jshint asi: true
