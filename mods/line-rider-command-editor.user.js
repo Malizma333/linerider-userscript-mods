@@ -11,6 +11,7 @@
 // @require      https://github.com/Malizma333/line-rider-command-editor-userscript/raw/master/ProjectFiles/styleConstants.js
 // @require      https://github.com/Malizma333/line-rider-command-editor-userscript/raw/master/ProjectFiles/valueConstants.js
 // @require      https://github.com/Malizma333/line-rider-command-editor-userscript/raw/master/ProjectFiles/windowConstants.js
+// @require      https://github.com/Malizma333/line-rider-command-editor-userscript/raw/master/ProjectFiles/validateFunctions.js
 // @require      https://github.com/Malizma333/line-rider-command-editor-userscript/raw/master/ProjectFiles/renderFunctions.js
 // @require      https://github.com/Malizma333/line-rider-command-editor-userscript/raw/master/ProjectFiles/commandEditor.js
 // @require      https://github.com/Malizma333/line-rider-command-editor-userscript/raw/master/ProjectFiles/main.js
