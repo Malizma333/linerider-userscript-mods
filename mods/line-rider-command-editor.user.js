@@ -8,9 +8,12 @@
 // @match        https://*.official-linerider.com/*
 // @match        http://localhost:8000/*
 // @grant        none
-// @require      https://raw.githubusercontent.com/Malizma333/line-rider-command-editor-userscript/master/commandEditor.js
-// @require      https://raw.githubusercontent.com/Malizma333/line-rider-command-editor-userscript/master/constants.js
-// @require      https://raw.githubusercontent.com/Malizma333/line-rider-command-editor-userscript/master/main.js
+// @require      https://github.com/Malizma333/line-rider-command-editor-userscript/raw/master/ProjectFiles/commandEditor.js
+// @require      https://github.com/Malizma333/line-rider-command-editor-userscript/raw/master/ProjectFiles/renderFunctions.js
+// @require      https://github.com/Malizma333/line-rider-command-editor-userscript/raw/master/ProjectFiles/styleConstants.js
+// @require      https://github.com/Malizma333/line-rider-command-editor-userscript/raw/master/ProjectFiles/valueConstants.js
+// @require      https://github.com/Malizma333/line-rider-command-editor-userscript/raw/master/ProjectFiles/windowConstants.js
+// @require      https://github.com/Malizma333/line-rider-command-editor-userscript/raw/master/ProjectFiles/main.js
 // @downloadURL  https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-command-editor.user.js
 // @updateURL    https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-command-editor.user.js
 // ==/UserScript==
