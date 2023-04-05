@@ -1,4 +1,4 @@
-# linerider-userscript-mods
+# Line Rider Userscript Mods
 
 A collection of tampermonkey userscripts that modify linerider.com
 
@@ -51,3 +51,7 @@ Converts a Geometrize Desktop json export into line rider. Only works with Geome
 ### Graph Mod
 
 Generates a graph given a correctly formatted function of x.
+
+### Command Editor Mod
+
+See readme explanation [here](https://github.com/Malizma333/line-rider-command-editor-userscript/tree/master#readme)
