@@ -54,4 +54,8 @@ Generates a graph given a correctly formatted function of x.
 
 ### Command Editor Mod
 
-See readme explanation [here](https://github.com/Malizma333/line-rider-command-editor-userscript/tree/master#readme)
+Adds UI to certain console features. See in-depth readme explanation [here](https://github.com/Malizma333/line-rider-command-editor-userscript/tree/master#readme)
+
+### Animation Mod
+
+Adds a tool for quickly generating frame-based animations. Built off of the updated transform mod.
