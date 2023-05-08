@@ -61,21 +61,24 @@ const getToolState = (state, toolId) => state.toolState[toolId]
 const getSelectToolState = state => getToolState(state, SELECT_TOOL)
 const getSimulatorCommittedTrack = state => state.simulator.committedEngine
 const getEditorZoom = state => state.camera.editorZoom
-const getSimulatorLayers = state => state.simulator.engine.engine.state.layers.buffer
+const getSimulatorLayers = state => state.simulator.committedEngine.engine.state.layers.buffer
 
 class AnimateMod {
   constructor (store, initState) {
     this.store = store
 
+    this.componentUpdateResolved = true
     this.changed = false
     this.state = initState
 
-    this.layers = getSimulatorLayers(this.store.getState())
+    this.layerLength = getSimulatorLayers(this.store.getState()).length
     this.track = getSimulatorCommittedTrack(this.store.getState())
     this.selectedPoints = EMPTY_SET
 
     store.subscribeImmediate(() => {
-      this.onUpdate()
+      if(this.componentUpdateResolved) {
+          this.onUpdate()
+      }
     })
   }
 
@@ -90,6 +93,8 @@ class AnimateMod {
   }
 
   onUpdate (nextState = this.state) {
+    this.componentUpdateResolved = false;
+
     let shouldUpdate = false
 
     if (this.state !== nextState) {
@@ -99,6 +104,7 @@ class AnimateMod {
 
     if (this.state.active) {
       const track = getSimulatorCommittedTrack(this.store.getState())
+
       if (this.track !== track) {
         this.track = track
         shouldUpdate = true
@@ -106,8 +112,8 @@ class AnimateMod {
 
       const layers = getSimulatorLayers(this.store.getState())
 
-      if (layers && this.layers !== layers) {
-          this.layers = layers
+      if (layers && this.layerLength !== layers.length) {
+          this.layerLength = layers.length
           shouldUpdate = true
       }
 
@@ -126,6 +132,7 @@ class AnimateMod {
     }
 
     if (!shouldUpdate) {
+      this.componentUpdateResolved = true;
       return
     }
 
@@ -136,6 +143,7 @@ class AnimateMod {
     }
 
     if (!this.active()) {
+      this.componentUpdateResolved = true;
       return
     }
 
@@ -144,11 +152,8 @@ class AnimateMod {
     .filter(l => l)
 
     let posttransformedLines = [];
-    let bufferLen = this.layers.length;
     let startTime = performance.now();
-
-    this.store.dispatch(addLayer());
-    this.store.dispatch(renameLayer(bufferLen, "AnimLayer"));
+    let allLines = [];
 
     for(let i = 0; i < this.state.aLength; i++) {
         const preBB = getBoundingBox(pretransformedLines)
@@ -229,7 +234,7 @@ class AnimateMod {
 
             transformedLines.push({
                 ...line.original.toJSON(),
-                layer: bufferLen,
+                layer: this.layerLength,
                 id: null,
                 x1: p1.x,
                 y1: p1.y,
@@ -243,8 +248,6 @@ class AnimateMod {
             posttransformedLines.push(newLine);
         }
 
-        this.store.dispatch(addLines(transformedLines))
-
         pretransformedLines = posttransformedLines.slice();
         posttransformedLines.length = 0;
 
@@ -252,13 +255,23 @@ class AnimateMod {
 
         if(endTime - startTime > 5000) {
             console.error("Time exception: Operation took longer than 5000ms to complete");
+            this.componentUpdateResolved = true;
             this.store.dispatch(revertTrackChanges())
             this.store.dispatch(setEditScene(new Millions.Scene()))
             return "Time";
         }
+
+        allLines.push(...transformedLines)
     }
 
-    this.changed = true
+    if(allLines.length > 0) {
+        this.store.dispatch(addLines(allLines))
+        this.store.dispatch(addLayer())
+        this.store.dispatch(renameLayer(this.layerLength, "AnimLayer"))
+        this.changed = true
+    }
+
+    this.componentUpdateResolved = true;
   }
 
   getTransform() {
