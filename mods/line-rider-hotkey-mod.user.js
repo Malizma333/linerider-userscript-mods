@@ -11,6 +11,8 @@
 // @match        http://localhost:8000/*
 // @match        https://*.surge.sh/*
 // @grant        none
+// @downloadURL  https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-hotkey-mod.user.js
+// @updateURL    https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-hotkey-mod.user.js
 
 // ==/UserScript==
 
