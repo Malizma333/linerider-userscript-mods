@@ -1,6 +1,6 @@
 // ==UserScript==
 
-// @name         Hotkey Mod
+// @name         Line Rider Hotkey Mod
 // @author       Malizma
 // @description  Linerider.com mod to change hotkeys
 // @version      1.0.1
