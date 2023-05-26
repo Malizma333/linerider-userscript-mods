@@ -3,7 +3,7 @@
 // @name         Hotkey Mod
 // @author       Malizma
 // @description  Linerider.com mod to change hotkeys
-// @version      1.0
+// @version      1.0.1
 
 // @namespace    http://tampermonkey.net/
 // @match        https://www.linerider.com/*
@@ -347,6 +347,8 @@ function main () {
       "Selection": '#e3f4ff'
   }
 
+  const IS_MAC = `${window.navigator.platform}`.toLowerCase().includes("mac")
+
   class HotkeyModComponent extends React.Component {
       constructor (props) {
           super(props)
@@ -366,7 +368,11 @@ function main () {
       }
 
       componentDidMount () {
-          this.mapAllKeys();
+          if(IS_MAC) {
+              this.setState({ keybinds: this.replaceCTRL() }, this.mapAllKeys())
+          } else {
+              this.mapAllKeys();
+          }
       }
 
       componentWillUpdate (nextProps, nextState) {
@@ -389,6 +395,17 @@ function main () {
               }, () => this.mapAllKeys())
               this.setState({ active: false })
           }
+      }
+
+      replaceCTRL() {
+          const keybinds = this.state.keybinds;
+          Object.keys(keybinds).map((e) => {
+              const index = keybinds[e].key.indexOf('ctrl');
+              if (index !== -1) {
+                  keybinds[e].key[index] = 'cmd';
+              }
+          })
+          return keybinds;
       }
 
       mapAllKeys() {
@@ -456,7 +473,6 @@ function main () {
               keybinds[keyID].key = this.state.keyCombination;
               this.setState({ keybinds });
 
-              console.log(keyID, this.state.keyCombination.join("+").toLowerCase())
               store.dispatch(setCommandHotkeys({
                   [keyID]: this.state.keyCombination.join("+").toLowerCase()
               }));
@@ -472,7 +488,7 @@ function main () {
           if (e.ctrlKey) modifiers.push('Ctrl');
           if (e.shiftKey) modifiers.push('Shift');
           if (e.altKey) modifiers.push('Alt');
-          if (e.metaKey) modifiers.push('Meta');
+          if (e.metaKey) modifiers.push('Cmd');
 
           let keyCombination = [...modifiers];
 
