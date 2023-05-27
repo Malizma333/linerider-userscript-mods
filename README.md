@@ -70,6 +70,10 @@ Adds UI to certain console features. See in-depth readme explanation [here](http
 
 Mod that adds support for changing common hotkeys.
 
+### Improved Mod API
+
+Adds some formatting improvements to the custom tools api, namely a dropdown and window sizing settings.
+
 ### Template Mod
 
 Has a basic example of how to write a mod for new Line Rider mod developers. The mod itself generates a rectangle.
