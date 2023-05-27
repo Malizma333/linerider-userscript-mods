@@ -321,6 +321,7 @@ function main () {
   }
 
   const toolMarkerStyle = {
+      backgroundColor: '#dddddd',
       border: '1px solid black',
       borderRadius: '50%',
       cursor: 'pointer',
@@ -435,12 +436,12 @@ function main () {
                     tagColors[props.tag] : '#ffffff'
             }}, `${props.name}`),
             create('input', {
-              style: { fontSize: '14px', width: '100%' },
+              style: { cursor: 'pointer', fontSize: '14px', width: '100%' },
               type: 'text',
               onKeyDown: (e) => this.handleKeyDown(e, id),
               onBlur: (e) => this.handleBlur(e, keybind),
               onFocus: (e) => this.handleFocus(e),
-              placeholder: 'Enter a key combination',
+              placeholder: 'Press ESC to cancel',
               defaultValue: keybind,
               readOnly: true
           }))
