@@ -11,8 +11,8 @@
 // @match        http://localhost:8000/*
 // @match        https://*.surge.sh/*
 // @grant        none
-// @downloadURL  https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-tenpc-generator-mod.js
-// @updateURL    https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-tenpc-generator-mod.js
+// @downloadURL  https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-tenpc-generator-mod.user.js
+// @updateURL    https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-tenpc-generator-mod.user.js
 // ==/UserScript==
 
 const updateLines = (linesToRemove, linesToAdd, name) => ({
