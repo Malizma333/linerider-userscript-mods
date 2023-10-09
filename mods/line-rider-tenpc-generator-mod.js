@@ -3,7 +3,7 @@
 // @name         Line Rider Ten Point Cannon Generator
 // @author       Malizma
 // @description  Linerider.com mod for generating ten point cannons
-// @version      0.1a
+// @version      1.0
 
 // @namespace    http://tampermonkey.net/
 // @match        https://www.linerider.com/*
