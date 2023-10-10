@@ -3,7 +3,7 @@
 // @name         Line Rider Animation Mod
 // @author       Malizma
 // @description  Adds the ability to animate more easily
-// @version      1.0
+// @version      1.1
 
 // @namespace    http://tampermonkey.net/
 // @match        https://www.linerider.com/*
@@ -42,6 +42,8 @@ const renameLayer = (id, name) => ({
   payload: {id, name}
 })
 
+const getAddedLayerID = (layers) => layers[layers.length - 1].id
+
 const commitTrackChanges = () => ({
   type: 'COMMIT_TRACK_CHANGES'
 })
@@ -62,6 +64,7 @@ const getSelectToolState = state => getToolState(state, SELECT_TOOL)
 const getSimulatorCommittedTrack = state => state.simulator.committedEngine
 const getEditorZoom = state => state.camera.editorZoom
 const getSimulatorLayers = state => state.simulator.committedEngine.engine.state.layers.buffer
+const getUncommittedLayers = state => state.simulator.engine.engine.state.layers.buffer
 
 class AnimateMod {
   constructor (store, initState) {
@@ -71,7 +74,7 @@ class AnimateMod {
     this.changed = false
     this.state = initState
 
-    this.layerLength = getSimulatorLayers(this.store.getState()).length
+    this.layers = getSimulatorLayers(this.store.getState())
     this.track = getSimulatorCommittedTrack(this.store.getState())
     this.selectedPoints = EMPTY_SET
 
@@ -112,8 +115,8 @@ class AnimateMod {
 
       const layers = getSimulatorLayers(this.store.getState())
 
-      if (layers && this.layerLength !== layers.length) {
-          this.layerLength = layers.length
+      if (layers && this.layers !== layers) {
+          this.layers = layers
           shouldUpdate = true
       }
 
@@ -155,123 +158,132 @@ class AnimateMod {
     let startTime = performance.now();
     let allLines = [];
 
-    for(let i = 0; i < this.state.aLength; i++) {
-        const preBB = getBoundingBox(pretransformedLines)
-        const preCenter = new V2({
-            x: preBB.x + 0.5 * preBB.width,
-            y: preBB.y + 0.5 * preBB.height
-        })
+    async function createLayer() {
+        await this.store.dispatch(addLayer())
+        this.changed = true
 
-        const alongRot = this.state.alongRot * Math.PI / 180
-        const preTransform = buildRotTransform(-alongRot)
-        const selectedLines = []
+        let layersArray = getUncommittedLayers(this.store.getState())
 
-        for (let line of pretransformedLines) {
-            const p1 = preparePointAlong(
-                new V2(line.p1),
-                preCenter, this.state.alongPerspX, this.state.alongPerspY, preTransform
-            )
-            const p2 = preparePointAlong(
-                new V2(line.p2),
-                preCenter, this.state.alongPerspX, this.state.alongPerspY, preTransform
-            )
-            selectedLines.push({original: line, p1, p2})
-        }
+        let addedLayerId = getAddedLayerID(layersArray);
+        this.store.dispatch(renameLayer(addedLayerId, "AnimLayer"))
 
-        const bb = getBoundingBox(selectedLines)
-
-        const anchor = new V2({
-            x: bb.x + (0.5 + this.state.anchorX) * bb.width,
-            y: bb.y + (0.5 - this.state.anchorY) * bb.height
-        })
-        const nudge = new V2({
-            x: this.state.nudgeXSmall + this.state.nudgeXBig,
-            y: -1 * (this.state.nudgeYSmall + this.state.nudgeYBig)
-        })
-
-        const transform = this.getTransform()
-        const transformedLines = []
-
-        const alongPerspX = this.state.alongPerspX * 0.01
-        const alongPerspY = this.state.alongPerspY * 0.01
-        const postTransform = buildRotTransform(alongRot)
-
-        let perspX = this.state.perspX
-        let perspY = this.state.perspY
-
-        const perspSafety = Math.pow(10, this.state.perspClamping)
-
-        if (this.state.relativePersp) {
-            let perspXDenominator = bb.width * this.state.scale * this.state.scaleX
-            if (Math.abs(bb.width) < perspSafety) {
-                perspXDenominator = perspSafety
-            }
-            perspX = perspX / perspXDenominator
-            let perspYDenominator = bb.height * this.state.scale * this.state.scaleY
-            if (Math.abs(perspYDenominator) < perspSafety) {
-                perspYDenominator = perspSafety
-            }
-            perspY = perspY / perspYDenominator
-        } else {
-            perspX = 0.01 * perspX
-            perspY = 0.01 * perspY
-        }
-        for (let line of selectedLines) {
-            const p1 = restorePoint(
-                transformPersp(
-                    new V2(line.p1).sub(anchor).transform(transform),
-                    perspX, perspY, perspSafety
-                ),
-                anchor, postTransform, alongPerspX, alongPerspY, preCenter,
-            ).add(nudge)
-            const p2 = restorePoint(
-                transformPersp(
-                    new V2(line.p2).sub(anchor).transform(transform),
-                    perspX, perspY, perspSafety
-                ),
-                anchor, postTransform, alongPerspX, alongPerspY, preCenter,
-            ).add(nudge)
-
-            transformedLines.push({
-                ...line.original.toJSON(),
-                layer: this.layerLength,
-                id: null,
-                x1: p1.x,
-                y1: p1.y,
-                x2: p2.x,
-                y2: p2.y
+        for(let i = 0; i < this.state.aLength; i++) {
+            const preBB = getBoundingBox(pretransformedLines)
+            const preCenter = new V2({
+                x: preBB.x + 0.5 * preBB.width,
+                y: preBB.y + 0.5 * preBB.height
             })
 
-            const newLine = Object.assign(Object.create(Object.getPrototypeOf(line.original)), line.original);
-            newLine.p1 = p1;
-            newLine.p2 = p2;
-            posttransformedLines.push(newLine);
+            const alongRot = this.state.alongRot * Math.PI / 180
+            const preTransform = buildRotTransform(-alongRot)
+            const selectedLines = []
+
+            for (let line of pretransformedLines) {
+                const p1 = preparePointAlong(
+                    new V2(line.p1),
+                    preCenter, this.state.alongPerspX, this.state.alongPerspY, preTransform
+                )
+                const p2 = preparePointAlong(
+                    new V2(line.p2),
+                    preCenter, this.state.alongPerspX, this.state.alongPerspY, preTransform
+                )
+                selectedLines.push({original: line, p1, p2})
+            }
+
+            const bb = getBoundingBox(selectedLines)
+
+            const anchor = new V2({
+                x: bb.x + (0.5 + this.state.anchorX) * bb.width,
+                y: bb.y + (0.5 - this.state.anchorY) * bb.height
+            })
+            const nudge = new V2({
+                x: this.state.nudgeXSmall + this.state.nudgeXBig,
+                y: -1 * (this.state.nudgeYSmall + this.state.nudgeYBig)
+            })
+
+            const transform = this.getTransform()
+            const transformedLines = []
+
+            const alongPerspX = this.state.alongPerspX * 0.01
+            const alongPerspY = this.state.alongPerspY * 0.01
+            const postTransform = buildRotTransform(alongRot)
+
+            let perspX = this.state.perspX
+            let perspY = this.state.perspY
+
+            const perspSafety = Math.pow(10, this.state.perspClamping)
+
+            if (this.state.relativePersp) {
+                let perspXDenominator = bb.width * this.state.scale * this.state.scaleX
+                if (Math.abs(bb.width) < perspSafety) {
+                    perspXDenominator = perspSafety
+                }
+                perspX = perspX / perspXDenominator
+                let perspYDenominator = bb.height * this.state.scale * this.state.scaleY
+                if (Math.abs(perspYDenominator) < perspSafety) {
+                    perspYDenominator = perspSafety
+                }
+                perspY = perspY / perspYDenominator
+            } else {
+                perspX = 0.01 * perspX
+                perspY = 0.01 * perspY
+            }
+            for (let line of selectedLines) {
+                const p1 = restorePoint(
+                    transformPersp(
+                        new V2(line.p1).sub(anchor).transform(transform),
+                        perspX, perspY, perspSafety
+                    ),
+                    anchor, postTransform, alongPerspX, alongPerspY, preCenter,
+                ).add(nudge)
+                const p2 = restorePoint(
+                    transformPersp(
+                        new V2(line.p2).sub(anchor).transform(transform),
+                        perspX, perspY, perspSafety
+                    ),
+                    anchor, postTransform, alongPerspX, alongPerspY, preCenter,
+                ).add(nudge)
+
+                transformedLines.push({
+                    ...line.original.toJSON(),
+                    layer: addedLayerId,
+                    id: null,
+                    x1: p1.x,
+                    y1: p1.y,
+                    x2: p2.x,
+                    y2: p2.y
+                })
+
+                const newLine = Object.assign(Object.create(Object.getPrototypeOf(line.original)), line.original);
+                newLine.p1 = p1;
+                newLine.p2 = p2;
+                posttransformedLines.push(newLine);
+            }
+
+            pretransformedLines = posttransformedLines.slice();
+            posttransformedLines.length = 0;
+
+            let endTime = performance.now();
+
+            if(endTime - startTime > 5000) {
+                console.error("Time exception: Operation took longer than 5000ms to complete");
+                this.componentUpdateResolved = true;
+                this.store.dispatch(revertTrackChanges())
+                this.store.dispatch(setEditScene(new Millions.Scene()))
+                return "Time";
+            }
+
+            allLines.push(...transformedLines)
         }
 
-        pretransformedLines = posttransformedLines.slice();
-        posttransformedLines.length = 0;
-
-        let endTime = performance.now();
-
-        if(endTime - startTime > 5000) {
-            console.error("Time exception: Operation took longer than 5000ms to complete");
-            this.componentUpdateResolved = true;
-            this.store.dispatch(revertTrackChanges())
-            this.store.dispatch(setEditScene(new Millions.Scene()))
-            return "Time";
+        if(allLines.length > 0) {
+            this.store.dispatch(addLines(allLines))
         }
 
-        allLines.push(...transformedLines)
+        this.componentUpdateResolved = true;
     }
 
-    if(allLines.length > 0) {
-        this.store.dispatch(addLines(allLines))
-        this.store.dispatch(addLayer())
-        this.store.dispatch(renameLayer(this.layerLength, "AnimLayer"))
-        this.changed = true
-    }
-
-    this.componentUpdateResolved = true;
+    createLayer.call(this);
   }
 
   getTransform() {
