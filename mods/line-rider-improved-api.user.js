@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Line Rider Improved Mod API
 // @namespace    http://tampermonkey.net/
-// @version      1.2
+// @version      1.3
 // @description  Renders mod components for linerider.com mods
 // @author       Malizma
 // @match        https://www.linerider.com/*
@@ -198,8 +198,37 @@ function main () {
         }
     }
 
+    displayName(className) {
+        if(className.length == 0) return 'Unnamed Mod';
+
+        let finalName = [className[0].toUpperCase()];
+
+        for(let i = 1; i < className.length; i++) {
+            let character = className[i];
+
+            if(character == character.toUpperCase()) {
+                finalName.push('');
+            }
+
+            finalName[finalName.length - 1] += character;
+        }
+
+        finalName = finalName.filter(e => e.toUpperCase() !== 'COMPONENT');
+        console.log(finalName);
+
+        return finalName.join(' ');
+    }
+
     render() {
         const activeSetting = this.state.customSettings[this.state.activeSetting];
+
+        this.state.customSettings.sort(function(modA, modB) {
+            var modAName = modA.name.toUpperCase();
+            var modBName = modB.name.toUpperCase();
+            if(modAName == 'SETTINGS') return -1;
+            if(modBName == 'SETTINGS') return 1;
+            return (modAName < modBName) ? -1 : (modAName > modBName) ? 1 : 0;
+        });
 
         return e('div', { style: rootStyle },
         this.state.customSettings.length > 1 && e('div', {style: {width: '100%'}},
@@ -209,7 +238,7 @@ function main () {
             onChange: e => this.setState({ activeSetting : e.target.value })},
              e('option', {value: null}, '- Select Mod -'),
              this.state.customSettings.map((option, index) => (
-              e('option', {value: index}, option.name)
+              e('option', {value: index}, this.displayName(option.name))
              ))
             )
         ),
