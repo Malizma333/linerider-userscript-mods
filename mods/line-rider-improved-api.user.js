@@ -214,7 +214,6 @@ function main () {
         }
 
         finalName = finalName.filter(e => e.toUpperCase() !== 'COMPONENT');
-        console.log(finalName);
 
         return finalName.join(' ');
     }
