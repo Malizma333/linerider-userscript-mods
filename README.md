@@ -52,6 +52,10 @@ Generates a regular polygon, based on a selected line as the radius and a given 
 
 Generates some neat spiral-like patterns when given an offset and a length.
 
+### Zig-Zag Mod
+
+Generates a zig-zag structure along a selected continuous curve.
+
 ### Tree Mod
 
 Generates a recursive, randomized tree structure based on range of branches, size, and iterations.
