@@ -250,6 +250,7 @@ if (window.registerCustomSetting) {
   }
 }
 
+// Credits to Superdavo0001 for their 10pc generator algorithm in the LRA:CE codebase
 function* GenerateCannon({ xSpeed = 0, ySpeed = 0, rotation = 0, selectedRider = 1, riderCount = 1 } = {}) {
   const { V2 } = window
 
