@@ -52,6 +52,10 @@ Generates a regular polygon, based on a selected line as the radius and a given 
 
 Generates some neat spiral-like patterns when given an offset and a length.
 
+### Ten Point Cannon Mod
+
+Generates a 10pc based on rider x and y speed. Works for multiple riders.
+
 ### Tree Mod
 
 Generates a recursive, randomized tree structure based on a range of branches, size, and number of iterations.
