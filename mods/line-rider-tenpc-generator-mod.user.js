@@ -15,9 +15,6 @@
 // @updateURL    https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-tenpc-generator-mod.user.js
 // ==/UserScript==
 
-const INC_PLAYER_INDEX = { type: 'INC_PLAYER_INDEX' }
-const DEC_PLAYER_INDEX = { type: 'DEC_PLAYER_INDEX' }
-
 const updateLines = (linesToRemove, linesToAdd, name) => ({
   type: 'UPDATE_LINES',
   payload: { linesToRemove, linesToAdd },
@@ -115,9 +112,6 @@ class TenPCMod {
     }
 
     if (!this.state.active) return
-
-    this.store.dispatch(INC_PLAYER_INDEX)
-    this.store.dispatch(DEC_PLAYER_INDEX)
 
     let myLines = []
 
@@ -250,7 +244,6 @@ if (window.registerCustomSetting) {
   }
 }
 
-// Credits to Superdavo0001 for their 10pc generator algorithm in the LRA:CE codebase
 function* GenerateCannon({ xSpeed = 0, ySpeed = 0, rotation = 0, selectedRider = 1, riderCount = 1 } = {}) {
   const { V2 } = window
 
@@ -267,31 +260,18 @@ function* GenerateCannon({ xSpeed = 0, ySpeed = 0, rotation = 0, selectedRider =
     V2.from(10,5)
   ]
 
-    let cFrames = window.store.getState().simulator.engine.engine._computed;
+    let engine = window.store.getState().simulator.engine.engine;
     let currentFrame = Math.ceil(window.store.getState().player.index);
-
-    if(!cFrames) {
-        console.log(window.store.getState().simulator.engine.engine)
-        return
-    }
-
-    let curRider = cFrames._frames[currentFrame].snapshot.entities[0].entities[selectedRider - 1]
-
-    if(currentFrame + 1 >= cFrames._frames.length) {
-        console.log(window.store.getState().simulator.engine.engine)
-        return
-    }
-
-    let nextRider = cFrames._frames[currentFrame + 1].snapshot.entities[0].entities[selectedRider - 1];
-
+    let curRider = engine.getFrame(currentFrame).snapshot.entities[0].entities[selectedRider - 1]
+    let nextRider = engine.getFrame(currentFrame + 1).snapshot.entities[0].entities[selectedRider - 1];
     let theta = Math.PI * rotation / 180;
-    let rotationMat = [[Math.cos(theta), -Math.sin(theta)], [Math.sin(theta), Math.cos(theta)]];
+    let rotationMatrix = [[Math.cos(theta), -Math.sin(theta)], [Math.sin(theta), Math.cos(theta)]];
 
     for (let i = 0; i < cpArray.length; i++)
     {
         let riderRotated = V2.from(
-            rotationMat[0][0] * cpArray[i].x + rotationMat[1][0] * cpArray[i].y,
-            rotationMat[0][1] * cpArray[i].x + rotationMat[1][1] * cpArray[i].y
+            rotationMatrix[0][0] * cpArray[i].x + rotationMatrix[1][0] * cpArray[i].y,
+            rotationMatrix[0][1] * cpArray[i].x + rotationMatrix[1][1] * cpArray[i].y
         );
 
 
