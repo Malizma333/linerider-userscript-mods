@@ -1,0 +1,74 @@
+{
+  "globals": {
+    "define": true,
+    "Reselect": true
+  },
+  "env": {
+    "browser": true,
+    "commonjs": true, 
+    "es2021": true
+  },
+  "overrides": [
+    {
+      "env": {
+        "node": true
+      },
+      "files": [
+        ".eslintrc.json"
+      ],
+      "parserOptions": {
+        "sourceType": "script"
+      }
+    }
+  ],
+  "parserOptions": {
+    "ecmaVersion": "latest"
+  },
+  "rules": {
+    "array-bracket-spacing": [
+      "error",
+      "always"
+    ],
+    "arrow-spacing": [
+      "error",
+      {
+        "after": true,
+        "before": true
+      }
+    ],
+    "comma-dangle": "error",
+    "comma-spacing": [
+      "error",
+      {
+        "after": true,
+        "before": false
+      }
+    ],
+    "keyword-spacing": [
+      "error",
+      {
+        "after": true,
+        "before": true
+      }
+    ],
+    "no-trailing-spaces": "error",
+    "no-undef": "error",
+    "no-unused-vars": "error",
+    "object-curly-spacing": [
+      "error",
+      "always"
+    ],
+    "quotes": "error",
+    "semi": "error",
+    "semi-spacing": ["error", {"before": false, "after": true}],
+    "space-before-function-paren": [
+      "error",
+      "always"
+    ],
+    "spaced-comment": [
+      "error",
+      "always"
+    ],
+    "switch-colon-spacing": "error"
+  }
+}

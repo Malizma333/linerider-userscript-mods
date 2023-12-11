@@ -1,7 +1,8 @@
-// TODO apply styleguide?
 // TODO create undocumented/empty variation
 // TODO add camera demo to square generation function
 // TODO update linerider mod readme
+
+/* global Actions, Selectors */
 
 /*
 Userscript metadata block. Stores features of the userscript such as name, description, and version.
@@ -16,7 +17,7 @@ Icon - Icon of userscript as it appears in the manager
 ?Require - Libraries that this userscript should use
 !Download URL - URL this userscript can be downloaded/updated from
 !Homepage URL - URL this userscript originates from
-!Support URL - URL that can be used to report userscript bugs 
+!Support URL - URL that can be used to report userscript bugs
 ?Grant - Greasemonkey API functions this userscript can use
 
 A "?" means this trait of the userscript data can be replaced or removed.
@@ -80,7 +81,7 @@ class TemplateMod {
   * changes to the committed engine to be kept in change history.
   * @returns {bool} Whether changes were made
   */
-  commit() {
+  commit () {
     // Return if there aren't changes to be made
     if (!this.changed) return false;
 
@@ -137,7 +138,7 @@ class TemplateMod {
     // If the mod isn't active, then no new changes are incoming and the previous changes have
     // already been discard, so the function is done
     if (!this.state.active) return;
-    
+
     /* This is where the bulk of the mod logic lies, after condition checking is finished. */
 
     // Helper array to keep track of new lines to add
@@ -254,63 +255,63 @@ function main () {
         ...props,
         value: this.state[key],
         onChange: e => this.setState({ [key]: parseFloat(e.target.value) })
-      }
+      };
 
-      return c('div', null,
+      return c("div", null,
         title,
-        c('input', { style: { width: '3em' }, type: 'number', ...props }),
-        c('input', { type: 'range', ...props, onFocus: e => e.target.blur() })
-      )
+        c("input", { style: { width: "3em" }, type: "number", ...props }),
+        c("input", { type: "range", ...props, onFocus: e => e.target.blur() })
+      );
     }
-    
+
     /**
     * @description
     * This function renders the entire mod UI component within the mod loader container.
     */
     render () {
-      return c('div', null,
-        this.state.active && c('div', null,
-        
+      return c("div", null,
+        this.state.active && c("div", null,
+
           // Sliders to change the mod state
-          this.renderSlider('width', 'Width', { min: 0, max: 100, step: 1 }),
-          this.renderSlider('xOff', 'X Offset', { min: 0, max: 100, step: 1 }),
-          this.renderSlider('yOff', 'Y Offset', { min: 0, max: 100, step: 1 }),
+          this.renderSlider("width", "Width", { min: 0, max: 100, step: 1 }),
+          this.renderSlider("xOff", "X Offset", { min: 0, max: 100, step: 1 }),
+          this.renderSlider("yOff", "Y Offset", { min: 0, max: 100, step: 1 }),
 
           // Button to commit changes to the engine
-          c('button',
+          c("button",
             {
-              style: { float: 'left' },
+              style: { float: "left" },
               onClick: this.onCommit.bind(this)
             },
-            'Commit'
+            "Commit"
           )
         ),
 
         // Button to open and close the mod
-        c('button',
+        c("button",
           {
-            style: { backgroundColor: this.state.active ? 'lightblue' : null },
+            style: { backgroundColor: this.state.active ? "lightblue" : null },
             onClick: this.onActivate.bind(this)
           },
-          'Template Mod'
+          "Template Mod"
         )
       );
     }
   }
 
   // Register the mod component with the active mod loader
-  window.registerCustomSetting(TemplateModComponent)
+  window.registerCustomSetting(TemplateModComponent);
 }
 
 // Waits for the mod loader to be registered, then registers this mod component
 if (window.registerCustomSetting) {
-  main()
+  main();
 } else {
-  const prevCb = window.onCustomToolsApiReady
+  const prevCb = window.onCustomToolsApiReady;
   window.onCustomToolsApiReady = () => {
-    if (prevCb) prevCb()
-    main()
-  }
+    if (prevCb) prevCb();
+    main();
+  };
 }
 
 /* This is where mod utility functions go */
@@ -321,17 +322,17 @@ if (window.registerCustomSetting) {
 */
 function* generateLines ({ width = 0, xOff = 0, yOff = 0 } = {}) {
   // Uses the Vector2 window definition
-  const { V2 } = window
+  const { V2 } = window;
 
   // Create points from state parameters
-  const pointA = V2.from(xOff, yOff)
-  const pointB = V2.from(xOff + width, yOff)
-  const pointC = V2.from(xOff + width, yOff + width)
-  const pointD = V2.from(xOff, yOff + width)
+  const pointA = V2.from(xOff, yOff);
+  const pointB = V2.from(xOff + width, yOff);
+  const pointC = V2.from(xOff + width, yOff + width);
+  const pointD = V2.from(xOff, yOff + width);
 
   // Yield each line connecting the points together
-  yield { p1: pointA, p2: pointB }
-  yield { p1: pointB, p2: pointC }
-  yield { p1: pointC, p2: pointD }
-  yield { p1: pointD, p2: pointA }
+  yield { p1: pointA, p2: pointB };
+  yield { p1: pointB, p2: pointC };
+  yield { p1: pointC, p2: pointD };
+  yield { p1: pointD, p2: pointA };
 }
