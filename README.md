@@ -84,4 +84,4 @@ Adds some formatting improvements to the custom tools API, namely a dropdown and
 
 ### Template Mod
 
-Has a basic example of how to write a mod for new Line Rider mod developers. The mod itself generates a rectangle.
+Has a basic example of how to write a mod for new Line Rider mod developers. The mod itself generates a square at the camera position.

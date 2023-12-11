@@ -1,6 +1,5 @@
 // TODO create undocumented/empty variation
-// TODO add camera demo to square generation function
-// TODO update linerider mod readme
+// TODO try catch for when mod errors to not break other mods
 
 /* global Actions, Selectors */
 
@@ -30,7 +29,7 @@ An "!" means this trait of the userscript data should be replaced.
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Linerider.com template for creating userscript
-// @version      0.0.0
+// @version      1.0.0
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -324,11 +323,14 @@ function* generateLines ({ width = 0, xOff = 0, yOff = 0 } = {}) {
   // Uses the Vector2 window definition
   const { V2 } = window;
 
+  // Retrieve camera position
+  const camPos = Selectors.getEditorCamera(window.store.getState()).position;
+
   // Create points from state parameters
-  const pointA = V2.from(xOff, yOff);
-  const pointB = V2.from(xOff + width, yOff);
-  const pointC = V2.from(xOff + width, yOff + width);
-  const pointD = V2.from(xOff, yOff + width);
+  const pointA = V2.from(xOff + camPos.x, yOff + camPos.y);
+  const pointB = V2.from(xOff + camPos.x + width, yOff + camPos.y);
+  const pointC = V2.from(xOff + camPos.x + width, yOff + camPos.y + width);
+  const pointD = V2.from(xOff + camPos.x, yOff + camPos.y + width);
 
   // Yield each line connecting the points together
   yield { p1: pointA, p2: pointB };
