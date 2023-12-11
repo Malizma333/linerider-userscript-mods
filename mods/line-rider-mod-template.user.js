@@ -1,6 +1,3 @@
-// TODO create undocumented/empty variation
-// TODO try catch for when mod errors to not break other mods
-
 /* global Actions, Selectors */
 
 /*
