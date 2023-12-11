@@ -36,7 +36,7 @@ An "!" means this trait of the userscript data should be replaced.
 
 // @require      https://raw.githubusercontent.com/Malizma333/lr-userscript-library/main/index.js
 
-// @downloadURL  https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-mod-template.user.js
+// @downloadURL  https://github.com/Malizma333/linerider-userscript-mods/raw/master/line-rider-mod-template.user.js
 // @homepageURL  https://github.com/Malizma333/linerider-userscript-mods
 // @supportURL   https://github.com/Malizma333/linerider-userscript-mods/issues
 // @grant        none
