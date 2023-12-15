@@ -3,7 +3,7 @@
 // @name         Line Rider Zigzag Mod
 // @author       Malizma
 // @description  Linerider.com userscript to generate zigzags
-// @version      1.0
+// @version      1.1
 
 // @namespace    http://tampermonkey.net/
 // @match        https://www.linerider.com/*
@@ -132,7 +132,7 @@ class ZigZagMod {
         let track = this.track
         let linesToAdd = []
 
-        for (let { p1, p2 } of genZigZag(chainCurve(selectedLines), this.state)) {
+        for (let { p1, p2 } of genZigZag(selectedLines, this.state)) {
             linesToAdd.push({
                 x1: p1.x,
                 y1: p1.y,
@@ -219,8 +219,8 @@ function main () {
             return e('div', null,
                      this.state.active &&
                      e('div', null,
-                       this.renderSlider('width', 'Width', { min: 1, max: 100, step: 1 }),
-                       this.renderSlider('height', 'Height', { min: -100, max: 100, step: 1 }),
+                       this.renderSlider('width', 'Width', { min: 1, max: 100, step: .1 }),
+                       this.renderSlider('height', 'Height', { min: -100, max: 100, step: .1 }),
                        e('button',
                          { style: { float: 'left' }, onClick: () => this.onCommit() },
                          'Commit'
@@ -248,112 +248,200 @@ if (window.registerCustomSetting) {
 }
 
 function setsEqual (a, b) {
-    if (a === b) {
-        return true
-    }
-    if (a.size !== b.size) {
-        return false
-    }
-    for (let x of a) {
-        if (!b.has(x)) {
-            return false
-        }
-    }
+  if(a === b) {
     return true
+  }
+  if(a.size !== b.size) {
+    return false
+  }
+  for(let x of a) {
+    if(!b.has(x)) {
+      return false
+    }
+  }
+  return true
 }
 
 function getLinesFromPoints (points) {
-    return new Set([...points].map(point => point >> 1))
+  return new Set([...points].map(point => point >> 1))
 }
 
-function distance(x1,y1,x2,y2) { return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)) }
-
-function chainCurve(curve) {
-    let startPoint = -1
-    let chainedCurve = []
-    let dict = {}
-
-    for(let i = 0; i < curve.length; i++) {
-        let connected = false
-        let currentLine = curve[i];
-
-        for(let j = 0; j < curve.length; j++) {
-            let otherLine = curve[j];
-
-            if(currentLine.p1.x === otherLine.p2.x && currentLine.p1.y === otherLine.p2.y) {
-                dict[j] = i
-                connected = true
-                break
-            }
-        }
-
-        if(!connected) {
-            if(startPoint > -1) return null
-            startPoint = i
-        }
-    }
-
-    chainedCurve.push(curve[startPoint])
-
-    while(startPoint in dict) {
-        startPoint = dict[startPoint]
-        chainedCurve.push(curve[startPoint])
-    }
-
-    return chainedCurve;
+function linesShareOnePoint(lineA, lineB) {
+  return (
+    lineA.p1.x === lineB.p1.x && lineA.p1.y === lineB.p1.y && !(lineA.p2.x === lineB.p2.x && lineA.p2.y === lineB.p2.y) ||
+    lineA.p1.x === lineB.p2.x && lineA.p1.y === lineB.p2.y && !(lineA.p2.x === lineB.p1.x && lineA.p2.y === lineB.p1.y) ||
+    lineA.p2.x === lineB.p1.x && lineA.p2.y === lineB.p1.y && !(lineA.p1.x === lineB.p2.x && lineA.p1.y === lineB.p2.y) ||
+    lineA.p2.x === lineB.p2.x && lineA.p2.y === lineB.p2.y && !(lineA.p1.x === lineB.p1.x && lineA.p1.y === lineB.p1.y)
+  )
 }
 
-function* genZigZag (chainedLines, { width = 5, height = 5 } = {}) {
-    const { V2 } = window
+function findShapes(lines) {
+  const shapes = [];
 
-    if(width <= 0 || !chainedLines) return;
+  while(lines.length > 0) {
+    const queue = [lines.pop()];
 
-    let firstPoint = {x: chainedLines[0].p1.x, y: chainedLines[0].p1.y}
-    let nextPoint = {...firstPoint}
-    let reverseVector = {x: 0, y: 0}
-    let flipSide = 1
-    let distanceReached = 0
-    let currentHeight = height
+    shapes.push([]);
 
-    let theta = Math.atan2(chainedLines[0].p2.y - chainedLines[0].p1.y, chainedLines[0].p2.x - chainedLines[0].p1.x)
-    let offsetVector = {
-        x: currentHeight * Math.cos(theta - flipSide * Math.PI/2),
-        y: currentHeight * Math.sin(theta - flipSide * Math.PI/2)
-    }
-    let prevOffsetPoint = {x: firstPoint.x + offsetVector.x, y: firstPoint.y + offsetVector.y}
+    while(queue.length > 0) {
 
-    for(let i = 0; i < chainedLines.length; i++) {
-        let currentLine = chainedLines[i]
-        distanceReached += distance(nextPoint.x, nextPoint.y, currentLine.p2.x, currentLine.p2.y)
-        nextPoint.x = currentLine.p2.x
-        nextPoint.y = currentLine.p2.y
+      const currentLine = queue.pop();
+      const toRemove = [];
 
-        if(distanceReached < width) continue
-
-        distanceReached = distanceReached - width
-
-        if(distanceReached > 0) i -= 1
-
-        theta = Math.atan2(currentLine.p2.y - currentLine.p1.y, currentLine.p2.x - currentLine.p1.x)
-        reverseVector = {x: -distanceReached * Math.cos(theta), y: -distanceReached * Math.sin(theta)}
-        offsetVector = {
-            x: currentHeight * Math.cos(theta + flipSide * Math.PI/2),
-            y: currentHeight * Math.sin(theta + flipSide * Math.PI/2)
+      shapes[shapes.length - 1].push({
+        id: currentLine.id,
+        endpoints: {
+          p1: currentLine.p1,
+          p2: currentLine.p2
+        },
+        neighbors: {
+          p1ToP1: [],
+          p1ToP2: [],
+          p2ToP1: [],
+          p2ToP2: []
         }
+      });
 
-        flipSide = -flipSide
+      for(let j = 0; j < lines.length; j++) {
+        if(linesShareOnePoint(currentLine, lines[j])) {
+          queue.push(lines[j]);
+          toRemove.unshift(j);
+        }
+      }
 
-        nextPoint.x += reverseVector.x
-        nextPoint.y += reverseVector.y
+      for(const j of toRemove) {
+        lines.splice(j,1);
+      }
+    }
+  }
+
+  for(const shape of shapes) {
+    for(const lineA of shape) {
+      for(const lineB of shape) {
+        if(linesShareOnePoint(lineA.endpoints, lineB.endpoints)) {
+          if(lineA.endpoints.p1.x === lineB.endpoints.p1.x && lineA.endpoints.p1.y === lineB.endpoints.p1.y) {
+            lineA.neighbors.p1ToP1.push(lineB);
+          }
+
+          if(lineA.endpoints.p1.x === lineB.endpoints.p2.x && lineA.endpoints.p1.y === lineB.endpoints.p2.y) {
+            lineA.neighbors.p1ToP2.push(lineB);
+          }
+
+          if(lineA.endpoints.p2.x === lineB.endpoints.p1.x && lineA.endpoints.p2.y === lineB.endpoints.p1.y) {
+            lineA.neighbors.p2ToP1.push(lineB);
+          }
+
+          if(lineA.endpoints.p2.x === lineB.endpoints.p2.x && lineA.endpoints.p2.y === lineB.endpoints.p2.y) {
+            lineA.neighbors.p2ToP2.push(lineB);
+          }
+        }
+      }
+    }
+  }
+
+  return shapes;
+}
+
+function interpolateLine(line, width, offset, startFromP1) {
+  const startPoint = startFromP1 ? line.p1 : line.p2;
+  const inv = startFromP1 ? 1 : -1;
+  const vector = {x: inv * (line.p2.x - line.p1.x), y: inv * (line.p2.y - line.p1.y)};
+  const length = Math.hypot(vector.x, vector.y);
+  const normVector = {x: vector.x / length, y: vector.y / length};
+  const theta = Math.atan2(vector.y, vector.x);
+  let remaining = (offset - length) % width;
+  const points = [];
+
+  for (let i = offset; i <= length; i += width) {
+    points.push({
+      x: startPoint.x + i * normVector.x,
+      y: startPoint.y + i * normVector.y,
+      a: theta
+    });
+  }
+
+  return { points, remaining };
+}
+
+function* genZigZag (selectedLines, { width = 5, height = 5 } = {}) {
+  const { V2 } = window
+
+  const shapesArray = findShapes(selectedLines);
+
+  if(width <= 0 || !shapesArray) return;
+
+  const visited = [];
+  const dataStack = [];
+
+  for(const shape of shapesArray) {
+    visited.length = 0;
+    dataStack.length = 0;
+
+    const initDirection = Math.atan2(shape[0].endpoints.p2.y - shape[0].endpoints.p1.y, shape[0].endpoints.p2.x - shape[0].endpoints.p1.x) - Math.PI / 2;
+    const initHeightVector = { x: height * Math.cos(initDirection), y: height * Math.sin(initDirection) };
+    const initLastPoint = V2.from(shape[0].endpoints.p1.x + initHeightVector.x, shape[0].endpoints.p1.y + initHeightVector.y);
+
+    dataStack.push({currentLine: shape[0], offset: 0, startFromP1: true, lastPoint: initLastPoint, flipped: -1});
+
+    while(dataStack.length > 0) {
+      const { currentLine, offset, startFromP1, lastPoint, flipped } = dataStack.pop();
+
+      if(visited.includes(currentLine.id)) continue;
+      visited.push(currentLine.id);
+
+      const startPoint = V2.from(lastPoint.x, lastPoint.y);
+      const initFlipped = -flipped;
+      let flipTracker = flipped;
+
+      const { points, remaining } = interpolateLine(currentLine.endpoints, width, offset, startFromP1);
+      const nextOffset = remaining;
+
+      for(let i = 1; i < points.length; i++) {
+        const currentPoint = points[i];
+        flipTracker = -flipTracker;
+        const currentDirection = currentPoint.a + flipTracker * Math.PI / 2;
+        const heightVector = { x: height * Math.cos(currentDirection), y: height * Math.sin(currentDirection) };
 
         yield {
-            p1: V2.from(prevOffsetPoint.x, prevOffsetPoint.y),
-            p2: V2.from(nextPoint.x + offsetVector.x, nextPoint.y + offsetVector.y)
+          p1: V2.from(currentPoint.x + heightVector.x, currentPoint.y + heightVector.y),
+          p2: V2.from(lastPoint.x, lastPoint.y)
         }
 
-        prevOffsetPoint = {x: nextPoint.x + offsetVector.x, y: nextPoint.y + offsetVector.y}
-        firstPoint = {...nextPoint};
+        lastPoint.x = currentPoint.x + heightVector.x;
+        lastPoint.y = currentPoint.y + heightVector.y;
+      }
 
-        distanceReached = 0
+      for(const neighbor of currentLine.neighbors.p1ToP1) {
+        if(startFromP1) {
+          dataStack.push({ currentLine: neighbor, offset: offset, startFromP1: true, lastPoint: startPoint, flipped: initFlipped });
+        } else {
+          dataStack.push({ currentLine: neighbor, offset: nextOffset, startFromP1: true, lastPoint: lastPoint, flipped: flipTracker });
+        }
+      }
+
+      for(const neighbor of currentLine.neighbors.p1ToP2) {
+        if(startFromP1) {
+          dataStack.push({ currentLine: neighbor, offset: offset, startFromP1: false, lastPoint: startPoint, flipped: initFlipped });
+        } else {
+          dataStack.push({ currentLine: neighbor, offset: nextOffset, startFromP1: false, lastPoint: lastPoint, flipped: flipTracker });
+        }
+      }
+
+      for(const neighbor of currentLine.neighbors.p2ToP1) {
+        if(startFromP1) {
+          dataStack.push({ currentLine: neighbor, offset: nextOffset, startFromP1: true, lastPoint: lastPoint, flipped: flipTracker });
+        } else {
+          dataStack.push({ currentLine: neighbor, offset: offset, startFromP1: true, lastPoint: startPoint, flipped: initFlipped });
+        }
+      }
+
+      for(const neighbor of currentLine.neighbors.p2ToP2) {
+        if(startFromP1) {
+          dataStack.push({ currentLine: neighbor, offset: nextOffset, startFromP1: false, lastPoint: lastPoint, flipped: flipTracker });
+        } else {
+          dataStack.push({ currentLine: neighbor, offset: offset, startFromP1: false, lastPoint: startPoint, flipped: initFlipped });
+        }
+      }
     }
+  }
 }
