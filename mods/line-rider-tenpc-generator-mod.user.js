@@ -3,7 +3,7 @@
 // @name         Line Rider Ten Point Cannon Generator
 // @author       Malizma
 // @description  Linerider.com mod for generating ten point cannons
-// @version      1.2
+// @version      1.2.1
 
 // @namespace    http://tampermonkey.net/
 // @match        https://www.linerider.com/*
@@ -204,6 +204,7 @@ function main () {
 
     onActivate () {
       if (this.state.active || sidebarOpen(window.store.getState())) {
+        this.setState({ forceLive: false });
         this.setState({ active: false });
       } else {
         this.setState({ active: true });
@@ -213,6 +214,7 @@ function main () {
     onCommit () {
       const committed = this.mod.commit();
       if (committed) {
+        this.setState({ forceLive: false });
         this.setState({ active: false });
       }
     }
