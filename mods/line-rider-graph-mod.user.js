@@ -1,3 +1,5 @@
+/* globals math */
+
 // ==UserScript==
 
 // @name         Line Rider Graph Mod
@@ -17,79 +19,79 @@
 // ==/UserScript==
 
 const updateLines = (linesToRemove, linesToAdd, name) => ({
-  type: 'UPDATE_LINES',
+  type: "UPDATE_LINES",
   payload: { linesToRemove, linesToAdd },
   meta: { name: name }
-})
+});
 
-const addLines = (line) => updateLines(null, line, 'ADD_LINES')
+const addLines = (line) => updateLines(null, line, "ADD_LINES");
 
 const commitTrackChanges = () => ({
-  type: 'COMMIT_TRACK_CHANGES'
-})
+  type: "COMMIT_TRACK_CHANGES"
+});
 
 const revertTrackChanges = () => ({
-  type: 'REVERT_TRACK_CHANGES'
-})
+  type: "REVERT_TRACK_CHANGES"
+});
 
-const getSimulatorCommittedTrack = state => state.simulator.committedEngine
+const getSimulatorCommittedTrack = state => state.simulator.committedEngine;
 
 class GraphMod {
   constructor (store, initState) {
-    this.store = store
-    this.state = initState
+    this.store = store;
+    this.state = initState;
 
-    this.changed = false
+    this.changed = false;
 
-    this.track = this.store.getState().simulator.committedEngine
+    this.track = this.store.getState().simulator.committedEngine;
 
     store.subscribeImmediate(() => {
-      this.onUpdate()
-    })
+      this.onUpdate();
+    });
   }
 
-  commit() {
+  commit () {
     if (this.changed) {
-      this.store.dispatch(commitTrackChanges())
-      this.store.dispatch(revertTrackChanges())
-      this.changed = false
-      return true
+      this.store.dispatch(commitTrackChanges());
+      this.store.dispatch(revertTrackChanges());
+      this.changed = false;
+      return true;
     }
   }
 
   onUpdate (nextState = this.state) {
-    let shouldUpdate = false
+    let shouldUpdate = false;
 
     if (!this.state.active && nextState.active) {
-      window.previewLinesInFastSelect = true
+      window.previewLinesInFastSelect = true;
     }
     if (this.state.active && !nextState.active) {
-      window.previewLinesInFastSelect = false
+      window.previewLinesInFastSelect = false;
     }
 
     if (this.state !== nextState) {
-      this.state = nextState
-      shouldUpdate = true
+      this.state = nextState;
+      shouldUpdate = true;
     }
 
     if (this.state.active) {
-      const track = getSimulatorCommittedTrack(this.store.getState())
+      const track = getSimulatorCommittedTrack(this.store.getState());
 
       if (this.track !== track) {
-        this.track = track
-        shouldUpdate = true
+        this.track = track;
+        shouldUpdate = true;
       }
     }
 
     if (shouldUpdate) {
 
       if (this.changed) {
-        this.store.dispatch(revertTrackChanges())
-        this.changed = false
+        this.store.dispatch(revertTrackChanges());
+        this.changed = false;
       }
 
       if (this.state.active) {
-        let lineArray = []
+        let lineArray = [];
 
         for (let { p1, p2 } of genLines(this.state)) {
           lineArray.push({
@@ -98,12 +100,12 @@ class GraphMod {
             x2: p2.x,
             y2: p2.y,
             type: 2
-          })
+          });
         }
 
         if (lineArray.length > 0) {
-          this.store.dispatch(addLines(lineArray))
-          this.changed = true
+          this.store.dispatch(addLines(lineArray));
+          this.changed = true;
         }
       }
     }
@@ -114,13 +116,13 @@ function main () {
   const {
     React,
     store
-  } = window
+  } = window;
 
-  const create = React.createElement
+  const create = React.createElement;
 
   class GraphModComponent extends React.Component {
     constructor (props) {
-      super(props)
+      super(props);
 
       this.state = {
         active: false,
@@ -132,13 +134,13 @@ function main () {
         step: .1,
         centerCamera: true,
         connectDots: false
-      }
+      };
 
-      this.graphMod = new GraphMod(store, this.state)
+      this.graphMod = new GraphMod(store, this.state);
     }
 
     componentWillUpdate (nextProps, nextState) {
-      this.graphMod.onUpdate(nextState)
+      this.graphMod.onUpdate(nextState);
     }
 
     renderCheckbox (key, props) {
@@ -146,11 +148,11 @@ function main () {
         ...props,
         checked: this.state[key],
         onChange: create => this.setState({ [key]: create.target.checked })
-      }
-      return create('div', null,
+      };
+      return create("div", null,
         key,
-        create('input', { type: 'checkbox', ...props })
-      )
+        create("input", { type: "checkbox", ...props })
+      );
     }
 
     renderSlider (key, title, props) {
@@ -158,20 +160,20 @@ function main () {
         ...props,
         value: this.state[key],
         onChange: create => this.setState({ [key]: parseFloat(create.target.value) })
-      }
+      };
 
-      return create('div', null,
+      return create("div", null,
         title,
-        create('input', { style: { width: '4em' }, type: 'number', ...props }),
-        create('input', { type: 'range', ...props, onFocus: create => create.target.blur() })
-      )
+        create("input", { style: { width: "4em" }, type: "number", ...props }),
+        create("input", { type: "range", ...props, onFocus: create => create.target.blur() })
+      );
     }
 
     onActivate () {
       if (this.state.active) {
-        this.setState({ active: false })
+        this.setState({ active: false });
       } else {
-        this.setState({ active: true })
+        this.setState({ active: true });
       }
     }
 
@@ -183,97 +185,97 @@ function main () {
     }
 
     render () {
-      return create('div', null,
-        this.state.active && create('div', null,
-          create('div', null,
-                 "Equation: ",
-                 create('textArea', { style: { width: '88%' }, type: 'text',
-                 value: this.state.func,
-                 onChange: create => this.setState({ func: create.target.value })
-              }),
-              'Domain',
-              this.renderSlider('domainM', 'Min: ', { min: -100, max: this.state.domainN, step: 1 }),
-              this.renderSlider('domainN', 'Max: ', { min: -100, max: 100, step: 1 }),
-              'Range',
-              this.renderSlider('rangeM', 'Min: ', { min: -100, max: this.state.rangeN, step: 1 }),
-              this.renderSlider('rangeN', 'Max: ', { min: -100, max: 100, step: 1 }),
-              this.renderSlider('step', 'Step', { min: 0.01, max: 5, step: 0.1 }),
-              this.renderCheckbox('centerCamera'),
-              this.renderCheckbox('connectDots'),
+      return create("div", null,
+        this.state.active && create("div", null,
+          create("div", null,
+            "Equation: ",
+            create("textArea", { style: { width: "88%" }, type: "text",
+              value: this.state.func,
+              onChange: create => this.setState({ func: create.target.value })
+            }),
+            "Domain",
+            this.renderSlider("domainM", "Min: ", { min: -100, max: this.state.domainN, step: 1 }),
+            this.renderSlider("domainN", "Max: ", { min: -100, max: 100, step: 1 }),
+            "Range",
+            this.renderSlider("rangeM", "Min: ", { min: -100, max: this.state.rangeN, step: 1 }),
+            this.renderSlider("rangeN", "Max: ", { min: -100, max: 100, step: 1 }),
+            this.renderSlider("step", "Step", { min: 0.01, max: 5, step: 0.1 }),
+            this.renderCheckbox("centerCamera"),
+            this.renderCheckbox("connectDots")
           ),
-          create('button', { style: { float: 'left' }, onClick: () => this.onCommit() },
-            'Commit'
+          create("button", { style: { float: "left" }, onClick: () => this.onCommit() },
+            "Commit"
           )
         ),
-        create('button',
+        create("button",
           {
             style: {
-              backgroundColor: this.state.active ? 'lightblue' : null
+              backgroundColor: this.state.active ? "lightblue" : null
             },
             onClick: this.onActivate.bind(this)
           },
-          'Graph Mod'
+          "Graph Mod"
         )
-      )
+      );
     }
   }
 
-  window.registerCustomSetting(GraphModComponent)
+  window.registerCustomSetting(GraphModComponent);
 }
 
 if (window.registerCustomSetting) {
-  main()
+  main();
 } else {
-  const prevCb = window.onCustomToolsApiReady
+  const prevCb = window.onCustomToolsApiReady;
   window.onCustomToolsApiReady = () => {
-    if (prevCb) prevCb()
-    main()
-  }
+    if (prevCb) prevCb();
+    main();
+  };
 }
 
-function* genLines ({ func = "", domainM = -10, domainN = 10, rangeM = -10, rangeN = 10, step = 0.1, centerCamera = true, connectDots = false} = {}) {
-    const { V2 } = window;
-    const camPos = window.store.getState().camera.editorPosition;
-    const offset = centerCamera ? camPos : V2.from(0,0);
-    let lastPos = null;
+function* genLines ({ func = "", domainM = -10, domainN = 10, rangeM = -10, rangeN = 10, step = 0.1, centerCamera = true, connectDots = false } = {}) {
+  const { V2 } = window;
+  const camPos = window.store.getState().camera.editorPosition;
+  const offset = centerCamera ? camPos : V2.from(0, 0);
+  let lastPos = null;
 
-    if(step <= 0) {
-        return;
-    }
+  if (step <= 0) {
+    return;
+  }
 
-    try {
-        const exp = math.parse(func);
-        const expC = exp.compile();
+  try {
+    const exp = math.parse(func);
+    const expC = exp.compile();
 
-        for(let x = domainM; x <= domainN; x += step) {
-            let y = 0;
+    for (let x = domainM; x <= domainN; x += step) {
+      let y = 0;
 
-            try {
-                let scope = {'x': x};
-                y = expC.evaluate(scope);
-            } catch(e) {
-                console.log(e);
-                return;
-            }
-
-            if(rangeM <= y && y <= rangeN) {
-                if(connectDots && lastPos) {
-                    yield {
-                        p1: V2.from(x + offset.x, offset.y - y + .1),
-                        p2: V2.from(lastPos.x + offset.x, offset.y - lastPos.y)
-                    }
-                } else {
-                    yield {
-                        p1: V2.from(x + offset.x, offset.y - y + .1),
-                        p2: V2.from(x + offset.x, offset.y - y)
-                    }
-                }
-
-                lastPos = V2.from(x, y);
-            }
-        }
-    } catch(e) {
+      try {
+        let scope = { "x": x };
+        y = expC.evaluate(scope);
+      } catch (e) {
         console.log(e);
         return;
+      }
+
+      if (rangeM <= y && y <= rangeN) {
+        if (connectDots && lastPos) {
+          yield {
+            p1: V2.from(x + offset.x, offset.y - y + .1),
+            p2: V2.from(lastPos.x + offset.x, offset.y - lastPos.y)
+          };
+        } else {
+          yield {
+            p1: V2.from(x + offset.x, offset.y - y + .1),
+            p2: V2.from(x + offset.x, offset.y - y)
+          };
+        }
+
+        lastPos = V2.from(x, y);
+      }
     }
+  } catch (e) {
+    console.log(e);
+    return;
+  }
 }

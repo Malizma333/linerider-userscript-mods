@@ -3,7 +3,7 @@
 // @name         Line Rider Ten Point Cannon Generator
 // @author       Malizma
 // @description  Linerider.com mod for generating ten point cannons
-// @version      1.2
+// @version      1.2.1
 
 // @namespace    http://tampermonkey.net/
 // @match        https://www.linerider.com/*
@@ -16,19 +16,19 @@
 // ==/UserScript==
 
 const updateLines = (linesToRemove, linesToAdd, name) => ({
-  type: 'UPDATE_LINES',
+  type: "UPDATE_LINES",
   payload: { linesToRemove, linesToAdd },
   meta: { name: name }
 });
 
-const addLines = (line) => updateLines(null, line, 'ADD_LINES');
+const addLines = (line) => updateLines(null, line, "ADD_LINES");
 
 const commitTrackChanges = () => ({
-  type: 'COMMIT_TRACK_CHANGES'
+  type: "COMMIT_TRACK_CHANGES"
 });
 
 const revertTrackChanges = () => ({
-  type: 'REVERT_TRACK_CHANGES'
+  type: "REVERT_TRACK_CHANGES"
 });
 
 const getSimulatorCommittedTrack = state => state.simulator.committedEngine;
@@ -49,10 +49,10 @@ class TenPCMod {
 
     store.subscribeImmediate(() => {
       this.onUpdate();
-    })
+    });
   }
 
-  commit() {
+  commit () {
     if (this.changed) {
       this.store.dispatch(commitTrackChanges());
       this.store.dispatch(revertTrackChanges());
@@ -61,7 +61,7 @@ class TenPCMod {
     }
   }
 
-  revert() {
+  revert () {
     if (this.changed) {
       this.store.dispatch(revertTrackChanges());
       this.changed = false;
@@ -93,22 +93,22 @@ class TenPCMod {
 
       const numRiders = getNumRiders(this.store.getState());
 
-      if(this.numRiders !== numRiders) {
+      if (this.numRiders !== numRiders) {
         this.numRiders = numRiders;
         shouldUpdate = true;
       }
 
-      if(this.selectedRider !== nextState.selectedRider) {
+      if (this.selectedRider !== nextState.selectedRider) {
         this.selectedRider = Math.min(this.numRiders, nextState.selectedRider);
         shouldUpdate = true;
       }
     }
 
-    if(!shouldUpdate) return;
+    if (!shouldUpdate) return;
 
     if (this.changed) {
-        this.store.dispatch(revertTrackChanges());
-        this.changed = false;
+      this.store.dispatch(revertTrackChanges());
+      this.changed = false;
     }
 
     if (!this.state.active) return;
@@ -116,7 +116,7 @@ class TenPCMod {
     let iterations = 0;
     const MAX_ITERATIONS = 1000;
 
-    while(true) {
+    while (true) {
       let myLines = [];
 
       for (let { p1, p2, f, m } of GenerateCannon(this.state)) {
@@ -138,18 +138,18 @@ class TenPCMod {
         this.changed = true;
       }
 
-      if(!this.state.forceLive) break;
+      if (!this.state.forceLive) break;
 
       let engine = window.store.getState().simulator.engine.engine;
       let currentFrame = Math.ceil(window.store.getState().player.index);
       let nextRider = engine.getFrame(currentFrame + 1).snapshot.entities[0].entities[this.state.selectedRider - 1];
 
-      if(nextRider.riderMounted) {
+      if (nextRider.riderMounted) {
         break;
       }
       window.store.dispatch(revertTrackChanges());
 
-      if(iterations++ >= MAX_ITERATIONS) {
+      if (iterations++ >= MAX_ITERATIONS) {
         console.error("Max iterations reached");
         return "MAX_ITERATIONS";
       }
@@ -167,7 +167,7 @@ function main () {
 
   class TenPCModComponent extends React.Component {
     constructor (props) {
-      super(props)
+      super(props);
 
       this.state = {
         active: false,
@@ -177,26 +177,26 @@ function main () {
         selectedRider: 1,
         riderCount: 1,
         forceLive: false
-      }
+      };
 
-      this.mod = new TenPCMod(store, this.state)
+      this.mod = new TenPCMod(store, this.state);
 
       store.subscribe(() => {
-          if(sidebarOpen(window.store.getState())) {
-              this.mod.revert()
-              this.setState({ active: false })
-          }
+        if (sidebarOpen(window.store.getState())) {
+          this.mod.revert();
+          this.setState({ active: false });
+        }
 
-          if(this.state.riderCount != this.mod.numRiders) {
-              this.setState({ riderCount: this.mod.numRiders })
-              this.setState({ selectedRider: Math.min(this.state.riderCount, this.state.selectedRider) })
-          }
-      })
+        if (this.state.riderCount != this.mod.numRiders) {
+          this.setState({ riderCount: this.mod.numRiders });
+          this.setState({ selectedRider: Math.min(this.state.riderCount, this.state.selectedRider) });
+        }
+      });
     }
 
     componentWillUpdate (nextProps, nextState) {
       let error = this.mod.onUpdate(nextState);
-      if(error == 'MAX_ITERATIONS') {
+      if (error == "MAX_ITERATIONS") {
         this.setState({ forceLive: false });
         this.setState({ active: false });
       }
@@ -204,6 +204,7 @@ function main () {
 
     onActivate () {
       if (this.state.active || sidebarOpen(window.store.getState())) {
+        this.setState({ forceLive: false });
         this.setState({ active: false });
       } else {
         this.setState({ active: true });
@@ -213,6 +214,7 @@ function main () {
     onCommit () {
       const committed = this.mod.commit();
       if (committed) {
+        this.setState({ forceLive: false });
         this.setState({ active: false });
       }
     }
@@ -224,9 +226,9 @@ function main () {
         onChange: e => this.setState({ [key]: e.target.checked })
       };
 
-      return create('div', null,
+      return create("div", null,
         title,
-        create('input', { type: 'checkbox', ...props })
+        create("input", { type: "checkbox", ...props })
       );
     }
 
@@ -237,67 +239,67 @@ function main () {
         onChange: create => this.setState({ [key]: parseFloat(create.target.value) })
       };
 
-      return create('div', null,
+      return create("div", null,
         title,
-        create('input', { style: { width: '4em' }, type: 'number', ...props }),
-        create('input', { type: 'range', ...props, onFocus: create => create.target.blur() })
+        create("input", { style: { width: "4em" }, type: "number", ...props }),
+        create("input", { type: "range", ...props, onFocus: create => create.target.blur() })
       );
     }
 
     render () {
-      return create('div', null,
-        this.state.active && create('div', null,
-          this.renderSlider('xSpeed', 'X Speed', { min: -99, max: 99, step: 1 }),
-          this.renderSlider('ySpeed', 'Y Speed', { min: -99, max: 99, step: 1 }),
-          this.renderSlider('rotation', 'Rotation', { min: 0, max: 360, step: 5 }),
-          this.state.riderCount > 1 && this.renderSlider('selectedRider', 'Rider', { min: 1, max: this.state.riderCount, step: 1 }),
-          this.renderCheckbox('forceLive', 'Force Live (Warning: Causes Lag) '),
+      return create("div", null,
+        this.state.active && create("div", null,
+          this.renderSlider("xSpeed", "X Speed", { min: -99, max: 99, step: 1 }),
+          this.renderSlider("ySpeed", "Y Speed", { min: -99, max: 99, step: 1 }),
+          this.renderSlider("rotation", "Rotation", { min: 0, max: 360, step: 5 }),
+          this.state.riderCount > 1 && this.renderSlider("selectedRider", "Rider", { min: 1, max: this.state.riderCount, step: 1 }),
+          this.renderCheckbox("forceLive", "Force Live (Warning: Causes Lag) "),
 
-          create('button', { style: { float: 'left' }, onClick: () => this.onCommit() },
-            'Commit'
+          create("button", { style: { float: "left" }, onClick: () => this.onCommit() },
+            "Commit"
           )
         ),
 
-        create('button',
+        create("button",
           {
             style: {
-              backgroundColor: this.state.active ? 'lightblue' : null
+              backgroundColor: this.state.active ? "lightblue" : null
             },
             onClick: this.onActivate.bind(this)
           },
-          'TenPC Mod'
+          "TenPC Mod"
         )
       );
     }
   }
 
-  window.registerCustomSetting(TenPCModComponent)
+  window.registerCustomSetting(TenPCModComponent);
 }
 
 if (window.registerCustomSetting) {
-  main()
+  main();
 } else {
-  const prevCb = window.onCustomToolsApiReady
+  const prevCb = window.onCustomToolsApiReady;
   window.onCustomToolsApiReady = () => {
-    if (prevCb) prevCb()
-    main()
-  }
+    if (prevCb) prevCb();
+    main();
+  };
 }
 
-function* GenerateCannon({ xSpeed = 0, ySpeed = 0, rotation = 0, selectedRider = 1, riderCount = 1 } = {}) {
-  const { V2 } = window
+function* GenerateCannon ({ xSpeed = 0, ySpeed = 0, rotation = 0, selectedRider = 1 } = {}) {
+  const { V2 } = window;
 
   const cpArray = [
-    V2.from(0,0),
-    V2.from(0,5),
-    V2.from(15,5),
-    V2.from(17.5,0),
-    V2.from(5,0),
-    V2.from(5,-5.5),
-    V2.from(11.5,-5),
-    V2.from(11.5,-5),
-    V2.from(10,5),
-    V2.from(10,5)
+    V2.from(0, 0),
+    V2.from(0, 5),
+    V2.from(15, 5),
+    V2.from(17.5, 0),
+    V2.from(5, 0),
+    V2.from(5, -5.5),
+    V2.from(11.5, -5),
+    V2.from(11.5, -5),
+    V2.from(10, 5),
+    V2.from(10, 5)
   ];
 
   let engine = window.store.getState().simulator.engine.engine;
@@ -305,7 +307,7 @@ function* GenerateCannon({ xSpeed = 0, ySpeed = 0, rotation = 0, selectedRider =
   let curRider = engine.getFrame(currentFrame).snapshot.entities[0].entities[selectedRider - 1];
   let nextRider = engine.getFrame(currentFrame + 1).snapshot.entities[0].entities[selectedRider - 1];
   let theta = Math.PI * rotation / 180;
-  let rotationMatrix = [[Math.cos(theta), -Math.sin(theta)], [Math.sin(theta), Math.cos(theta)]];
+  let rotationMatrix = [ [ Math.cos(theta), -Math.sin(theta) ], [ Math.sin(theta), Math.cos(theta) ] ];
 
   for (let i = 0; i < cpArray.length; i++)
   {
@@ -323,13 +325,13 @@ function* GenerateCannon({ xSpeed = 0, ySpeed = 0, rotation = 0, selectedRider =
 
     let lineStack = GenerateSingleLine(curRider.points[i], nextRider.points[i], target, offset);
 
-    for(let m = 0; m < lineStack.length; m++) {
+    for (let m = 0; m < lineStack.length; m++) {
       yield lineStack[m];
     }
   }
 }
 
-function GenerateSingleLine(pointCur, pointNext, pointTarget, offset = 1.0)
+function GenerateSingleLine (pointCur, pointNext, pointTarget, offset = 1.0)
 {
   const { V2 } = window;
 
@@ -340,7 +342,7 @@ function GenerateSingleLine(pointCur, pointNext, pointTarget, offset = 1.0)
   let targetDir = pointTarget.copy().sub(pointNext.pos);
   let speedReq = targetDir.len();
 
-  if(targetDir.len() > 0) {
+  if (targetDir.len() > 0) {
     targetDir.div(targetDir.len());
   }
 
