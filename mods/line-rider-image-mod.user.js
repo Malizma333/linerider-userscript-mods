@@ -1,18 +1,25 @@
 // ==UserScript==
 
-// @name         Line Rider Image Mod
+// @name         Image Generator
+// @namespace    https://www.linerider.com/
 // @author       Malizma
-// @description  Adds the ability to import images
-// @version      1.4
+// @description  Generates colored line arrays from image data
+// @version      1.4.0
+// @icon         https://www.linerider.com/favicon.ico
 
-// @namespace    http://tampermonkey.net/
 // @match        https://www.linerider.com/*
 // @match        https://*.official-linerider.com/*
-// @match        http://localhost:8000/*
-// @grant        none
+// @match        http://localhost:*/*
+// @match        https://*.surge.sh/*
+
 // @downloadURL  https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-image-mod.user.js
 // @updateURL    https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-image-mod.user.js
+// @homepageURL  https://github.com/Malizma333/linerider-userscript-mods
+// @supportURL   https://github.com/Malizma333/linerider-userscript-mods/issues
+// @grant        none
+
 // ==/UserScript==
+
 
 const updateLines = (linesToRemove, linesToAdd) => ({
   type: "UPDATE_LINES",

@@ -1,18 +1,22 @@
 // ==UserScript==
 
-// @name         Line Rider Zigzag Mod
+// @name         Zigzag Generator
+// @namespace    https://www.linerider.com/
 // @author       Malizma
-// @description  Linerider.com userscript to generate zigzags
-// @version      1.1
+// @description  Generates zig-zags
+// @version      1.1.1
+// @icon         https://www.linerider.com/favicon.ico
 
-// @namespace    http://tampermonkey.net/
 // @match        https://www.linerider.com/*
 // @match        https://*.official-linerider.com/*
-// @match        http://localhost:8000/*
+// @match        http://localhost:*/*
 // @match        https://*.surge.sh/*
-// @grant        none
+
 // @downloadURL  https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-zigzag-mod.user.js
 // @updateURL    https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-zigzag-mod.user.js
+// @homepageURL  https://github.com/Malizma333/linerider-userscript-mods
+// @supportURL   https://github.com/Malizma333/linerider-userscript-mods/issues
+// @grant        none
 
 // ==/UserScript==
 

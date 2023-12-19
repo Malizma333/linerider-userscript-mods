@@ -1,5 +1,3 @@
-/* global Actions, Selectors */
-
 // ==UserScript==
 
 // @name         _
@@ -17,11 +15,14 @@
 // @require      https://raw.githubusercontent.com/Malizma333/lr-userscript-library/main/index.js
 
 // @downloadURL  _
+// @updateURL    _
 // @homepageURL  _
 // @supportURL   _
 // @grant        none
 
 // ==/UserScript==
+
+/* global Actions, Selectors */
 
 class EmptyMod {
   constructor (store, initState) {

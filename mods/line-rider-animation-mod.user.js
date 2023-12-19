@@ -1,24 +1,29 @@
-/* globals Millions, V2 */
-
 // ==UserScript==
 
-// @name         Line Rider Animation Mod
+// @name         Animation Helper
+// @namespace    https://www.linerider.com/
 // @author       Malizma
-// @description  Adds the ability to animate more easily
-// @version      1.1
+// @description  Generates repeated transforms for animation
+// @version      1.1.0
+// @icon         https://www.linerider.com/favicon.ico
 
-// @namespace    http://tampermonkey.net/
 // @match        https://www.linerider.com/*
 // @match        https://*.official-linerider.com/*
-// @match        http://localhost:8000/*
+// @match        http://localhost:*/*
 // @match        https://*.surge.sh/*
-// @grant        none
+
 // @downloadURL  https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-animation-mod.user.js
 // @updateURL    https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-animation-mod.user.js
+// @homepageURL  https://github.com/Malizma333/linerider-userscript-mods
+// @supportURL   https://github.com/Malizma333/linerider-userscript-mods/issues
+// @grant        none
+
 // ==/UserScript==
 
 // jshint asi: true
 // jshint esversion: 6
+
+/* globals Millions, V2 */
 
 /* constants */
 const SELECT_TOOL = "SELECT_TOOL";

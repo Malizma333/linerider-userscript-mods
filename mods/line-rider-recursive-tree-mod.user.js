@@ -1,17 +1,23 @@
 // ==UserScript==
 
-// @name         Line Rider Recursive Tree Mod
+// @name         Recursive Tree Generator
+// @namespace    https://www.linerider.com/
 // @author       Malizma
-// @description  Adds the ability to generate trees
-// @version      1.0
+// @description  Generates tree-like line structures recrusively
+// @version      1.0.0
+// @icon         https://www.linerider.com/favicon.ico
 
-// @namespace    http://tampermonkey.net/
 // @match        https://www.linerider.com/*
 // @match        https://*.official-linerider.com/*
-// @match        http://localhost:8000/*
-// @grant        none
+// @match        http://localhost:*/*
+// @match        https://*.surge.sh/*
+
 // @downloadURL  https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-recursive-tree-mod.user.js
 // @updateURL    https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-recursive-tree-mod.user.js
+// @homepageURL  https://github.com/Malizma333/linerider-userscript-mods
+// @supportURL   https://github.com/Malizma333/linerider-userscript-mods/issues
+// @grant        none
+
 // ==/UserScript==
 
 const updateLines = (linesToRemove, linesToAdd) => ({

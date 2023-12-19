@@ -1,5 +1,3 @@
-/* global Actions, Selectors */
-
 /*
 Userscript metadata block. Stores features of the userscript such as name, description, and version.
 
@@ -37,11 +35,14 @@ An "!" means this trait of the userscript data should be replaced.
 // @require      https://raw.githubusercontent.com/Malizma333/lr-userscript-library/main/index.js
 
 // @downloadURL  https://github.com/Malizma333/linerider-userscript-mods/raw/master/line-rider-mod-template.user.js
+// @updateURL    https://github.com/Malizma333/linerider-userscript-mods/raw/master/line-rider-mod-template.user.js
 // @homepageURL  https://github.com/Malizma333/linerider-userscript-mods
 // @supportURL   https://github.com/Malizma333/linerider-userscript-mods/issues
 // @grant        none
 
 // ==/UserScript==
+
+/* global Actions, Selectors */
 
 /**
 * @description

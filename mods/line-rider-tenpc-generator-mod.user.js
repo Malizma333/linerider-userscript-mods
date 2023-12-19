@@ -1,18 +1,23 @@
 // ==UserScript==
 
-// @name         Line Rider Ten Point Cannon Generator
+// @name         Ten Point Cannon Generator
+// @namespace    https://www.linerider.com/
 // @author       Malizma
-// @description  Linerider.com mod for generating ten point cannons
+// @description  Generates ten point cannons
 // @version      1.2.1
+// @icon         https://www.linerider.com/favicon.ico
 
-// @namespace    http://tampermonkey.net/
 // @match        https://www.linerider.com/*
 // @match        https://*.official-linerider.com/*
-// @match        http://localhost:8000/*
+// @match        http://localhost:*/*
 // @match        https://*.surge.sh/*
-// @grant        none
+
 // @downloadURL  https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-tenpc-generator-mod.user.js
 // @updateURL    https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-tenpc-generator-mod.user.js
+// @homepageURL  https://github.com/Malizma333/linerider-userscript-mods
+// @supportURL   https://github.com/Malizma333/linerider-userscript-mods/issues
+// @grant        none
+
 // ==/UserScript==
 
 const updateLines = (linesToRemove, linesToAdd, name) => ({

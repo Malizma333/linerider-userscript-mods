@@ -1,17 +1,23 @@
 // ==UserScript==
 
-// @name         Line Rider Shape Mod
+// @name         Shape Generator
+// @namespace    https://www.linerider.com/
 // @author       Malizma
-// @description  Creates polygons
-// @version      1.0
+// @description  Generates regular polygons
+// @version      1.0.0
+// @icon         https://www.linerider.com/favicon.ico
 
-// @namespace    http://tampermonkey.net/
 // @match        https://www.linerider.com/*
 // @match        https://*.official-linerider.com/*
-// @match        http://localhost:8000/*
-// @grant        none
+// @match        http://localhost:*/*
+// @match        https://*.surge.sh/*
+
 // @downloadURL  https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-shape-mod.user.js
 // @updateURL    https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-shape-mod.user.js
+// @homepageURL  https://github.com/Malizma333/linerider-userscript-mods
+// @supportURL   https://github.com/Malizma333/linerider-userscript-mods/issues
+// @grant        none
+
 // ==/UserScript==
 
 const SELECT_TOOL = "SELECT_TOOL";
@@ -75,28 +81,6 @@ class ShapeMod {
 
       this.onUpdate();
     });
-
-    // addModMiddleware does not work for more than one mod!
-    // window.addModMiddleware(store => next => action => {
-    //   debugger
-    //   switch (action.type) {
-    //     case 'TRIGGER_COMMAND':
-    //       switch (action.payload) {
-    //         case 'triggers.removeLastLine':
-    //           if (this.state.active) {
-    //             return
-    //           }
-    //           break
-    //         case 'triggers.undo':
-    //         case 'triggers.redo':
-    //           if (this.state.active && this.changed) {
-    //             store.dispatch(revertTrackChanges())
-    //             this.changed = false
-    //           }
-    //       }
-    //   }
-    //   return next(action)
-    // })
   }
 
   commitShape () {

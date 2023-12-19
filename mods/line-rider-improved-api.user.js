@@ -1,16 +1,23 @@
 // ==UserScript==
-// @name         Line Rider Improved Mod API
-// @namespace    http://tampermonkey.net/
-// @version      1.3
-// @description  Renders mod components for linerider.com mods
+
+// @name         Improved Mod API
+// @namespace    https://www.linerider.com/
 // @author       Malizma
+// @description  Container for linerider.com mods
+// @version      1.3.0
+// @icon         https://www.linerider.com/favicon.ico
+
 // @match        https://www.linerider.com/*
 // @match        https://*.official-linerider.com/*
-// @match        http://localhost:8000/*
-// @match        https://square-rider.surge.sh/*
-// @grant        none
+// @match        http://localhost:*/*
+// @match        https://*.surge.sh/*
+
 // @downloadURL  https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-improved-api.user.js
 // @updateURL    https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-improved-api.user.js
+// @homepageURL  https://github.com/Malizma333/linerider-userscript-mods
+// @supportURL   https://github.com/Malizma333/linerider-userscript-mods/issues
+// @grant        none
+
 // ==/UserScript==
 
 // jshint asi: true

@@ -1,22 +1,28 @@
-/* globals math */
-
 // ==UserScript==
 
-// @name         Line Rider Graph Mod
+// @name         Graph Generator
+// @namespace    https://www.linerider.com/
 // @author       Malizma
-// @description  Adds the ability to generate graphs from equations
-// @version      1.1
+// @description  Generates graphs from equations
+// @version      1.1.0
+// @icon         https://www.linerider.com/favicon.ico
 
-// @namespace    http://tampermonkey.net/
 // @match        https://www.linerider.com/*
 // @match        https://*.official-linerider.com/*
-// @match        http://localhost:8000/*
-// @match        https://square-rider.surge.sh/*
+// @match        http://localhost:*/*
+// @match        https://*.surge.sh/*
+
 // @require      https://cdnjs.cloudflare.com/ajax/libs/mathjs/9.2.0/math.js
-// @grant        none
+
 // @downloadURL  https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-graph-mod.user.js
 // @updateURL    https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-graph-mod.user.js
+// @homepageURL  https://github.com/Malizma333/linerider-userscript-mods
+// @supportURL   https://github.com/Malizma333/linerider-userscript-mods/issues
+// @grant        none
+
 // ==/UserScript==
+
+/* globals math */
 
 const updateLines = (linesToRemove, linesToAdd, name) => ({
   type: "UPDATE_LINES",
