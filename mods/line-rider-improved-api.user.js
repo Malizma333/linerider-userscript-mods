@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Container for linerider.com mods
-// @version      1.4.0
+// @version      1.4.1
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -121,8 +121,8 @@ function main () {
             height: "16%",
             overflowY: "auto",
             overflowX: "hidden",
-            top: "50%",
-            right: "8px",
+            top: "8px",
+            right: "250px",
             border: "1px solid black",
             backgroundColor: "#ffffff",
             opacity: 0,
