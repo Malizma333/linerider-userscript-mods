@@ -18,8 +18,8 @@
 // @require      https://github.com/Malizma333/line-rider-command-editor-userscript/raw/master/ProjectFiles/renderFunctions.js
 // @require      https://github.com/Malizma333/line-rider-command-editor-userscript/raw/master/ProjectFiles/commandEditor.js
 // @require      https://github.com/Malizma333/line-rider-command-editor-userscript/raw/master/ProjectFiles/main.js
-// @downloadURL  https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-animation-mod.user.js
-// @updateURL    https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-animation-mod.user.js
+// @downloadURL  https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-command-editor.user.js
+// @updateURL    https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-command-editor.user.js
 // @homepageURL  https://github.com/Malizma333/line-rider-command-editor-userscript
 // @supportURL   https://github.com/Malizma333/line-rider-command-editor-userscript/issues
 // ==/UserScript==
