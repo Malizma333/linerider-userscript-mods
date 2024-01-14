@@ -256,7 +256,7 @@ function main () {
         this.state.active && create("div", null,
           this.renderSlider("xSpeed", "X Speed", { min: -99, max: 99, step: 1 }),
           this.renderSlider("ySpeed", "Y Speed", { min: -99, max: 99, step: 1 }),
-          this.renderSlider("rotation", "Rotation", { min: 0, max: 360, step: 5 }),
+          this.renderSlider("rotation", "Rotation", { min: 0, max: 360, step: 1 }),
           this.state.riderCount > 1 && this.renderSlider("selectedRider", "Rider", { min: 1, max: this.state.riderCount, step: 1 }),
           this.renderCheckbox("forceLive", "Force Live (Warning: Causes Lag) "),
 
