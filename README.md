@@ -70,6 +70,10 @@ Generates a zig-zag structure along a selected continuous curve.
 
 Adds a tool for quickly generating frame-based animations. Built off of the updated transform mod.
 
+### Bookmark Mod
+
+Allows for creating multiple bookmarked timestamps (flags), as opposed to having just one flag.
+
 ### Command Editor Mod
 
 Adds UI to certain console features. See in-depth readme explanation [here](https://github.com/Malizma333/line-rider-command-editor-userscript/tree/master#readme)
