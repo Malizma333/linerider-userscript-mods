@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Allows you to make bookmarks that act similar to flags but there's multiple
-// @version      1.2.1
+// @version      1.2.2
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -162,15 +162,12 @@ function main () {
     render () {
       return c("div", null,
         this.state.active && c("div", { style: {height: '20vh', border: '1px solid black', overflowY: 'auto'} },
-          this.state.timestamps.map((timestamp, index) => {
-            return c('div', {key: index}, this.renderTimeStamp(index))
-          }),
           c("button", {
             onClick: () => {
               const timestamps = this.state.timestamps;
               const currentIndex = store.getState().player.index;
               const currentTimestamp = this.convertIndexToTime(currentIndex);
-              timestamps.push(currentTimestamp)
+              timestamps.unshift(currentTimestamp)
               this.setState({ timestamps })
             }}, "+"),
            c("button", {
@@ -180,7 +177,10 @@ function main () {
             }}, "X"),
           c("button", {onClick: this.onIndexView.bind(this)},
             this.state.indexView ? "Show Times" : "Show Indices"
-          )
+          ),
+          this.state.timestamps.map((timestamp, index) => {
+            return c('div', {key: index}, this.renderTimeStamp(index))
+          })
         ),
         c("button", {
             style: { backgroundColor: this.state.active ? "lightblue" : null },
