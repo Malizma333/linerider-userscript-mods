@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Allows you to make bookmarks that act similar to flags but there's multiple
-// @version      1.2.0
+// @version      1.2.1
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -161,7 +161,7 @@ function main () {
 
     render () {
       return c("div", null,
-        this.state.active && c("div", null,
+        this.state.active && c("div", { style: {height: '20vh', border: '1px solid black', overflowY: 'auto'} },
           this.state.timestamps.map((timestamp, index) => {
             return c('div', {key: index}, this.renderTimeStamp(index))
           }),
