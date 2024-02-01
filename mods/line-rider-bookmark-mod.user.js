@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Allows you to make bookmarks that act similar to flags but there's multiple
-// @version      1.0.0
+// @version      1.1.0
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -20,6 +20,8 @@
 
 // ==/UserScript==
 
+const DEFAULT_STATE = [[0,0,0,'']];
+
 function main () {
   const {
     React,
@@ -33,7 +35,7 @@ function main () {
 
       this.state = {
         active: false,
-        timestamps: [[0,0,0]]
+        timestamps: JSON.parse(JSON.stringify(DEFAULT_STATE))
       };
     }
 
@@ -43,10 +45,10 @@ function main () {
         if(timestamps && timestamps.length) {
           this.setState({ timestamps });
         } else {
-          this.setState({ timestamps: [[0,0,0]] })
+          this.setState({ timestamps: JSON.parse(JSON.stringify(DEFAULT_STATE)) })
         }
       } catch(e) {
-        this.setState({ timestamps: [[0,0,0]] })
+        this.setState({ timestamps: JSON.parse(JSON.stringify(DEFAULT_STATE)) })
       }
     }
 
@@ -82,7 +84,17 @@ function main () {
     }
 
     renderTimeStamp (index) {
-      return c('div', {style: {display: 'flex', flexDirection: 'row'}},
+      return c('div', null,
+        c("input", {
+          type: 'text',
+          value: this.state.timestamps[index][3],
+          onChange: (e) => {
+            const timestamps = this.state.timestamps;
+            timestamps[index][3] = e.target.value;
+            this.setState({ timestamps })
+          }
+        }),
+        c('div', {style: {display: 'flex', flexDirection: 'row'}},
         c("button", {
         onClick: () => {
           const targetTimestamp = this.state.timestamps[index];
@@ -100,6 +112,7 @@ function main () {
           this.setState({ timestamps });
         }}, "-")
        )
+      )
     }
 
     render () {
