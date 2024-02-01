@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Allows you to make bookmarks that act similar to flags but there's multiple
-// @version      1.1.0
+// @version      1.2.0
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -35,6 +35,7 @@ function main () {
 
       this.state = {
         active: false,
+        indexView: false,
         timestamps: JSON.parse(JSON.stringify(DEFAULT_STATE))
       };
     }
@@ -61,9 +62,48 @@ function main () {
       }
     }
 
+    onIndexView () {
+      if (this.state.indexView) {
+        this.setState({ indexView: false });
+      } else {
+        this.setState({ indexView: true });
+      }
+    }
+
     componentWillUpdate(nextProps, nextState) {
       if(!nextState.timestamps) return;
       window.localStorage.setItem('BOOKMARK_MOD_TIMESTAMPS', JSON.stringify(nextState.timestamps));
+    }
+
+    convertIndexToTime(index) {
+      const time = [
+        Math.floor(index / 2400),
+        Math.floor((index % 2400) / 40),
+        Math.floor(index % 40)
+      ];
+      return time;
+    }
+
+    convertTimeToIndex(time) {
+      const index = time[0] * 2400 + time[1] * 40 + time[2];
+      return index;
+    }
+
+    renderFramePicker (index) {
+      const props = {
+        type: "text",
+        inputmode: "numeric",
+        value: this.convertTimeToIndex(this.state.timestamps[index]),
+        onChange: e => {
+          const timestamps = this.state.timestamps;
+          timestamps[index] = this.convertIndexToTime(parseInt(e.target.value))
+          this.setState({ timestamps });
+        }
+      };
+
+      return c("div", null,
+        c("input", { style: { width: "8em" }, ...props })
+      );
     }
 
     renderNumberPicker (index, key, constraints) {
@@ -98,12 +138,16 @@ function main () {
         c("button", {
         onClick: () => {
           const targetTimestamp = this.state.timestamps[index];
-          const targetFrame = targetTimestamp[0] * 2400 + targetTimestamp[1] * 40 + targetTimestamp[2];
+          const targetFrame = this.convertTimeToIndex(targetTimestamp)
           store.dispatch({ type: "SET_PLAYER_INDEX", payload: targetFrame });
         }}, ">"),
-        this.renderNumberPicker(index, 0, { min: 0, max: 59 }), ':',
-        this.renderNumberPicker(index, 1, { min: 0, max: 59 }), ':',
-        this.renderNumberPicker(index, 2, { min: 0, max: 39 }),
+        this.state.indexView ? c('div', null,
+          this.renderFramePicker(index)
+        ) : c('div', {style: {display: 'flex', flexDirection: 'row'}},
+          this.renderNumberPicker(index, 0, { min: 0, max: 59 }), ':',
+          this.renderNumberPicker(index, 1, { min: 0, max: 59 }), ':',
+          this.renderNumberPicker(index, 2, { min: 0, max: 39 }),
+        ),
         c("button", {
         onClick: () => {
           if(!window.confirm("Remove bookmark?")) return;
@@ -124,12 +168,8 @@ function main () {
           c("button", {
             onClick: () => {
               const timestamps = this.state.timestamps;
-              const currentTime = store.getState().player.index;
-              const currentTimestamp = [
-                Math.floor(currentTime / 2400),
-                Math.floor((currentTime % 2400) / 40),
-                Math.floor(currentTime % 40)
-              ]
+              const currentIndex = store.getState().player.index;
+              const currentTimestamp = this.convertIndexToTime(currentIndex);
               timestamps.push(currentTimestamp)
               this.setState({ timestamps })
             }}, "+"),
@@ -137,14 +177,15 @@ function main () {
             onClick: () => {
               if(!window.confirm("Remove all bookmarks?")) return;
               this.setState({ timestamps: [] })
-            }}, "X")
+            }}, "X"),
+          c("button", {onClick: this.onIndexView.bind(this)},
+            this.state.indexView ? "Show Times" : "Show Indices"
+          )
         ),
-        c("button",
-          {
+        c("button", {
             style: { backgroundColor: this.state.active ? "lightblue" : null },
             onClick: this.onActivate.bind(this)
-          },
-          "Bookmark Mod"
+          }, "Bookmark Mod"
         )
       );
     }
