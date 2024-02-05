@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Allows you to make bookmarks that act similar to flags but there's multiple
-// @version      1.3.0
+// @version      1.3.1
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -129,7 +129,7 @@ function main () {
         ...constraints,
         type: "number",
         value: this.state[key],
-        onChange: e => this.setState({ [key]: e.target.value })
+        onChange: e => this.setState({ [key]: parseInt(e.target.value) })
       };
 
       return c("div", null,
