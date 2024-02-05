@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Allows you to make bookmarks that act similar to flags but there's multiple
-// @version      1.2.2
+// @version      1.3.0
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -36,6 +36,10 @@ function main () {
       this.state = {
         active: false,
         indexView: false,
+        bpm: 60,
+        start: 0,
+        end: 1200,
+        beats: 1,
         timestamps: JSON.parse(JSON.stringify(DEFAULT_STATE))
       };
     }
@@ -70,6 +74,20 @@ function main () {
       }
     }
 
+    onGenerateBPM() {
+      if(this.state.beats <= 0) return;
+      if(this.state.bpm <= 0) return;
+      if(this.state.start < 0) return;
+      if(this.state.end < 0) return;
+      const timestamps = this.state.timestamps;
+      for(let frame = this.state.start; frame < this.state.end; frame += 2400/(this.state.beats * this.state.bpm)) {
+        const timestamp = this.convertIndexToTime(frame);
+        timestamp.push("BPM Marker");
+        timestamps.push(timestamp);
+      }
+      this.setState({ timestamps });
+    }
+
     componentWillUpdate(nextProps, nextState) {
       if(!nextState.timestamps) return;
       window.localStorage.setItem('BOOKMARK_MOD_TIMESTAMPS', JSON.stringify(nextState.timestamps));
@@ -102,11 +120,25 @@ function main () {
       };
 
       return c("div", null,
-        c("input", { style: { width: "8em" }, ...props })
+        c("input", { style: { width: "6em" }, ...props })
       );
     }
 
-    renderNumberPicker (index, key, constraints) {
+    renderNumberPicker(key, title, constraints) {
+      const props = {
+        ...constraints,
+        type: "number",
+        value: this.state[key],
+        onChange: e => this.setState({ [key]: e.target.value })
+      };
+
+      return c("div", null,
+        title,
+        c("input", { style: { width: "4em" }, ...props })
+      );
+    }
+
+    renderTimePicker (index, key, constraints) {
       const props = {
         type: "text",
         inputmode: "numeric",
@@ -123,9 +155,24 @@ function main () {
       );
     }
 
+    renderBPMGenerator() {
+      const maxIndex = window.store.getState().player.maxIndex;
+      return c('div', null,
+        "Generating BPM Markers",
+        c("button", {onClick: this.onGenerateBPM.bind(this)}, "Generate"),
+        c('div', {style: {display: 'flex', flexDirection: 'row'}},
+          this.renderNumberPicker('start', 'Start', { min: 0, max: 1000, step: 1 }),
+          this.renderNumberPicker('end', 'End', { min: 0, max: maxIndex, step: 1}),
+          this.renderNumberPicker('bpm', 'BPM', { min: 0, max: maxIndex, step: 1})
+        ),
+        this.renderNumberPicker('beats', 'Beat Count (1/x) ', { min: 1, max: 256, step: 1})
+      )
+    }
+
     renderTimeStamp (index) {
       return c('div', null,
         c("input", {
+          style: { width: "8em" },
           type: 'text',
           value: this.state.timestamps[index][3],
           onChange: (e) => {
@@ -144,9 +191,9 @@ function main () {
         this.state.indexView ? c('div', null,
           this.renderFramePicker(index)
         ) : c('div', {style: {display: 'flex', flexDirection: 'row'}},
-          this.renderNumberPicker(index, 0, { min: 0, max: 59 }), ':',
-          this.renderNumberPicker(index, 1, { min: 0, max: 59 }), ':',
-          this.renderNumberPicker(index, 2, { min: 0, max: 39 }),
+          this.renderTimePicker(index, 0, { min: 0, max: 59 }), ':',
+          this.renderTimePicker(index, 1, { min: 0, max: 59 }), ':',
+          this.renderTimePicker(index, 2, { min: 0, max: 39 }),
         ),
         c("button", {
         onClick: () => {
@@ -161,7 +208,12 @@ function main () {
 
     render () {
       return c("div", null,
-        this.state.active && c("div", { style: {height: '20vh', border: '1px solid black', overflowY: 'auto'} },
+        c("button", {
+            style: { backgroundColor: this.state.active ? "lightblue" : null },
+            onClick: this.onActivate.bind(this)
+          }, "Bookmark Mod"
+        ),
+        this.state.active && c("div", { style: {height: '20vh', border: '1px solid black', overflowY: 'auto', overflowX: 'hidden'} },
           c("button", {
             onClick: () => {
               const timestamps = this.state.timestamps;
@@ -180,12 +232,8 @@ function main () {
           ),
           this.state.timestamps.map((timestamp, index) => {
             return c('div', {key: index}, this.renderTimeStamp(index))
-          })
-        ),
-        c("button", {
-            style: { backgroundColor: this.state.active ? "lightblue" : null },
-            onClick: this.onActivate.bind(this)
-          }, "Bookmark Mod"
+          }),
+          this.renderBPMGenerator()
         )
       );
     }
