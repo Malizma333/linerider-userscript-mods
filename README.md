@@ -52,6 +52,10 @@ Generates a regular polygon, based on a selected line as the radius and a given 
 
 Generates some neat spiral-like patterns when given an offset and a length.
 
+### Sudoku Mod
+
+Generates a sudoku puzzle from a seed, which references a list of puzzles pulled from a database.
+
 ### Ten Point Cannon Mod
 
 Generates a 10pc based on rider x and y speed. Works for multiple riders.
