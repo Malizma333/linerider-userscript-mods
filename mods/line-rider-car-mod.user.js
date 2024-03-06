@@ -20,7 +20,7 @@
 
 // ==/UserScript==
 
-const CarMod = (function() {
+const CarMod = (function () {
   let init = false;
   let USER_PARAMS = {
     // Preferences
@@ -47,36 +47,36 @@ const CarMod = (function() {
     MAX_ROTATION: 20,
     ROTATION_CHANGE: 10,
     // Keybindings
-    SPEED_UP_KEY: 'w',
-    SPEED_DOWN_KEY: 's',
-    TURN_LEFT_KEY: 'a',
-    TURN_RIGHT_KEY: 'd',
-    ROTATE_LEFT_KEY: 'ArrowLeft',
-    ROTATE_RIGHT_KEY: 'ArrowRight',
-    ZOOM_IN_KEY: 'ArrowUp',
-    ZOOM_OUT_KEY: 'ArrowDown',
+    SPEED_UP_KEY: "w",
+    SPEED_DOWN_KEY: "s",
+    TURN_LEFT_KEY: "a",
+    TURN_RIGHT_KEY: "d",
+    ROTATE_LEFT_KEY: "ArrowLeft",
+    ROTATE_RIGHT_KEY: "ArrowRight",
+    ZOOM_IN_KEY: "ArrowUp",
+    ZOOM_OUT_KEY: "ArrowDown",
     // Keyframes
     KEYFRAMES_ENABLED: false,
     KEYFRAME_ARRAY: [
-      [0, {'w': 1}],
-      [40, {}],
-      [80, {'a': 1}],
-      [120, {}]
+      [ 0, { "w": 1 } ],
+      [ 40, {} ],
+      [ 80, { "a": 1 } ],
+      [ 120, {} ]
     ]
-  }
+  };
 
   const ONE_DEGREE = 0.0174532925;
   const ORIGIN_INDEX = 6;
 
   const CONTROLS = {
-    SPEED_UP: {KEY: USER_PARAMS.SPEED_UP_KEY, state: 0},
-    SPEED_DOWN: {KEY: USER_PARAMS.SPEED_DOWN_KEY, state: 0},
-    TURN_LEFT: {KEY: USER_PARAMS.TURN_LEFT_KEY, state: 0},
-    TURN_RIGHT: {KEY: USER_PARAMS.TURN_RIGHT_KEY, state: 0},
-    ROTATE_LEFT: {KEY: USER_PARAMS.ROTATE_LEFT_KEY, state: 0},
-    ROTATE_RIGHT: {KEY: USER_PARAMS.ROTATE_RIGHT_KEY, state: 0},
-    ZOOM_IN: {KEY: USER_PARAMS.ZOOM_IN_KEY, state: 0},
-    ZOOM_OUT: {KEY: USER_PARAMS.ZOOM_OUT_KEY, state: 0}
+    SPEED_UP: { KEY: USER_PARAMS.SPEED_UP_KEY, state: 0 },
+    SPEED_DOWN: { KEY: USER_PARAMS.SPEED_DOWN_KEY, state: 0 },
+    TURN_LEFT: { KEY: USER_PARAMS.TURN_LEFT_KEY, state: 0 },
+    TURN_RIGHT: { KEY: USER_PARAMS.TURN_RIGHT_KEY, state: 0 },
+    ROTATE_LEFT: { KEY: USER_PARAMS.ROTATE_LEFT_KEY, state: 0 },
+    ROTATE_RIGHT: { KEY: USER_PARAMS.ROTATE_RIGHT_KEY, state: 0 },
+    ZOOM_IN: { KEY: USER_PARAMS.ZOOM_IN_KEY, state: 0 },
+    ZOOM_OUT: { KEY: USER_PARAMS.ZOOM_OUT_KEY, state: 0 }
   };
 
   const MOVE_STATE = {
@@ -89,21 +89,21 @@ const CarMod = (function() {
   };
 
   const GRAVITY_PROPS = {
-    DEFAULT: {x:0, y:0.175},
-    ZERO: {x:0, y:0},
+    DEFAULT: { x:0, y:0.175 },
+    ZERO: { x:0, y:0 },
     currentPointIndex: -1,
     currentKeyframeIndex: -1,
     playerWasRunning: false
-  }
+  };
 
-  function subscribe(
+  function subscribe (
     store = window.store,
     select = (state) => state,
     notify = () => {}
   ) {
     let state;
 
-    function subscription() {
+    function subscription () {
       const update = select(store.getState());
       if (update !== state) {
         state = update;
@@ -116,7 +116,7 @@ const CarMod = (function() {
     return unsubscribe;
   }
 
-  function reset() {
+  function reset () {
     window.store.dispatch({ type: "SET_PLAYER_STOP_AT_END", payload: false });
     window.store.dispatch({ type: "SET_PLAYER_MAX_INDEX", payload: 0 });
     window.store.getState().simulator.engine.engine._computed._frames.length = 1;
@@ -136,7 +136,7 @@ const CarMod = (function() {
     MOVE_STATE.offset_rotation = 0;
     GRAVITY_PROPS.currentPointIndex = -1;
     GRAVITY_PROPS.currentKeyframeIndex = -1;
-    setCustomRiders([`
+    window.setCustomRiders([ `
       .flag{opacity:0;}.skin{opacity:0;}.hair{opacity:0;}.fill{opacity:0;}#eye{opacity:0;}#string{opacity:0;}
       .hat{opacity:0}.arm{opacity:0;}.leg{opacity:0;}.sled{opacity:0;}.scarfEven{opacity:0;}.scarfOdd{opacity:0;}
       .torso{fill:${USER_PARAMS.CAR_COLOR};stroke-width:0;transform:translate(3.2px,0px)scale(0.6,1.7);rx:1.5}
@@ -150,32 +150,32 @@ const CarMod = (function() {
       #scarf3{opacity:1;rx:1;fill:black;width:1px;transform:translate(3px,-27.5px);}
       #scarf4{opacity:1;rx:1;fill:black;width:1px;transform:translate(2px,-27.5px);}
       #scarf5{opacity:0;}
-    `]);
+    ` ]);
   }
 
-  function disable(store) {
+  function disable (store) {
     USER_PARAMS.ENABLED = false;
     store.dispatch({ type: "SET_PLAYER_STOP_AT_END", payload: false });
     store.dispatch({ type: "SET_PLAYER_MAX_INDEX", payload: 0 });
     store.getState().simulator.engine.engine._computed._frames.length = 1;
-    setCustomRiders(setCustomRiders.default);
-    Object.defineProperty(window.$ENGINE_PARAMS, "gravity", { get() { return GRAVITY_PROPS.DEFAULT; }});
+    window.setCustomRiders(window.setCustomRiders.default);
+    Object.defineProperty(window.$ENGINE_PARAMS, "gravity", { get () { return GRAVITY_PROPS.DEFAULT; } });
   }
 
-  function enable(store) {
+  function enable (store) {
     USER_PARAMS.ENABLED = true;
 
     reset();
 
-    Object.defineProperty(window.$ENGINE_PARAMS, "gravity", { get() { try {
+    Object.defineProperty(window.$ENGINE_PARAMS, "gravity", { get () { try {
       GRAVITY_PROPS.currentPointIndex = (GRAVITY_PROPS.currentPointIndex + 1) % 17;
 
       const FRAMES = store.getState().simulator.engine.engine._computed._frames;
       const RIDER_POINTS = FRAMES[FRAMES.length-1].snapshot.entities[0].entities[0].points;
       const CURRENT_POINT = RIDER_POINTS[GRAVITY_PROPS.currentPointIndex];
 
-      if(USER_PARAMS.KEYFRAMES_ENABLED) {
-        if(GRAVITY_PROPS.currentKeyframeIndex + 1 < USER_PARAMS.KEYFRAME_ARRAY.length &&
+      if (USER_PARAMS.KEYFRAMES_ENABLED) {
+        if (GRAVITY_PROPS.currentKeyframeIndex + 1 < USER_PARAMS.KEYFRAME_ARRAY.length &&
           FRAMES.length >= USER_PARAMS.KEYFRAME_ARRAY[GRAVITY_PROPS.currentKeyframeIndex + 1][0]) {
           GRAVITY_PROPS.currentKeyframeIndex++;
         }
@@ -190,79 +190,79 @@ const CarMod = (function() {
         CONTROLS.ZOOM_OUT.state = CURRENT_KEYFRAME[CONTROLS.ZOOM_OUT.KEY] ? 1 : 0;
       }
 
-      if(CURRENT_POINT.type === 'FlutterPoint') return GRAVITY_PROPS.DEFAULT;
+      if (CURRENT_POINT.type === "FlutterPoint") return GRAVITY_PROPS.DEFAULT;
 
-      if(GRAVITY_PROPS.currentPointIndex === 0) {
+      if (GRAVITY_PROPS.currentPointIndex === 0) {
         const HYPOTONUSE = Math.hypot(CURRENT_POINT.vel.x, CURRENT_POINT.vel.y);
         const PERP_ANGLE = Math.atan2(CURRENT_POINT.vel.y, CURRENT_POINT.vel.x) + Math.PI / 2;
         const NORMAL_VELOCITY = {
           x: CURRENT_POINT.vel.x / HYPOTONUSE,
           y: CURRENT_POINT.vel.y / HYPOTONUSE
-        }
+        };
         const TRAIL_A = {
           x1: CURRENT_POINT.pos.x - 7 * Math.cos(PERP_ANGLE) + 2 * NORMAL_VELOCITY.x,
           y1: CURRENT_POINT.pos.y - 7 * Math.sin(PERP_ANGLE) + 2 * NORMAL_VELOCITY.y,
           x2: CURRENT_POINT.pos.x - 7 * Math.cos(PERP_ANGLE),
           y2: CURRENT_POINT.pos.y - 7 * Math.sin(PERP_ANGLE)
-        }
+        };
         const TRAIL_B = {
           x1: CURRENT_POINT.pos.x - 3.25 * Math.cos(PERP_ANGLE) + 2 * NORMAL_VELOCITY.x,
           y1: CURRENT_POINT.pos.y - 3.25 * Math.sin(PERP_ANGLE) + 2 * NORMAL_VELOCITY.y,
           x2: CURRENT_POINT.pos.x - 3.25 * Math.cos(PERP_ANGLE),
           y2: CURRENT_POINT.pos.y - 3.25 * Math.sin(PERP_ANGLE)
-        }
+        };
 
-        if(USER_PARAMS.TRAIL_ENABLED) {
+        if (USER_PARAMS.TRAIL_ENABLED) {
           store.dispatch({
             type: "UPDATE_LINES",
-            payload: { linesToAdd: [{...TRAIL_A, type: 2}, {...TRAIL_B, type: 2}], initialLoad: false },
+            payload: { linesToAdd: [ { ...TRAIL_A, type: 2 }, { ...TRAIL_B, type: 2 } ], initialLoad: false },
             meta: { name: "ADD_LINES" }
           });
         }
 
         MOVE_STATE.previousRotation = MOVE_STATE.base_rotation + MOVE_STATE.offset_rotation;
 
-        if(CONTROLS.SPEED_UP.state === 1) {
+        if (CONTROLS.SPEED_UP.state === 1) {
           MOVE_STATE.speed = Math.min(
             USER_PARAMS.MAX_SPEED, MOVE_STATE.speed + USER_PARAMS.ACCELERATION
           );
         }
-        if(CONTROLS.SPEED_DOWN.state === 1) {
+        if (CONTROLS.SPEED_DOWN.state === 1) {
           MOVE_STATE.speed = Math.max(
             USER_PARAMS.MIN_SPEED, MOVE_STATE.speed - USER_PARAMS.DECELERATION
           );
         }
-        if(CONTROLS.TURN_RIGHT.state === 1) {
+        if (CONTROLS.TURN_RIGHT.state === 1) {
           MOVE_STATE.base_rotation += USER_PARAMS.ROTATION_CHANGE * ONE_DEGREE;
           MOVE_STATE.turn += USER_PARAMS.DIRECTION_CHANGE * ONE_DEGREE;
         }
-        if(CONTROLS.TURN_LEFT.state === 1) {
+        if (CONTROLS.TURN_LEFT.state === 1) {
           MOVE_STATE.base_rotation -= USER_PARAMS.ROTATION_CHANGE * ONE_DEGREE;
           MOVE_STATE.turn -= USER_PARAMS.DIRECTION_CHANGE * ONE_DEGREE;
         }
-        if(CONTROLS.ROTATE_RIGHT.state === 1) {
+        if (CONTROLS.ROTATE_RIGHT.state === 1) {
           MOVE_STATE.offset_rotation = Math.min(
             USER_PARAMS.MAX_ROTATION * ONE_DEGREE, MOVE_STATE.offset_rotation + USER_PARAMS.ROTATION_CHANGE * ONE_DEGREE
           );
         }
-        if(CONTROLS.ROTATE_LEFT.state === 1) {
+        if (CONTROLS.ROTATE_LEFT.state === 1) {
           MOVE_STATE.offset_rotation = Math.max(
             USER_PARAMS.MIN_ROTATION * ONE_DEGREE, MOVE_STATE.offset_rotation - USER_PARAMS.ROTATION_CHANGE * ONE_DEGREE
           );
         }
-        if(CONTROLS.ZOOM_IN.state === 1) {
+        if (CONTROLS.ZOOM_IN.state === 1) {
           MOVE_STATE.zoom = Math.min(
             USER_PARAMS.MAX_ZOOM, MOVE_STATE.zoom + USER_PARAMS.ZOOM_CHANGE
           );
         }
-        if(CONTROLS.ZOOM_OUT.state === 1) {
+        if (CONTROLS.ZOOM_OUT.state === 1) {
           MOVE_STATE.zoom = Math.max(
             USER_PARAMS.MIN_ZOOM, MOVE_STATE.zoom - USER_PARAMS.ZOOM_CHANGE
           );
         }
       }
 
-      store.dispatch({type: "SET_PLAYBACK_ZOOM", payload: Math.pow(2, MOVE_STATE.zoom)});
+      store.dispatch({ type: "SET_PLAYBACK_ZOOM", payload: Math.pow(2, MOVE_STATE.zoom) });
 
       const ROTATION_CHANGE = MOVE_STATE.base_rotation + MOVE_STATE.offset_rotation - MOVE_STATE.previousRotation;
       const CENTERED_POINT = {
@@ -289,23 +289,23 @@ const CarMod = (function() {
       };
 
       return NEW_GRAVITY;
-    } catch(e) { console.error(JSON.stringify(e)); return GRAVITY_PROPS.ZERO; } }});
+    } catch (e) { console.error(JSON.stringify(e)); return GRAVITY_PROPS.ZERO; } } });
 
-    if(init) return;
+    if (init) return;
     init = true;
 
     const unsubscribeFromPlayer = subscribe(
       store,
       ({ player: { running } }) => running,
       (playing) => {
-        if(!USER_PARAMS.ENABLED) return;
+        if (!USER_PARAMS.ENABLED) return;
 
-        if(!playing && GRAVITY_PROPS.playerWasRunning) {
-          store.dispatch({type: "COMMIT_TRACK_CHANGES"});
+        if (!playing && GRAVITY_PROPS.playerWasRunning) {
+          store.dispatch({ type: "COMMIT_TRACK_CHANGES" });
           store.dispatch({ type: "SET_PLAYER_STOP_AT_END", payload: true });
         }
 
-        if(playing) {
+        if (playing) {
           GRAVITY_PROPS.playerWasRunning = true;
         } else {
           GRAVITY_PROPS.playerWasRunning = false;
@@ -313,74 +313,74 @@ const CarMod = (function() {
       }
     );
 
-    document.addEventListener('keydown', (event) => {
-      switch(event.key) {
-        case CONTROLS.SPEED_UP.KEY:
-          CONTROLS.SPEED_UP.state = 1;
-          break;
-        case CONTROLS.SPEED_DOWN.KEY:
-          CONTROLS.SPEED_DOWN.state = 1;
-          break;
-        case CONTROLS.TURN_LEFT.KEY:
-          CONTROLS.TURN_LEFT.state = 1;
-          break;
-        case CONTROLS.TURN_RIGHT.KEY:
-          CONTROLS.TURN_RIGHT.state = 1;
-          break;
-        case CONTROLS.ROTATE_LEFT.KEY:
-          CONTROLS.ROTATE_LEFT.state = 1;
-          break;
-        case CONTROLS.ROTATE_RIGHT.KEY:
-          CONTROLS.ROTATE_RIGHT.state = 1;
-          break;
-        case CONTROLS.ZOOM_IN.KEY:
-          CONTROLS.ZOOM_IN.state = 1;
-          break;
-        case CONTROLS.ZOOM_OUT.KEY:
-          CONTROLS.ZOOM_OUT.state = 1;
-          break;
-        default:
-          break;
+    document.addEventListener("keydown", (event) => {
+      switch (event.key) {
+      case CONTROLS.SPEED_UP.KEY:
+        CONTROLS.SPEED_UP.state = 1;
+        break;
+      case CONTROLS.SPEED_DOWN.KEY:
+        CONTROLS.SPEED_DOWN.state = 1;
+        break;
+      case CONTROLS.TURN_LEFT.KEY:
+        CONTROLS.TURN_LEFT.state = 1;
+        break;
+      case CONTROLS.TURN_RIGHT.KEY:
+        CONTROLS.TURN_RIGHT.state = 1;
+        break;
+      case CONTROLS.ROTATE_LEFT.KEY:
+        CONTROLS.ROTATE_LEFT.state = 1;
+        break;
+      case CONTROLS.ROTATE_RIGHT.KEY:
+        CONTROLS.ROTATE_RIGHT.state = 1;
+        break;
+      case CONTROLS.ZOOM_IN.KEY:
+        CONTROLS.ZOOM_IN.state = 1;
+        break;
+      case CONTROLS.ZOOM_OUT.KEY:
+        CONTROLS.ZOOM_OUT.state = 1;
+        break;
+      default:
+        break;
       }
     }, false);
 
-    document.addEventListener('keyup', (event) => {
-      switch(event.key) {
-        case CONTROLS.SPEED_UP.KEY:
-          CONTROLS.SPEED_UP.state = 0;
-          break;
-        case CONTROLS.SPEED_DOWN.KEY:
-          CONTROLS.SPEED_DOWN.state = 0;
-          break;
-        case CONTROLS.TURN_LEFT.KEY:
-          CONTROLS.TURN_LEFT.state = 0;
-          break;
-        case CONTROLS.TURN_RIGHT.KEY:
-          CONTROLS.TURN_RIGHT.state = 0;
-          break;
-        case CONTROLS.ROTATE_LEFT.KEY:
-          CONTROLS.ROTATE_LEFT.state = 0;
-          break;
-        case CONTROLS.ROTATE_RIGHT.KEY:
-          CONTROLS.ROTATE_RIGHT.state = 0;
-          break;
-        case CONTROLS.ZOOM_IN.KEY:
-          CONTROLS.ZOOM_IN.state = 0;
-          break;
-        case CONTROLS.ZOOM_OUT.KEY:
-          CONTROLS.ZOOM_OUT.state = 0;
-          break;
-        default:
-          break;
+    document.addEventListener("keyup", (event) => {
+      switch (event.key) {
+      case CONTROLS.SPEED_UP.KEY:
+        CONTROLS.SPEED_UP.state = 0;
+        break;
+      case CONTROLS.SPEED_DOWN.KEY:
+        CONTROLS.SPEED_DOWN.state = 0;
+        break;
+      case CONTROLS.TURN_LEFT.KEY:
+        CONTROLS.TURN_LEFT.state = 0;
+        break;
+      case CONTROLS.TURN_RIGHT.KEY:
+        CONTROLS.TURN_RIGHT.state = 0;
+        break;
+      case CONTROLS.ROTATE_LEFT.KEY:
+        CONTROLS.ROTATE_LEFT.state = 0;
+        break;
+      case CONTROLS.ROTATE_RIGHT.KEY:
+        CONTROLS.ROTATE_RIGHT.state = 0;
+        break;
+      case CONTROLS.ZOOM_IN.KEY:
+        CONTROLS.ZOOM_IN.state = 0;
+        break;
+      case CONTROLS.ZOOM_OUT.KEY:
+        CONTROLS.ZOOM_OUT.state = 0;
+        break;
+      default:
+        break;
       }
     }, false);
   }
 
-  function update(state) {
-    USER_PARAMS = {...USER_PARAMS, ...state}
+  function update (state) {
+    USER_PARAMS = { ...USER_PARAMS, ...state };
   }
 
-  return { reset, enable, disable, update }
+  return { reset, enable, disable, update };
 })();
 
 function main () {
@@ -412,7 +412,7 @@ function main () {
         INIT_ROTATION: 0,
         MIN_ROTATION: -20,
         MAX_ROTATION: 20,
-        ROTATION_CHANGE: 10,
+        ROTATION_CHANGE: 10
       };
     }
 

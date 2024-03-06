@@ -22,19 +22,20 @@
 
 // ==/UserScript==
 
+/* global PUZZLES */
 // Puzzles taken from first 10000 entries of https://www.kaggle.com/datasets/bryanpark/sudoku/data
 
 const numberMaps = {
-    '1': [[1,0,1,2]],
-    '2': [[1,0,0,0],[1,0,1,1],[0,1,1,1],[0,1,0,2],[1,2,0,2]],
-    '3': [[1,0,0,0],[0,1,1,1],[1,0,1,2],[1,2,0,2]],
-    '4': [[0,0,0,1],[0,1,1,1],[1,0,1,2]],
-    '5': [[1,0,0,0],[0,0,0,1],[0,1,1,1],[1,1,1,2],[1,2,0,2]],
-    '6': [[1,0,0,0],[0,1,1,1],[0,0,0,2],[1,1,1,2],[1,2,0,2]],
-    '7': [[1,0,1,2],[1,0,0,0]],
-    '8': [[1,0,0,0],[0,1,1,1],[0,0,0,2],[1,0,1,2],[1,2,0,2]],
-    '9': [[1,0,0,0],[0,0,0,1],[0,1,1,1],[1,0,1,2],[1,2,0,2]]
-}
+  "1": [ [ 1, 0, 1, 2 ] ],
+  "2": [ [ 1, 0, 0, 0 ], [ 1, 0, 1, 1 ], [ 0, 1, 1, 1 ], [ 0, 1, 0, 2 ], [ 1, 2, 0, 2 ] ],
+  "3": [ [ 1, 0, 0, 0 ], [ 0, 1, 1, 1 ], [ 1, 0, 1, 2 ], [ 1, 2, 0, 2 ] ],
+  "4": [ [ 0, 0, 0, 1 ], [ 0, 1, 1, 1 ], [ 1, 0, 1, 2 ] ],
+  "5": [ [ 1, 0, 0, 0 ], [ 0, 0, 0, 1 ], [ 0, 1, 1, 1 ], [ 1, 1, 1, 2 ], [ 1, 2, 0, 2 ] ],
+  "6": [ [ 1, 0, 0, 0 ], [ 0, 1, 1, 1 ], [ 0, 0, 0, 2 ], [ 1, 1, 1, 2 ], [ 1, 2, 0, 2 ] ],
+  "7": [ [ 1, 0, 1, 2 ], [ 1, 0, 0, 0 ] ],
+  "8": [ [ 1, 0, 0, 0 ], [ 0, 1, 1, 1 ], [ 0, 0, 0, 2 ], [ 1, 0, 1, 2 ], [ 1, 2, 0, 2 ] ],
+  "9": [ [ 1, 0, 0, 0 ], [ 0, 0, 0, 1 ], [ 0, 1, 1, 1 ], [ 1, 0, 1, 2 ], [ 1, 2, 0, 2 ] ]
+};
 
 const updateLines = (linesToRemove, linesToAdd) => ({
   type: "UPDATE_LINES",
@@ -208,27 +209,27 @@ if (window.registerCustomSetting) {
 function* genLines ({ seed=0 } = {}) {
   const puzzle = PUZZLES[seed];
   const camPos = window.store.getState().camera.editorPosition;
-  for(let i = 0; i < 10; i++) {
-      yield {
-          p1: { x: camPos.x + i * 50, y: camPos.y },
-          p2: { x: camPos.x + i * 50, y: camPos.y + 450 }
-      };
+  for (let i = 0; i < 10; i++) {
+    yield {
+      p1: { x: camPos.x + i * 50, y: camPos.y },
+      p2: { x: camPos.x + i * 50, y: camPos.y + 450 }
+    };
 
-      yield {
-          p1: { x: camPos.x, y: camPos.y + i * 50 },
-          p2: { x: camPos.x + 450, y: camPos.y + i * 50 }
-      };
+    yield {
+      p1: { x: camPos.x, y: camPos.y + i * 50 },
+      p2: { x: camPos.x + 450, y: camPos.y + i * 50 }
+    };
   }
 
-  for(let i = 0; i < 9; i++) {
-      for(let j = 0; j < 9; j++) {
-          if(puzzle[i*9+j] == '0') continue;
-          for(const l of numberMaps[puzzle[i*9+j]]) {
-              yield {
-                  p1: { x: camPos.x + l[0]*12.5 + j * 50 + 18.75, y: camPos.y + l[1]*12.5 + i * 50 + 12.5},
-                  p2: { x: camPos.x + l[2]*12.5 + j * 50 + 18.75, y: camPos.y + l[3]*12.5 + i * 50 + 12.5}
-              };
-          }
+  for (let i = 0; i < 9; i++) {
+    for (let j = 0; j < 9; j++) {
+      if (puzzle[i*9+j] == "0") continue;
+      for (const l of numberMaps[puzzle[i*9+j]]) {
+        yield {
+          p1: { x: camPos.x + l[0]*12.5 + j * 50 + 18.75, y: camPos.y + l[1]*12.5 + i * 50 + 12.5 },
+          p2: { x: camPos.x + l[2]*12.5 + j * 50 + 18.75, y: camPos.y + l[3]*12.5 + i * 50 + 12.5 }
+        };
       }
+    }
   }
 }
