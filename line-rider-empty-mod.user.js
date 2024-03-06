@@ -12,8 +12,6 @@
 // @match        http://localhost:*/*
 // @match        https://*.surge.sh/*
 
-// @require      https://raw.githubusercontent.com/Malizma333/lr-userscript-library/main/index.js
-
 // @downloadURL  _
 // @updateURL    _
 // @homepageURL  _
