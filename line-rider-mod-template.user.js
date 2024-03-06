@@ -40,7 +40,29 @@ An "!" means this trait of the userscript data should be replaced.
 
 // ==/UserScript==
 
-/* global Actions, Selectors */
+/* Actions */
+
+const updateLines = (linesToRemove, linesToAdd, name) => ({
+  type: "UPDATE_LINES",
+  payload: { linesToRemove, linesToAdd },
+  meta: { name: name }
+});
+
+const addLines = (line) => updateLines(null, line, "ADD_LINES");
+
+const commitTrackChanges = () => ({
+  type: "COMMIT_TRACK_CHANGES"
+});
+
+const revertTrackChanges = () => ({
+  type: "REVERT_TRACK_CHANGES"
+});
+
+/* Selectors */
+
+const getSimulatorCommittedTrack = state => state.simulator.committedEngine;
+
+const getEditorPosition = (state) => state.camera.editorPosition;
 
 /**
 * @description
@@ -59,7 +81,7 @@ class TemplateMod {
     // Initializing states to be tracked
     this.store = store;
     this.state = initState;
-    this.track = Selectors.getSimulatorCommittedTrack(store.getState());
+    this.track = getSimulatorCommittedTrack(store.getState());
 
     // Helper variable for tracking changes
     this.changed = false;
@@ -81,8 +103,8 @@ class TemplateMod {
     if (!this.changed) return false;
 
     // Apply changes to the committed engine and revert them from the uncommitted engine
-    this.store.dispatch(Actions.commitTrackChanges());
-    this.store.dispatch(Actions.revertTrackChanges());
+    this.store.dispatch(commitTrackChanges());
+    this.store.dispatch(revertTrackChanges());
     this.changed = false;
     return true;
   }
@@ -113,7 +135,7 @@ class TemplateMod {
 
     // Checks that the engine has changed, only if the mod is active
     if (this.state.active) {
-      const track = Selectors.getSimulatorCommittedTrack(this.store.getState());
+      const track = getSimulatorCommittedTrack(this.store.getState());
 
       if (this.track !== track) {
         this.track = track;
@@ -126,7 +148,7 @@ class TemplateMod {
 
     // If changes have been made previously, discard them for the new changes incoming
     if (this.changed) {
-      this.store.dispatch(Actions.revertTrackChanges());
+      this.store.dispatch(revertTrackChanges());
       this.changed = false;
     }
 
@@ -153,7 +175,7 @@ class TemplateMod {
 
     // Add the new lines to the uncommitted engine if there's lines to be added
     if (linesToAdd.length > 0) {
-      this.store.dispatch(Actions.addLines(linesToAdd));
+      this.store.dispatch(addLines(linesToAdd));
       this.changed = true;
     }
   }
@@ -320,7 +342,7 @@ function* generateLines ({ width = 0, xOff = 0, yOff = 0 } = {}) {
   const { V2 } = window;
 
   // Retrieve camera position
-  const camPos = Selectors.getEditorCamera(window.store.getState()).position;
+  const camPos = getEditorPosition(window.store.getState()).position;
 
   // Create points from state parameters
   const pointA = V2.from(xOff + camPos.x, yOff + camPos.y);

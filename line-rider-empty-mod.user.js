@@ -20,7 +20,17 @@
 
 // ==/UserScript==
 
-/* global Actions, Selectors */
+/* Actions */
+
+const commitTrackChanges = () => ({
+  type: "COMMIT_TRACK_CHANGES"
+});
+
+const revertTrackChanges = () => ({
+  type: "REVERT_TRACK_CHANGES"
+});
+
+/* Selectors */
 
 class EmptyMod {
   constructor (store, initState) {
@@ -39,8 +49,8 @@ class EmptyMod {
   commit () {
     if (!this.changed) return false;
 
-    this.store.dispatch(Actions.commitTrackChanges());
-    this.store.dispatch(Actions.revertTrackChanges());
+    this.store.dispatch(commitTrackChanges());
+    this.store.dispatch(revertTrackChanges());
     this.changed = false;
     return true;
   }
@@ -60,7 +70,7 @@ class EmptyMod {
     if (!shouldUpdate) return;
 
     if (this.changed) {
-      this.store.dispatch(Actions.revertTrackChanges());
+      this.store.dispatch(revertTrackChanges());
       this.changed = false;
     }
 
