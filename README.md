@@ -28,6 +28,10 @@ Converts a [Geometrize Desktop](https://www.geometrize.co.uk/) JSON file export 
 
 Generates an image from any supported image file format. Includes clamping feature for limiting number of layers. Be careful about rendering larger images as it may crash the site.
 
+### SVG Generator
+
+Generates an svg file for download from a selection of lines.
+
 ### Text Mod
 
 Generates text typed in a text box. Needs a Line Rider font JSON file, which can be found in the font folder.
