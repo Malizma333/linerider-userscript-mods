@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Generates an svg file from a selection of lines
-// @version      1.1.0
+// @version      1.1.1
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -232,12 +232,12 @@ function getLinesFromPoints (points) {
 }
 
 function getColorsFromLayers (layers) {
-  const colors = {};
+  const colors = [];
 
   for(const layer of layers) {
     const name = layer.name;
     if(name.length < 7) {
-      colors[layer.id] = "black";
+      colors.push({id: layer.id, color: "black"})
       continue;
     }
 
@@ -245,16 +245,16 @@ function getColorsFromLayers (layers) {
     const ss = layer.name.substring(0,7);
 
     if(regex.test(ss)) {
-      colors[layer.id] = ss;
+      colors.push({id: layer.id, color: ss})
     } else {
-      colors[layer.id] = "black";
+      colors.push({id: layer.id, color: "black"})
     }
   }
 
   return colors;
 }
 
-function getSVG (selectedLines, colors, useColor) {
+function getSVG (selectedLines, layerColors, useColor) {
   if(!selectedLines || selectedLines.length === 0) return false;
 
   const bounds = {
@@ -266,6 +266,14 @@ function getSVG (selectedLines, colors, useColor) {
   bounds.minY = selectedLines[0].y1;
   bounds.maxY = selectedLines[0].y2;
 
+  const linesToAdd = {};
+  const colorMap = {};
+
+  for(const layerColor of layerColors) {
+    linesToAdd[layerColor.id] = [];
+    colorMap[layerColor.id] = layerColor.color;
+  }
+
   for(const line of selectedLines) {
     const minLX = Math.min(line.x1, line.x2);
     const minLY = Math.min(line.y1, line.y2);
@@ -276,6 +284,15 @@ function getSVG (selectedLines, colors, useColor) {
     if(bounds.minY > minLY) {bounds.minY = minLY;}
     if(bounds.maxX < maxLX) {bounds.maxX = maxLX;}
     if(bounds.maxY < maxLY) {bounds.maxY = maxLY;}
+
+    const layerID = line.layer || 0;
+    linesToAdd[layerID].push({
+      x1: line.x1,
+      y1: line.y1,
+      x2: line.x2,
+      y2: line.y2,
+      color: colorMap[layerID]
+    })
   }
 
   bounds.minX -= 2;
@@ -291,20 +308,22 @@ function getSVG (selectedLines, colors, useColor) {
   svg.setAttribute("width", String(bounds.maxX - bounds.minX));
   svg.setAttribute("height", String(bounds.maxY - bounds.minY));
 
-  for(const line of selectedLines) {
-    const lineElem = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    lineElem.setAttribute("x1", String(line.x1 - bounds.minX));
-    lineElem.setAttribute("y1", String(line.y1 - bounds.minY));
-    lineElem.setAttribute("x2", String(line.x2 - bounds.minX));
-    lineElem.setAttribute("y2", String(line.y2 - bounds.minY));
-    if(useColor) {
-      lineElem.setAttribute("stroke", colors[line.layer || 0]);
-    } else {
-      lineElem.setAttribute("stroke", "black");
+  for(const coloredLayer of layerColors) {
+    for(const line of linesToAdd[coloredLayer.id]) {
+      const lineElem = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      lineElem.setAttribute("x1", String(line.x1 - bounds.minX));
+      lineElem.setAttribute("y1", String(line.y1 - bounds.minY));
+      lineElem.setAttribute("x2", String(line.x2 - bounds.minX));
+      lineElem.setAttribute("y2", String(line.y2 - bounds.minY));
+      if(useColor) {
+        lineElem.setAttribute("stroke", line.color);
+      } else {
+        lineElem.setAttribute("stroke", "black");
+      }
+      lineElem.setAttribute("stroke-linecap", "round");
+      lineElem.setAttribute("stroke-width", 2);
+      svg.appendChild(lineElem);
     }
-    lineElem.setAttribute("stroke-linecap", "round");
-    lineElem.setAttribute("stroke-width", 2);
-    svg.appendChild(lineElem);
   }
 
   const svgString = new XMLSerializer().serializeToString(svg);
