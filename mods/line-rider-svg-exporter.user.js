@@ -12,8 +12,8 @@
 // @match        http://localhost:*/*
 // @match        https://*.surge.sh/*
 
-// @downloadURL  https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-zigzag-mod.user.js
-// @updateURL    https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-zigzag-mod.user.js
+// @downloadURL  https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-svg-exporter.user.js
+// @updateURL    https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-svg-exporter.user.js
 // @homepageURL  https://github.com/Malizma333/linerider-userscript-mods
 // @supportURL   https://github.com/Malizma333/linerider-userscript-mods/issues
 // @grant        none
