@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Generates an svg file from a selection of lines
-// @version      1.0.0
+// @version      1.1.0
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -40,6 +40,7 @@ const getActiveTool = state => state.selectedTool;
 const getToolState = (state, toolId) => state.toolState[toolId];
 const getSelectToolState = state => getToolState(state, SELECT_TOOL);
 const getSimulatorCommittedTrack = state => state.simulator.committedEngine;
+const getCommittedTrackLayers = state => getSimulatorCommittedTrack(state).engine.state.layers;
 
 class SVGExportMod {
   constructor (store, initState) {
@@ -47,6 +48,7 @@ class SVGExportMod {
     this.state = initState;
 
     this.track = getSimulatorCommittedTrack(this.store.getState());
+    this.layers = getCommittedTrackLayers(this.store.getState());
     this.selectedPoints = EMPTY_SET;
 
     store.subscribeImmediate(() => {
@@ -61,28 +63,25 @@ class SVGExportMod {
     });
   }
 
-  onExport () {
+  onExport (useColor) {
     if (this.selectedPoints.size === 0) return 2;
 
     const selectedLines = [ ...getLinesFromPoints(this.selectedPoints) ]
     .map(id => this.track.getLine(id))
     .filter(l => l);
 
-    const success = 0;
-
     try {
-      if(getSVG(selectedLines)) {
+      if(getSVG(selectedLines, getColorsFromLayers(this.layers.buffer), useColor)) {
         console.info("[SVG Export] Success");
+        return 0;
       } else {
-        success = 2;
         console.info("[SVG Export] Failed");
+        return 2;
       }
     } catch(e) {
-      success = 1;
       console.error("[SVG Export] Failed:", e.message);
+      return 1;
     }
-
-    return success;
   }
 
   onUpdate (nextState = this.state) {
@@ -103,6 +102,12 @@ class SVGExportMod {
 
     if(track !== this.track) {
       this.track = track;
+    }
+
+    const layers = getCommittedTrackLayers(this.store.getState());
+
+    if(layers !== this.layers) {
+      this.layers = layers;
     }
 
     const selectToolState = getSelectToolState(this.store.getState());
@@ -129,6 +134,7 @@ function main () {
 
       this.state = {
         active: false,
+        useColor: true,
         success: 0
       };
 
@@ -147,6 +153,18 @@ function main () {
       this.mod.onUpdate(nextState);
     }
 
+    renderCheckbox (key, label) {
+      const settings = {
+        checked: this.state[key],
+        onChange: e => this.setState({ [key]: e.target.checked })
+      };
+
+      return React.createElement("div", null,
+                                 label+' ',
+                                 React.createElement("input", { type: "checkbox", ...settings })
+                                );
+    }
+
     onActivate () {
       if (this.state.active) {
         this.setState({ active: false });
@@ -157,7 +175,7 @@ function main () {
     }
 
     onExport () {
-      const exportSuccess = this.mod.onExport();
+      const exportSuccess = this.mod.onExport(this.state.useColor);
       this.setState({ success: exportSuccess })
     }
 
@@ -167,6 +185,7 @@ function main () {
                e("div", null,
                  this.state.success === 1 && e("div", null, "Error: See console"),
                  this.state.success === 2 && e("div", null, "Error: No lines selected"),
+                 this.renderCheckbox('useColor', "Use Color"),
                  e("button",
                    { style: { float: "left" }, onClick: () => this.onExport() },
                    "Export"
@@ -212,23 +231,46 @@ function getLinesFromPoints (points) {
   return new Set([ ...points ].map(point => point >> 1));
 }
 
-function getSVG(selectedLines) {
+function getColorsFromLayers (layers) {
+  const colors = {};
+
+  for(const layer of layers) {
+    const name = layer.name;
+    if(name.length < 7) {
+      colors[layer.id] = "black";
+      continue;
+    }
+
+    const regex = new RegExp(/^#([A-Fa-f0-9]{6})$/);
+    const ss = layer.name.substring(0,7);
+
+    if(regex.test(ss)) {
+      colors[layer.id] = ss;
+    } else {
+      colors[layer.id] = "black";
+    }
+  }
+
+  return colors;
+}
+
+function getSVG (selectedLines, colors, useColor) {
   if(!selectedLines || selectedLines.length === 0) return false;
 
   const bounds = {
     minX: 0, maxX: 0, minY: 0, maxY: 0
   }
 
-  bounds.minX = selectedLines[0].p1.x;
-  bounds.maxX = selectedLines[0].p2.x;
-  bounds.minY = selectedLines[0].p1.y;
-  bounds.maxY = selectedLines[0].p2.y;
+  bounds.minX = selectedLines[0].x1;
+  bounds.maxX = selectedLines[0].x2;
+  bounds.minY = selectedLines[0].y1;
+  bounds.maxY = selectedLines[0].y2;
 
   for(const line of selectedLines) {
-    const minLX = Math.min(line.p1.x, line.p2.x);
-    const minLY = Math.min(line.p1.y, line.p2.y);
-    const maxLX = Math.max(line.p1.x, line.p2.x);
-    const maxLY = Math.max(line.p1.y, line.p2.y);
+    const minLX = Math.min(line.x1, line.x2);
+    const minLY = Math.min(line.y1, line.y2);
+    const maxLX = Math.max(line.x1, line.x2);
+    const maxLY = Math.max(line.y1, line.y2);
 
     if(bounds.minX > minLX) {bounds.minX = minLX;}
     if(bounds.minY > minLY) {bounds.minY = minLY;}
@@ -251,11 +293,17 @@ function getSVG(selectedLines) {
 
   for(const line of selectedLines) {
     const lineElem = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    lineElem.setAttribute("x1", String(line.p1.x - bounds.minX));
-    lineElem.setAttribute("y1", String(line.p1.y - bounds.minY));
-    lineElem.setAttribute("x2", String(line.p2.x - bounds.minX));
-    lineElem.setAttribute("y2", String(line.p2.y - bounds.minY));
-    lineElem.setAttribute("stroke", "black");
+    lineElem.setAttribute("x1", String(line.x1 - bounds.minX));
+    lineElem.setAttribute("y1", String(line.y1 - bounds.minY));
+    lineElem.setAttribute("x2", String(line.x2 - bounds.minX));
+    lineElem.setAttribute("y2", String(line.y2 - bounds.minY));
+    if(useColor) {
+      lineElem.setAttribute("stroke", colors[line.layer || 0]);
+    } else {
+      lineElem.setAttribute("stroke", "black");
+    }
+    lineElem.setAttribute("stroke-linecap", "round");
+    lineElem.setAttribute("stroke-width", 2);
     svg.appendChild(lineElem);
   }
 
