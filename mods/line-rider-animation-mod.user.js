@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Generates repeated transforms for animation
-// @version      1.3.0
+// @version      1.3.1
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -163,8 +163,7 @@ class AnimateMod {
         const posttransformedLines = [];
         const startTime = performance.now();
         const allLines = [];
-        const layersArray = getSimulatorLayers(this.store.getState());
-        let layerIndex = Math.max(...layersArray.map(l => l.id)) + 1;
+        let layerIndex = Math.max(...this.layers.map(l => l.id)) + 1;
 
         if(!this.state.separateLayers) {
             this.store.dispatch(addLayer());
