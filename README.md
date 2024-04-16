@@ -97,3 +97,7 @@ Adds some formatting improvements to the custom tools API, namely a dropdown and
 ### Template Mod
 
 Has a basic example of how to write a mod for new Line Rider mod developers. The mod itself generates a square at the camera position.
+
+### Xavi Animation Helper
+
+Like the animation mod, but works well with cyclic animation layers.
