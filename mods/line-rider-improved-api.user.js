@@ -4,12 +4,11 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Container for linerider.com mods
-// @version      1.4.1
+// @version      1.4.2
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
 // @match        https://*.official-linerider.com/*
-// @match        http://localhost:*/*
 // @match        https://*.surge.sh/*
 
 // @downloadURL  https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-improved-api.user.js
@@ -205,7 +204,7 @@ function main () {
       }
     }
 
-    displayName (className) {
+    createDisplayName (className) {
       if (className.length == 0) return "Unnamed Mod";
 
       let finalName = [ className[0].toUpperCase() ];
@@ -244,7 +243,7 @@ function main () {
             onChange: e => this.setState({ activeSetting : e.target.value }) },
           e("option", { value: null }, "- Select Mod -"),
           this.state.customSettings.map((option, index) => (
-            e("option", { value: index }, this.displayName(option.name))
+            e("option", { value: index }, this.createDisplayName(option.name))
           ))
           )
         ),
@@ -273,21 +272,23 @@ function main () {
       } else {
         this.state = {
           divWidth: 200,
-          divHeight: 150
+          divHeight: 150,
         };
       }
     }
 
-    componentWillUpdate (nextProps, nextState) {
+    onApply () {
+      localStorage.setItem("WINDOW_PREFERENCES", JSON.stringify(this.state));
       Object.assign(settingsContainer.style, {
-        width: nextState.divWidth + "px",
-        height: nextState.divHeight + "px"
+        width: this.state.divWidth + "px",
+        height: this.state.divHeight + "px"
       });
     }
 
     render () {
       return e("div", null,
-        e("div", null,
+        e('button', {onClick: () => this.onApply()}, 'Apply'),
+        e("div", {style: {marginBottom: '5px'}},
           "Window Width ",
           e("input", { style: { width: "3.3em" }, type: "number",
             min: 200, max: 300, step: 1,
@@ -296,12 +297,11 @@ function main () {
               let w = parseFloat(e.target.value);
               if (200 <= w && w <= 300) {
                 this.setState({ divWidth: w });
-                localStorage.setItem("windowPreferences", JSON.stringify(this.state));
               }
             }
           })
         ),
-        e("div", null,
+        e("div", {style: {marginBottom: '5px'}},
           "Window Height ",
           e("input", { style: { width: "3.3em" }, type: "number",
             min: 150, max: 250, step: 1,
@@ -310,16 +310,16 @@ function main () {
               let h = parseFloat(e.target.value);
               if (150 <= h && h <= 250) {
                 this.setState({ divHeight: h });
-                localStorage.setItem("windowPreferences", JSON.stringify(this.state));
               }
             }
-          })));
+          }))
+       )
     }
   }
 
   window.registerCustomSetting(Settings);
 
-  let windowPreferences = localStorage.getItem("windowPreferences");
+  let windowPreferences = localStorage.getItem("WINDOW_PREFERENCES");
 
   if (windowPreferences) {
     let parsedPreferences = JSON.parse(windowPreferences);
