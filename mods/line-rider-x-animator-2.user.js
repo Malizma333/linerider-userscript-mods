@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  The advanced, layer automated animation tool
-// @version      0.2.1
+// @version      0.2.2
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -40,9 +40,9 @@ const renameLayer = (id, name) => ({
     payload: { id, name }
 })
 
-const lockLayer = (id) => ({
+const setLayerEditable = (id, editable) => ({
     type: "SET_LAYER_EDITABLE",
-    payload: { id, editable: false }
+    payload: { id, editable }
 })
 
 const setScript = (script) => ({
@@ -360,7 +360,7 @@ class AnimateMod {
         for(let id = this.beginLayerId; id < this.beginLayerId + LOOP_LENGTH; id++) {
             this.store.dispatch(addLayer());
             this.store.dispatch(renameLayer(id, LAYER_NAME));
-            this.store.dispatch(lockLayer(id));
+            this.store.dispatch(setLayerEditable(id, false));
         }
 
         const nextScript = getTrackScript(this.store.getState()) +
@@ -385,6 +385,12 @@ class AnimateMod {
         for(let id = this.beginLayerId; id < this.beginLayerId + LOOP_LENGTH; id++) {
             this.store.dispatch(renameLayer(id, color + LAYER_NAME));
         }
+    }
+
+    onUnlockFrame() {
+        const currentFrame = getPlayerIndex(this.store.getState());
+        const layerId = currentFrame % LOOP_LENGTH + this.beginLayerId;
+        this.store.dispatch(setLayerEditable(layerId, true))
     }
 }
 
@@ -557,6 +563,7 @@ function main () {
                            e("input", { type: "color", style: { width: "2em", marginRight: ".5em" }, value: this.state.animColor, onChange: e => this.setState({ animColor: e.target.value }) }),
                            e("button", { onClick: () => this.mod.onChangeColor(this.state.animColor) }, "Set"),
                           ),
+                         e("button", { onClick: () => this.mod.onUnlockFrame() }, "Unlock Frame"),
                          e("hr"),
                          this.renderSlider("scaleX", { min: 0, max: 10, step: 0.01 }, "Scale X"),
                          this.renderSlider("scaleY", { min: 0, max: 10, step: 0.01 }, "Scale Y"),
