@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  The advanced, layer automated animation tool
-// @version      0.1.1
+// @version      0.2.1
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -179,7 +179,7 @@ class AnimateMod {
         .map(id => this.track.getLine(id))
         .filter(l => l);
 
-        const posttransformedLines = [];
+        let posttransformedLines = [];
         const startTime = performance.now();
         const allLines = [];
         const layersArray = this.layers;
@@ -194,24 +194,28 @@ class AnimateMod {
         }
 
         for (let index = currentFrame; index < this.state.aLength + currentFrame; index++) {
-            const preBB = getBoundingBox(pretransformedLines);
+            const progress = (index - currentFrame) / this.state.aLength;
+
+            posttransformedLines = pretransformedLines.map(line => Object.assign(Object.create(Object.getPrototypeOf(line)), line));
+
+            const preBB = getBoundingBox(posttransformedLines);
             const preCenter = new V2({
                 x: preBB.x + 0.5 * preBB.width,
                 y: preBB.y + 0.5 * preBB.height
             });
 
-            const alongRot = this.state.alongRot * Math.PI / 180;
+            const alongRot = this.state.alongRot * progress * Math.PI / 180;
             const preTransform = buildRotTransform(-alongRot);
             const selectedLines = [];
 
-            for (let line of pretransformedLines) {
+            for (let line of posttransformedLines) {
                 const p1 = preparePointAlong(
                     new V2(line.p1),
-                    preCenter, this.state.alongPerspX, this.state.alongPerspY, preTransform
+                    preCenter, this.state.alongPerspX * progress, this.state.alongPerspY * progress, preTransform
                 );
                 const p2 = preparePointAlong(
                     new V2(line.p2),
-                    preCenter, this.state.alongPerspX, this.state.alongPerspY, preTransform
+                    preCenter, this.state.alongPerspX * progress, this.state.alongPerspY * progress, preTransform
                 );
                 selectedLines.push({ original: line, p1, p2 });
             }
@@ -219,33 +223,33 @@ class AnimateMod {
             const bb = getBoundingBox(selectedLines);
 
             const anchor = new V2({
-                x: bb.x + (0.5 + this.state.anchorX) * bb.width,
-                y: bb.y + (0.5 - this.state.anchorY) * bb.height
+                x: bb.x + (0.5 + this.state.anchorX * progress) * bb.width,
+                y: bb.y + (0.5 - this.state.anchorY * progress) * bb.height
             });
             const nudge = new V2({
-                x: this.state.nudgeXSmall + this.state.nudgeXBig,
-                y: -1 * (this.state.nudgeYSmall + this.state.nudgeYBig)
+                x: this.state.nudgeXSmall * progress + this.state.nudgeXBig * progress,
+                y: -1 * (this.state.nudgeYSmall * progress + this.state.nudgeYBig * progress)
             });
 
-            const transform = this.getTransform();
+            const transform = this.getTransform(progress);
             const transformedLines = [];
 
-            const alongPerspX = this.state.alongPerspX * 0.01;
-            const alongPerspY = this.state.alongPerspY * 0.01;
+            const alongPerspX = this.state.alongPerspX * progress * 0.01;
+            const alongPerspY = this.state.alongPerspY * progress * 0.01;
             const postTransform = buildRotTransform(alongRot);
 
-            let perspX = this.state.perspX;
-            let perspY = this.state.perspY;
+            let perspX = this.state.perspX * progress;
+            let perspY = this.state.perspY * progress;
 
             const perspSafety = Math.pow(10, this.state.perspClamping);
 
             if (this.state.relativePersp) {
-                let perspXDenominator = bb.width * this.state.scale * this.state.scaleX;
+                let perspXDenominator = bb.width * ((this.state.scale - 1) * progress + 1) * ((this.state.scaleX - 1) * progress + 1);
                 if (Math.abs(bb.width) < perspSafety) {
                     perspXDenominator = perspSafety;
                 }
                 perspX = perspX / perspXDenominator;
-                let perspYDenominator = bb.height * this.state.scale * this.state.scaleY;
+                let perspYDenominator = bb.height * ((this.state.scale - 1) * progress + 1) * ((this.state.scaleY - 1) * progress + 1);
                 if (Math.abs(perspYDenominator) < perspSafety) {
                     perspYDenominator = perspSafety;
                 }
@@ -289,15 +293,7 @@ class AnimateMod {
                     y2: p2.y + camOffset.y,
                     type: 2
                 });
-
-                const newLine = Object.assign(Object.create(Object.getPrototypeOf(line.original)), line.original);
-                newLine.p1 = p1;
-                newLine.p2 = p2;
-                posttransformedLines.push(newLine);
             }
-
-            pretransformedLines = posttransformedLines.slice();
-            posttransformedLines.length = 0;
 
             layerId += 1;
             if(layerId > this.beginLayerId + LOOP_LENGTH) {
@@ -324,19 +320,19 @@ class AnimateMod {
         this.componentUpdateResolved = true;
     }
 
-    getTransform () {
-        let scaleX = this.state.scale * this.state.scaleX;
+    getTransform (progress) {
+        let scaleX = ((this.state.scale - 1) * progress + 1) * ((this.state.scaleX - 1) * progress + 1);
         if (this.state.flipX) {
             scaleX *= -1;
         }
-        let scaleY = this.state.scale * this.state.scaleY;
+        let scaleY = ((this.state.scale - 1) * progress + 1) * ((this.state.scaleY - 1) * progress + 1);
         if (this.state.flipY) {
             scaleY *= -1;
         }
         const transform = buildAffineTransform(
-            this.state.skewX, this.state.skewY,
+            this.state.skewX * progress, this.state.skewY * progress,
             scaleX, scaleY,
-            this.state.rotate * Math.PI / 180
+            this.state.rotate * progress * Math.PI / 180
         );
         return transform;
     }
@@ -432,7 +428,7 @@ function main () {
                 ...this.defaults,
                 active: false,
                 initialized: false,
-                animColor: "black",
+                animColor: "#000000",
                 relativeTools: false,
                 warpTools: false,
                 translateTools: false,
