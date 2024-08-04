@@ -74,10 +74,6 @@ Generates a zig-zag structure along a selected continuous curve.
 
 ## Other
 
-### Animation Mod
-
-Adds a tool for quickly generating frame-based animations. Built off of the updated transform mod.
-
 ### Bookmark Mod
 
 Allows for creating multiple bookmarked timestamps (flags), as opposed to having just one flag.
@@ -98,6 +94,6 @@ Adds some formatting improvements to the custom tools API, namely a dropdown and
 
 Has a basic example of how to write a mod for new Line Rider mod developers. The mod itself generates a square at the camera position.
 
-### Xavi Animation Helper
+### XAnimator 2
 
-Like the animation mod, but works well with cyclic animation layers.
+Inspired by the custom animation mod made for Rush E 3, adds animation capabilities to the Transform mod by adding automatic layer generation + automation, camera locking, and UI improvements.
