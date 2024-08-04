@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  The advanced, layer automated animation tool
-// @version      0.2.2
+// @version      0.2.3
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -81,7 +81,7 @@ const getActiveTool = state => state.selectedTool;
 const getToolState = (state, toolId) => state.toolState[toolId];
 const getSelectToolState = state => getToolState(state, SELECT_TOOL);
 const getSimulatorCommittedTrack = state => state.simulator.committedEngine;
-const getSimulatorLayers = state => state.simulator.engine.engine.state.layers.buffer;
+const getSimulatorCommittedLayers = state => state.simulator.committedEngine.engine.state.layers.buffer;
 const getPlayerIndex = state => Math.floor(state.player.index);
 const getTrackCamera = (state, index, track) => {
     const {width, height} = state.camera.playbackDimensions || state.camera.editorDimensions
@@ -98,7 +98,7 @@ class AnimateMod {
         this.changed = false;
         this.state = initState;
 
-        this.layers = getSimulatorLayers(this.store.getState());
+        this.layers = getSimulatorCommittedLayers(this.store.getState());
         this.track = getSimulatorCommittedTrack(this.store.getState());
         this.selectedPoints = EMPTY_SET;
         this.beginLayerId = 1;
@@ -138,7 +138,7 @@ class AnimateMod {
                 shouldUpdate = true;
             }
 
-            const layers = getSimulatorLayers(this.store.getState());
+            const layers = getSimulatorCommittedLayers(this.store.getState());
 
             if (layers && this.layers !== layers) {
                 this.layers = layers;
@@ -355,11 +355,18 @@ class AnimateMod {
     }
 
     onPrepLayers () {
-        this.beginLayerId = Math.max(...getSimulatorLayers(this.store.getState()).map(layer => layer.id)) + 1
+        console.log(getSimulatorCommittedLayers(this.store.getState()).length)
+        this.beginLayerId = Math.max(...getSimulatorCommittedLayers(this.store.getState()).map(layer => layer.id)) + 1
 
         for(let id = this.beginLayerId; id < this.beginLayerId + LOOP_LENGTH; id++) {
             this.store.dispatch(addLayer());
             this.store.dispatch(renameLayer(id, LAYER_NAME));
+        }
+
+        this.store.dispatch(commitTrackChanges());
+        this.store.dispatch(revertTrackChanges());
+
+        for(let id = this.beginLayerId; id < this.beginLayerId + LOOP_LENGTH; id++) {
             this.store.dispatch(setLayerEditable(id, false));
         }
 
@@ -376,9 +383,6 @@ class AnimateMod {
             }
             return true;
         }
-
-        this.store.dispatch(commitTrackChanges());
-        this.store.dispatch(revertTrackChanges());
     }
 
     onChangeColor(color) {
@@ -447,7 +451,7 @@ function main () {
                 const script = getTrackScript(store.getState());
 
                 if (!this.state.initialized && script.includes(HEADER_COMMENT)) {
-                    this.mod.beginLayerId = Math.min(...getSimulatorLayers(store.getState()).filter(layer => layer.name.includes(LAYER_NAME)).map(layer => layer.id))
+                    this.mod.beginLayerId = Math.min(...getSimulatorCommittedLayers(store.getState()).filter(layer => layer.name.includes(LAYER_NAME)).map(layer => layer.id))
                     this.setState({ initialized: true });
                 }
 
