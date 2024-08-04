@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  The advanced, layer automated animation tool
-// @version      0.1.0
+// @version      0.1.1
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -447,6 +447,10 @@ function main () {
                 if (!this.state.initialized && script.includes(HEADER_COMMENT)) {
                     this.mod.beginLayerId = Math.min(...getSimulatorLayers(store.getState()).filter(layer => layer.name.includes(LAYER_NAME)).map(layer => layer.id))
                     this.setState({ initialized: true });
+                }
+
+                if (this.state.initialized && !script.includes(HEADER_COMMENT)) {
+                    this.setState({ initialized: false });
                 }
 
                 const selectToolActive = getActiveTool(store.getState()) === SELECT_TOOL;
