@@ -10,5 +10,5 @@
 // @match        http://localhost:*/*
 // @match        https://*.surge.sh/*
 // @grant        none
-// @require      https://github.com/Malizma333/line-rider-command-editor-userscript/raw/main/command-editor.min.js
+// @require      https://github.com/Malizma333/line-rider-command-editor-userscript/raw/master/command-editor.min.js
 // ==/UserScript==
