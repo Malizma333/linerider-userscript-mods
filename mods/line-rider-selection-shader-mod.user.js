@@ -12,8 +12,8 @@
 // @match        http://localhost:*/*
 // @match        https://*.surge.sh/*    
 
-// @downloadURL  https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/selection-shader-mod.user.js
-// @updateURL    https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/selection-shader-mod.user.js
+// @downloadURL  https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-selection-shader-mod.user.js
+// @updateURL    https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-selection-shader-mod.user.js
 // @homepageURL  https://github.com/Malizma333/linerider-userscript-mods
 // @supportURL   https://github.com/Malizma333/linerider-userscript-mods/issues
 // @grant        none
