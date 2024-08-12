@@ -10,7 +10,7 @@
 // @match        https://www.linerider.com/*
 // @match        https://*.official-linerider.com/*
 // @match        http://localhost:*/*
-// @match        https://*.surge.sh/*    
+// @match        https://*.surge.sh/*
 
 // @downloadURL  https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-selection-shader-mod.user.js
 // @updateURL    https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-selection-shader-mod.user.js
