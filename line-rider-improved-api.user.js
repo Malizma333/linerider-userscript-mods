@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Container for linerider.com mods
-// @version      1.5.0
+// @version      1.5.1
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -204,7 +204,7 @@ function main () {
                         overflowX: "hidden",
                         bottom: "15%",
                         right: "8px",
-                        border: "1px solid black",
+                        border: "2px solid black",
                         backgroundColor: "#ffffff",
                         opacity: 0,
                         pointerEvents: "none"
@@ -226,15 +226,16 @@ function main () {
                 return (modAName < modBName) ? -1 : (modAName > modBName) ? 1 : 0;
             });
             return e(
-                "div", { style: rootStyle },
-                this.state.customSettings.length > 1 && e(
-                    "div", { style: { width: "100%" } },
+                "div",
+                { style: rootStyle },
+                this.state.customSettings.length > 0 && e(
+                    "div",
+                    { style: { width: "100%" } },
                     this.state.customSettings.map(
                         (mod, index) => e(
                             'div',
-                            {style: {border: '1px solid black'}},
-                            e(mod
-                             )
+                            {style: {borderTop: index > 0 ? '2px solid black' : null}},
+                            e(mod)
                         )
                     )
                 )
@@ -250,44 +251,6 @@ function main () {
         e(CustomSettingsContainer),
         settingsContainer
     );
-
-    /*
-  class Settings extends React.Component {
-    constructor (props) {
-      super(props);
-
-      let windowPreferences = localStorage.getItem("windowPreferences");
-
-      if (windowPreferences) {
-        this.state = JSON.parse(windowPreferences);
-      } else {
-        this.state = {};
-      }
-    }
-
-    onApply () {
-      localStorage.setItem("WINDOW_PREFERENCES", JSON.stringify(this.state));
-    }
-
-    render () {
-      return e(
-          "div",
-          null,
-          "Settings",
-          e('br'),
-          e('button', {onClick: () => this.onApply()}, 'Apply'),
-      )
-    }
-  }
-
-  window.registerCustomSetting(Settings);
-
-  let windowPreferences = localStorage.getItem("WINDOW_PREFERENCES");
-
-  if (windowPreferences) {
-    let parsedPreferences = JSON.parse(windowPreferences);
-  }
-  */
 }
 
 if (window.store) {
