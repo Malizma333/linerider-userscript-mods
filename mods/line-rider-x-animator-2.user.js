@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  The advanced, layer automated animation tool
-// @version      0.2.3
+// @version      0.2.4
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -146,7 +146,6 @@ class AnimateMod {
             }
 
             const selectToolState = getSelectToolState(this.store.getState());
-
             let selectedPoints = selectToolState.selectedPoints;
 
             if (!selectToolState.multi) {
@@ -163,6 +162,8 @@ class AnimateMod {
             this.componentUpdateResolved = true;
             return;
         }
+
+        console.log(this.changed)
 
         if (this.changed) {
             this.store.dispatch(revertTrackChanges());
@@ -355,7 +356,6 @@ class AnimateMod {
     }
 
     onPrepLayers () {
-        console.log(getSimulatorCommittedLayers(this.store.getState()).length)
         this.beginLayerId = Math.max(...getSimulatorCommittedLayers(this.store.getState()).map(layer => layer.id)) + 1
 
         for(let id = this.beginLayerId; id < this.beginLayerId + LOOP_LENGTH; id++) {
@@ -389,6 +389,9 @@ class AnimateMod {
         for(let id = this.beginLayerId; id < this.beginLayerId + LOOP_LENGTH; id++) {
             this.store.dispatch(renameLayer(id, color + LAYER_NAME));
         }
+
+        this.store.dispatch(commitTrackChanges());
+        this.store.dispatch(revertTrackChanges());
     }
 
     onUnlockFrame() {
