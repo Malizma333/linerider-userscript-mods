@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Container for linerider.com mods
-// @version      1.5.1
+// @version      1.5.2
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -198,8 +198,12 @@ function main () {
                     containerAssigned = true;
                     Object.assign(settingsContainer.style, {
                         position: "fixed",
+                        minWidth: "10vw",
                         width: "20vw",
+                        maxWidth: "30vw",
+                        minHeight: "15vh",
                         height: "25vh",
+                        maxHeight: "35vh",
                         overflowY: "auto",
                         overflowX: "hidden",
                         bottom: "15%",
@@ -207,7 +211,8 @@ function main () {
                         border: "2px solid black",
                         backgroundColor: "#ffffff",
                         opacity: 0,
-                        pointerEvents: "none"
+                        pointerEvents: "none",
+                        resize: "both"
                     });
                 }
             };
