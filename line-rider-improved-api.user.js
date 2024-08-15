@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Container for linerider.com mods
-// @version      1.5.2
+// @version      1.6.0
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -50,7 +50,10 @@ function main () {
         alignItems: "flex-start",
         textAlign: "left",
         transition: "opacity 225ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
-        width: "100%"
+        flex: 1,
+        width: "100%",
+        overflowY: "auto",
+        overflowX: "hidden",
     };
 
     const boxStyle = {
@@ -58,6 +61,46 @@ function main () {
         flexDirection: "column-reverse",
         padding: 8,
         width: "100%"
+    };
+
+    const settingsContainerStyle = {
+        position: "fixed",
+        minWidth: "15vw",
+        width: "20vw",
+        maxWidth: "40vw",
+        minHeight: "15vh",
+        height: "25vh",
+        maxHeight: "45vh",
+        top: "70vh",
+        left: "78vw",
+        border: "3px solid black",
+        backgroundColor: "#ffffff",
+        resize: "both",
+        overflow: "hidden",
+        opacity: 0,
+        pointerEvents: "none",
+    };
+
+    const toolContainerStyle = {
+        position: "fixed",
+        width : "200px",
+        height: "16%",
+        overflowY: "auto",
+        overflowX: "hidden",
+        top: "8px",
+        right: "250px",
+        border: "1px solid black",
+        backgroundColor: "#ffffff",
+        pointerEvents: "none",
+        opacity: 0,
+    };
+
+    const headerStyle = {
+        cursor: "move",
+        minHeight: '3ch',
+        backgroundColor: "#aaaaaa",
+        zIndex: "10",
+        borderBottom: "3px solid black"
     };
 
     store.subscribe(() => {
@@ -114,19 +157,7 @@ function main () {
 
                 if (!containerAssigned) {
                     containerAssigned = true;
-                    Object.assign(toolContainer.style, {
-                        position: "fixed",
-                        width : "200px",
-                        height: "16%",
-                        overflowY: "auto",
-                        overflowX: "hidden",
-                        top: "8px",
-                        right: "250px",
-                        border: "1px solid black",
-                        backgroundColor: "#ffffff",
-                        opacity: 0,
-                        pointerEvents: "none"
-                    });
+                    Object.assign(toolContainer.style, toolContainerStyle);
                 }
             };
         }
@@ -176,6 +207,8 @@ function main () {
         toolContainer
     );
 
+    const settingsProps = {lastX: 0, lastY: 0, newX: 0, newY: 0}
+
     class CustomSettingsContainer extends React.Component {
         constructor () {
             super();
@@ -196,24 +229,7 @@ function main () {
 
                 if (!containerAssigned) {
                     containerAssigned = true;
-                    Object.assign(settingsContainer.style, {
-                        position: "fixed",
-                        minWidth: "10vw",
-                        width: "20vw",
-                        maxWidth: "30vw",
-                        minHeight: "15vh",
-                        height: "25vh",
-                        maxHeight: "35vh",
-                        overflowY: "auto",
-                        overflowX: "hidden",
-                        bottom: "15%",
-                        right: "8px",
-                        border: "2px solid black",
-                        backgroundColor: "#ffffff",
-                        opacity: 0,
-                        pointerEvents: "none",
-                        resize: "both"
-                    });
+                    Object.assign(settingsContainer.style, settingsContainerStyle);
                 }
             };
 
@@ -222,25 +238,83 @@ function main () {
             }
         }
 
+        onStartDrag(e) {
+            e = e || window.event;
+            e.preventDefault();
+
+            settingsProps.lastX = e.clientX;
+            settingsProps.lastY = e.clientY;
+
+            document.onmousemove = this.onDrag;
+            document.onmouseup = this.onCloseDrag;
+        }
+
+        onDrag(e) {
+            e = e || window.event;
+            e.preventDefault();
+
+            settingsProps.newX = settingsProps.lastX - e.clientX;
+            settingsProps.newY = settingsProps.lastY - e.clientY;
+            settingsProps.lastX = e.clientX;
+            settingsProps.lastY = e.clientY;
+
+            const nextOffsetX = settingsContainer.offsetLeft - settingsProps.newX;
+            const nextOffsetY = settingsContainer.offsetTop - settingsProps.newY;
+
+            if(0 <= nextOffsetX && nextOffsetX <= window.innerWidth - settingsContainer.offsetWidth &&
+               0 <= nextOffsetY && nextOffsetY <= window.innerHeight - settingsContainer.offsetHeight) {
+                settingsContainer.style.left = `${settingsContainer.offsetLeft - settingsProps.newX}px`;
+                settingsContainer.style.top = `${settingsContainer.offsetTop - settingsProps.newY}px`;
+            }
+
+            if(settingsContainer.offsetLeft < 0) {
+                settingsContainer.style.left = `${0}px`;
+            }
+
+            if(settingsContainer.offsetLeft > window.innerWidth - settingsContainer.offsetWidth) {
+                settingsContainer.style.left = `${window.innerWidth - settingsContainer.offsetWidth}px`;
+            }
+
+            if(settingsContainer.offsetTop < 0) {
+                settingsContainer.style.top = `${0}px`;
+            }
+
+            if(settingsContainer.offsetTop > window.innerHeight - settingsContainer.offsetHeight) {
+                settingsContainer.style.top = `${window.innerHeight - settingsContainer.offsetHeight}px`;
+            }
+        }
+
+        onCloseDrag(e) {
+            document.onmouseup = null;
+            document.onmousemove = null;
+        }
+
         render () {
             this.state.customSettings.sort(function (modA, modB) {
                 var modAName = modA.name.toUpperCase();
                 var modBName = modB.name.toUpperCase();
-                if (modAName == "SETTINGS") return -1;
-                if (modBName == "SETTINGS") return 1;
                 return (modAName < modBName) ? -1 : (modAName > modBName) ? 1 : 0;
             });
+
             return e(
                 "div",
-                { style: rootStyle },
-                this.state.customSettings.length > 0 && e(
+                {style: {display: "flex", height: "100%", width: "100%", flexDirection: "column"}},
+                e(
                     "div",
-                    { style: { width: "100%" } },
-                    this.state.customSettings.map(
-                        (mod, index) => e(
-                            'div',
-                            {style: {borderTop: index > 0 ? '2px solid black' : null}},
-                            e(mod)
+                    {style: headerStyle, onMouseDown: (e) => this.onStartDrag(e)}
+                ),
+                e(
+                    "div",
+                    { style: rootStyle },
+                    this.state.customSettings.length > 0 && e(
+                        "div",
+                        { style: { width: "100%" } },
+                        this.state.customSettings.map(
+                            (mod, index) => e(
+                                'div',
+                                {style: {borderTop: index > 0 ? '2px solid black' : null}},
+                                e(mod)
+                            )
                         )
                     )
                 )
