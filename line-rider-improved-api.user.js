@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Container for linerider.com mods
-// @version      1.6.1
+// @version      1.7.0
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -31,6 +31,40 @@ const getActiveTool = state => state.selectedTool;
 const getWindowFocused = state => state.views.Main;
 const getPlayerRunning = state => state.player.running;
 
+const defaultPreferences = {
+    settingsTop: "65vh",
+    settingsLeft: "78vw",
+    settingsWidth: "20vw",
+    settingsHeight: "25vh"
+};
+const preferencesKey = "MOD_API_PREFERENCES"
+
+function loadPrefs() {
+    let storedPreferences = localStorage.getItem(preferencesKey);
+    if (storedPreferences) {
+        const nextPrefs = JSON.parse(storedPreferences);
+
+        Object.keys(defaultPreferences)
+            .filter(key => !Object.keys(nextPrefs).includes(key))
+            .forEach(key => {
+            console.log(key);
+            nextPrefs[key] = defaultPreferences[key]
+        });
+        return nextPrefs;
+    }
+
+    return defaultPreferences;
+}
+
+function savePrefs(newPrefs) {
+    console.log(newPrefs);
+
+    localStorage.setItem(
+        preferencesKey,
+        JSON.stringify(newPrefs)
+    );
+}
+
 function main () {
     window.V2 = window.V2 || window.store.getState().simulator.engine.engine.state.startPoint.constructor;
 
@@ -43,6 +77,9 @@ function main () {
     const e = React.createElement;
     var playerRunning = getPlayerRunning(store.getState());
     var windowFocused = getWindowFocused(store.getState());
+
+    const preferences = loadPrefs();
+    savePrefs(preferences);
 
     const rootStyle = {
         display: "flex",
@@ -66,13 +103,9 @@ function main () {
     const settingsContainerStyle = {
         position: "fixed",
         minWidth: "15vw",
-        width: "20vw",
         maxWidth: "40vw",
         minHeight: "15vh",
-        height: "25vh",
         maxHeight: "45vh",
-        top: "65vh",
-        left: "78vw",
         border: "3px solid black",
         backgroundColor: "#ffffff",
         resize: "both",
@@ -102,6 +135,11 @@ function main () {
         zIndex: "10",
         borderBottom: "3px solid black"
     };
+
+    settingsContainerStyle.top = preferences.settingsTop;
+    settingsContainerStyle.left = preferences.settingsLeft;
+    settingsContainerStyle.width = preferences.settingsWidth;
+    settingsContainerStyle.height = preferences.settingsHeight;
 
     store.subscribe(() => {
         playerRunning = getPlayerRunning(store.getState());
@@ -207,7 +245,7 @@ function main () {
         toolContainer
     );
 
-    const settingsProps = {lastX: 0, lastY: 0, newX: 0, newY: 0}
+    const dragProps = {lastX: 0, lastY: 0}
 
     class CustomSettingsContainer extends React.Component {
         constructor () {
@@ -236,14 +274,40 @@ function main () {
             if (typeof window.onCustomToolsApiReady === "function") {
                 window.onCustomToolsApiReady();
             }
+
+            window.addEventListener('resize', this.updateDimensions);
+        }
+
+        updateDimensions() {
+            if(settingsContainer.offsetLeft < 0) {
+                settingsContainer.style.left = `${0}vw`;
+                preferences.settingsLeft = `${0}vw`;
+            }
+
+            if(settingsContainer.offsetLeft > window.innerWidth - settingsContainer.offsetWidth) {
+                settingsContainer.style.left = `${100 * (window.innerWidth - settingsContainer.offsetWidth) / window.innerWidth}vw`;
+                preferences.settingsLeft = `${100 * (window.innerWidth - settingsContainer.offsetWidth) / window.innerWidth}vw`;
+            }
+
+            if(settingsContainer.offsetTop < 0) {
+                settingsContainer.style.top = `${0}vh`;
+                preferences.settingsTop = `${0}vh`;
+            }
+
+            if(settingsContainer.offsetTop > window.innerHeight - settingsContainer.offsetHeight) {
+                settingsContainer.style.top = `${100 * (window.innerHeight - settingsContainer.offsetHeight) / window.innerHeight}vh`;
+                preferences.settingsTop = `${100 * (window.innerHeight - settingsContainer.offsetHeight) / window.innerHeight}vh`;
+            }
+
+            savePrefs(preferences);
         }
 
         onStartDrag(e) {
             e = e || window.event;
             e.preventDefault();
 
-            settingsProps.lastX = e.clientX;
-            settingsProps.lastY = e.clientY;
+            dragProps.lastX = e.clientX;
+            dragProps.lastY = e.clientY;
 
             document.onmousemove = this.onDrag;
             document.onmouseup = this.onCloseDrag;
@@ -253,35 +317,23 @@ function main () {
             e = e || window.event;
             e.preventDefault();
 
-            settingsProps.newX = settingsProps.lastX - e.clientX;
-            settingsProps.newY = settingsProps.lastY - e.clientY;
-            settingsProps.lastX = e.clientX;
-            settingsProps.lastY = e.clientY;
+            const newX = dragProps.lastX - e.clientX;
+            const newY = dragProps.lastY - e.clientY;
+            dragProps.lastX = e.clientX;
+            dragProps.lastY = e.clientY;
 
-            const nextOffsetX = settingsContainer.offsetLeft - settingsProps.newX;
-            const nextOffsetY = settingsContainer.offsetTop - settingsProps.newY;
+            const nextOffsetX = settingsContainer.offsetLeft - newX;
+            const nextOffsetY = settingsContainer.offsetTop - newY;
 
             if(0 <= nextOffsetX && nextOffsetX <= window.innerWidth - settingsContainer.offsetWidth &&
                0 <= nextOffsetY && nextOffsetY <= window.innerHeight - settingsContainer.offsetHeight) {
-                settingsContainer.style.left = `${settingsContainer.offsetLeft - settingsProps.newX}px`;
-                settingsContainer.style.top = `${settingsContainer.offsetTop - settingsProps.newY}px`;
+                settingsContainer.style.left = `${100 * (settingsContainer.offsetLeft - newX) / window.innerWidth}vw`;
+                settingsContainer.style.top = `${100 * (settingsContainer.offsetTop - newY) / window.innerHeight}vh`;
+                preferences.settingsLeft = `${100 * (settingsContainer.offsetLeft - newX) / window.innerWidth}vw`;
+                preferences.settingsTop = `${100 * (settingsContainer.offsetTop - newY) / window.innerHeight}vh`;
             }
 
-            if(settingsContainer.offsetLeft < 0) {
-                settingsContainer.style.left = `${0}px`;
-            }
-
-            if(settingsContainer.offsetLeft > window.innerWidth - settingsContainer.offsetWidth) {
-                settingsContainer.style.left = `${window.innerWidth - settingsContainer.offsetWidth}px`;
-            }
-
-            if(settingsContainer.offsetTop < 0) {
-                settingsContainer.style.top = `${0}px`;
-            }
-
-            if(settingsContainer.offsetTop > window.innerHeight - settingsContainer.offsetHeight) {
-                settingsContainer.style.top = `${window.innerHeight - settingsContainer.offsetHeight}px`;
-            }
+            savePrefs(preferences);
         }
 
         onCloseDrag(e) {
@@ -330,6 +382,14 @@ function main () {
         e(CustomSettingsContainer),
         settingsContainer
     );
+
+    const resizeObserver = new ResizeObserver(() => {
+        preferences.settingsWidth = `${100 * settingsContainer.offsetWidth / window.innerWidth}vw`;
+        preferences.settingsHeight = `${100 * settingsContainer.offsetHeight / window.innerHeight}vh`;
+        savePrefs(preferences);
+    });
+
+    resizeObserver.observe(settingsContainer);
 }
 
 if (window.store) {
