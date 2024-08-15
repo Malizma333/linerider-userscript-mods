@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Container for linerider.com mods
-// @version      1.6.0
+// @version      1.6.1
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -71,7 +71,7 @@ function main () {
         minHeight: "15vh",
         height: "25vh",
         maxHeight: "45vh",
-        top: "70vh",
+        top: "65vh",
         left: "78vw",
         border: "3px solid black",
         backgroundColor: "#ffffff",
