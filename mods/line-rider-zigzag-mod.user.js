@@ -165,9 +165,10 @@ function main () {
       super(props);
 
       this.state = {
-        active: false,
-        width: 5,
-        height: 5
+          active: false,
+          width: 5,
+          height: 5,
+          offsetMode: false
       };
 
       this.mod = new ZigZagMod(store, this.state);
@@ -201,6 +202,20 @@ function main () {
       }
     }
 
+      renderCheckbox (key, title = null) {
+          if (!title) title = key;
+
+          const props = {
+              id: key,
+              checked: this.state[key],
+              onChange: e => this.setState({ [key]: e.target.checked })
+          };
+          return e("div", null,
+                   e("label", { style: { width: "4em" }, for: key }, title),
+                   e("input", { style: { marginLeft: ".5em" }, type: "checkbox", ...props })
+                  );
+      }
+
     renderSlider (key, title, props) {
       props = {
         ...props,
@@ -220,6 +235,7 @@ function main () {
       return e("div", null,
         this.state.active &&
                      e("div", null,
+                       this.renderCheckbox("offsetMode", "Offset Mode"),
                        this.renderSlider("width", "Width", { min: 1, max: 100, step: .1 }),
                        this.renderSlider("height", "Height", { min: -100, max: 100, step: .1 }),
                        e("button",
@@ -364,7 +380,7 @@ function interpolateLine (line, width, offset, startFromP1) {
   return { points, remaining };
 }
 
-function* genZigZag (selectedLines, { width = 5, height = 5 } = {}) {
+function* genZigZag (selectedLines, { width = 5, height = 5, offsetMode = false } = {}) {
   const { V2 } = window;
 
   const shapesArray = findShapes(selectedLines);
@@ -399,7 +415,11 @@ function* genZigZag (selectedLines, { width = 5, height = 5 } = {}) {
 
       for (let i = 1; i < points.length; i++) {
         const currentPoint = points[i];
-        flipTracker = -flipTracker;
+
+        if(!offsetMode) {
+            flipTracker = -flipTracker;
+        }
+
         const currentDirection = currentPoint.a + flipTracker * Math.PI / 2;
         const heightVector = { x: height * Math.cos(currentDirection), y: height * Math.sin(currentDirection) };
 
