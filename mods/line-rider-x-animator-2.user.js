@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  The advanced, layer automated animation tool
-// @version      0.2.4
+// @version      0.2.5
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -559,7 +559,7 @@ function main () {
                      null,
                      this.state.active &&
                      e("div", null,
-                       e("span", { style: { fontStyle: "italic", color: "red", fontSize: 11, whiteSpace: "nowrap" } }, "*WARNING: This mod is untested and might break at times*"),
+                       e("span", { style: { fontStyle: "italic", color: "red", fontSize: 11, whiteSpace: "nowrap" } }, "WARNING: This mod is severely untested, use at your own risk"),
                        e("hr"),
                        !this.state.initialized && e("button", { onClick: () => this.mod.onPrepLayers() }, "Initialize"),
                        this.state.initialized &&
