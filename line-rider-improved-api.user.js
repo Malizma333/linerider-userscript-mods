@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Container for linerider.com mods
-// @version      1.7.1
+// @version      1.7.2
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -392,5 +392,9 @@ function main () {
 if (window.store) {
     main();
 } else {
-    window.onAppReady = main;
+    const prevInit = window.onAppReady;
+    window.onAppReady = () => {
+        if (prevInit) prevInit();
+        main();
+    };
 }
