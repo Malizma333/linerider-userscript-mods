@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Container for linerider.com mods
-// @version      1.7.0
+// @version      1.7.1
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -47,7 +47,6 @@ function loadPrefs() {
         Object.keys(defaultPreferences)
             .filter(key => !Object.keys(nextPrefs).includes(key))
             .forEach(key => {
-            console.log(key);
             nextPrefs[key] = defaultPreferences[key]
         });
         return nextPrefs;
@@ -57,8 +56,6 @@ function loadPrefs() {
 }
 
 function savePrefs(newPrefs) {
-    console.log(newPrefs);
-
     localStorage.setItem(
         preferencesKey,
         JSON.stringify(newPrefs)
