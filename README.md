@@ -90,6 +90,10 @@ Mod that adds support for changing common hotkeys.
 
 Adds some formatting improvements to the custom tools API, namely a dropdown and window sizing settings.
 
+### More Controls
+
+Adds some UI to hidden and hard to edit track properties.
+
 ### Template Mod
 
 Has a basic example of how to write a mod for new Line Rider mod developers. The mod itself generates a square at the camera position.
