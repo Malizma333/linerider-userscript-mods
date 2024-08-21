@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Provides a menu for viewing and editing specific track data
-// @version      1.0.0
+// @version      1.0.1
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -329,13 +329,13 @@ function main () {
                     type: "number",
                     readOnly: !editable,
                     value: this.state[key][0],
-                    onChange: e => (actions[0])(this, e.target.value)
+                    onChange: e => (actions[0])(this, Number(e.target.value))
                 }, {
                     id: key + '1',
                     type: "number",
                     readOnly: !editable,
                     value: this.state[key][1],
-                    onChange: e => (actions[1])(this, e.target.value)
+                    onChange: e => (actions[1])(this, Number(e.target.value))
                 }
             ];
 
@@ -358,7 +358,7 @@ function main () {
                 type: isNumber ? "number" : "text",
                 readOnly: !editable,
                 value: this.state[key],
-                onChange: e => action(this, e.target.value)
+                onChange: e => action(this, isNumber ? Number(e.target.value) : e.target.value)
             };
 
             return e(
