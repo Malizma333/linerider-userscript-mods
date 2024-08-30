@@ -32,7 +32,7 @@ const revertTrackChanges = () => ({
 
 /* Selectors */
 
-class EmptyMod {
+class Mod {
   constructor (store, initState) {
     this.store = store;
     this.state = initState;
@@ -89,7 +89,7 @@ function main () {
   } = window;
   const c = React.createElement;
 
-  class EmptyModComponent extends React.Component {
+  class ModComponent extends React.Component {
     constructor (props) {
       super(props);
 
@@ -98,7 +98,7 @@ function main () {
         /* State Props */
       };
 
-      this.modLogic = new EmptyMod(store, this.state);
+      this.modLogic = new Mod(store, this.state);
 
       store.subscribe(() => {
 
@@ -142,13 +142,13 @@ function main () {
             style: { backgroundColor: this.state.active ? "lightblue" : null },
             onClick: this.onActivate.bind(this)
           },
-          "Empty Mod"
+          "New Mod"
         )
       );
     }
   }
 
-  window.registerCustomSetting(EmptyModComponent);
+  window.registerCustomSetting(ModComponent);
 }
 
 if (window.registerCustomSetting) {
