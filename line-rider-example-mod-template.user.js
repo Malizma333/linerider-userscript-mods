@@ -342,7 +342,7 @@ function* generateLines ({ width = 0, xOff = 0, yOff = 0 } = {}) {
   const { V2 } = window;
 
   // Retrieve camera position
-  const camPos = getEditorPosition(window.store.getState()).position;
+  const camPos = getEditorPosition(window.store.getState());
 
   // Create points from state parameters
   const pointA = V2.from(xOff + camPos.x, yOff + camPos.y);
