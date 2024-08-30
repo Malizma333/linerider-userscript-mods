@@ -20,10 +20,10 @@ An "!" means this trait of the userscript data should be replaced.
 
 // ==UserScript==
 
-// @name         Line Rider Template Mod
+// @name         Line Rider Example Mod
 // @namespace    https://www.linerider.com/
 // @author       Malizma
-// @description  Linerider.com template for creating userscript
+// @description  Linerider.com example mod
 // @version      1.0.0
 // @icon         https://www.linerider.com/favicon.ico
 
@@ -32,8 +32,8 @@ An "!" means this trait of the userscript data should be replaced.
 // @match        http://localhost:*/*
 // @match        https://*.surge.sh/*
 
-// @downloadURL  https://github.com/Malizma333/linerider-userscript-mods/raw/master/line-rider-mod-template.user.js
-// @updateURL    https://github.com/Malizma333/linerider-userscript-mods/raw/master/line-rider-mod-template.user.js
+// @downloadURL  https://github.com/Malizma333/linerider-userscript-mods/raw/master/line-rider-example-mod-template.user.js
+// @updateURL    https://github.com/Malizma333/linerider-userscript-mods/raw/master/line-rider-example-mod-template.user.js
 // @homepageURL  https://github.com/Malizma333/linerider-userscript-mods
 // @supportURL   https://github.com/Malizma333/linerider-userscript-mods/issues
 // @grant        none
@@ -69,7 +69,7 @@ const getEditorPosition = (state) => state.camera.editorPosition;
 * This is the class that stores all of the mod logic. It is responsible for reading changes in the
 * mod UI or other UI changes, and adjusting the state of the engine based on those UI changes.
 */
-class TemplateMod {
+class ExampleMod {
 
   /**
   * @description
@@ -198,7 +198,7 @@ function main () {
   * This is the mod component itself. It renders the UI and keeps track of states that will be
   * changed by the user interacting with it.
   */
-  class TemplateModComponent extends React.Component {
+  class ExampleModComponent extends React.Component {
     constructor (props) {
       // Extend props to the base component definition
       super(props);
@@ -212,7 +212,7 @@ function main () {
       };
 
       // Abstract the mod logic into a separately defined class
-      this.modLogic = new TemplateMod(store, this.state);
+      this.modLogic = new ExampleMod(store, this.state);
 
       // Called on updates to the store
       store.subscribe(() => {
@@ -310,14 +310,14 @@ function main () {
             style: { backgroundColor: this.state.active ? "lightblue" : null },
             onClick: this.onActivate.bind(this)
           },
-          "Template Mod"
+          "Example Mod"
         )
       );
     }
   }
 
   // Register the mod component with the active mod loader
-  window.registerCustomSetting(TemplateModComponent);
+  window.registerCustomSetting(ExampleModComponent);
 }
 
 // Waits for the mod loader to be registered, then registers this mod component
