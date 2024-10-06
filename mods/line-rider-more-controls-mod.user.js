@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Provides a menu for viewing and editing specific track data
-// @version      1.1.0
+// @version      1.1.1
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -350,6 +350,7 @@ function main () {
             }
             riderPos[0] = x;
             store.dispatch({ type: "SET_RIDERS", payload: ridersArray });
+            store.dispatch({ type: "COMMIT_TRACK_CHANGES" });
             parent.setState({ riderPos });
         }
 
@@ -362,6 +363,7 @@ function main () {
             }
             riderPos[1] = y;
             store.dispatch({ type: "SET_RIDERS", payload: ridersArray });
+            store.dispatch({ type: "COMMIT_TRACK_CHANGES" });
             parent.setState({ riderPos });
         }
 
@@ -374,6 +376,7 @@ function main () {
             }
             riderVel[0] = x;
             store.dispatch({ type: "SET_RIDERS", payload: ridersArray });
+            store.dispatch({ type: "COMMIT_TRACK_CHANGES" });
             parent.setState({ riderVel });
         }
 
@@ -386,6 +389,7 @@ function main () {
             }
             riderVel[1] = y;
             store.dispatch({ type: "SET_RIDERS", payload: ridersArray });
+            store.dispatch({ type: "COMMIT_TRACK_CHANGES" });
             parent.setState({ riderVel });
         }
 
@@ -397,6 +401,7 @@ function main () {
                 startAngle: a
             }
             store.dispatch({ type: "SET_RIDERS", payload: ridersArray });
+            store.dispatch({ type: "COMMIT_TRACK_CHANGES" });
             parent.setState({ riderAngle: a });
         }
 
@@ -408,6 +413,7 @@ function main () {
                 remountable: r
             }
             store.dispatch({ type: "SET_RIDERS", payload: ridersArray });
+            store.dispatch({ type: "COMMIT_TRACK_CHANGES" });
             parent.setState({ riderRemountable: r });
         }
 
@@ -434,6 +440,7 @@ function main () {
                 remountable: true
             });
             store.dispatch({ type: "SET_RIDERS", payload: ridersArray });
+            store.dispatch({ type: "COMMIT_TRACK_CHANGES" });
         }
 
         onDecrementRiders() {
@@ -443,6 +450,7 @@ function main () {
 
             ridersArray.pop();
             store.dispatch({ type: "SET_RIDERS", payload: ridersArray });
+            store.dispatch({ type: "COMMIT_TRACK_CHANGES" });
         }
 
         renderDouble(key, label, sublabels, editable, actions) {
