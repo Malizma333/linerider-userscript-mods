@@ -52,7 +52,7 @@ const setSelectToolState = toolState => setToolState(SELECT_TOOL, toolState)
 const updateLines = (linesToRemove, linesToAdd, name) => ({
   type: 'UPDATE_LINES',
   payload: { linesToRemove, linesToAdd },
-  meta: { name: name }
+  meta: { name }
 })
 
 const addLines = (line) => updateLines(null, line, 'ADD_LINES')
@@ -150,8 +150,8 @@ class ShadeMod {
           .map(id => this.track.getLine(id))
           .filter(l => l)
 
-        let shadeLines = []
-        for (let { p1, p2 } of genFill(selectedLines, this.state)) {
+        const shadeLines = []
+        for (const { p1, p2 } of genFill(selectedLines, this.state)) {
           shadeLines.push({
             x1: p1.x,
             y1: p1.y,
@@ -280,7 +280,7 @@ function setsEqual (a, b) {
   if (a.size !== b.size) {
     return false
   }
-  for (let x of a) {
+  for (const x of a) {
     if (!b.has(x)) {
       return false
     }
@@ -293,7 +293,7 @@ function getLinesFromPoints (points) {
 }
 
 // takes an iterable of lines and properties and returns an iterable of lines of alternating fill
-function* genFill (lines, { angle = 0, spacing = 0, offset = 0 } = {}) {
+function * genFill (lines, { angle = 0, spacing = 0, offset = 0 } = {}) {
   const { V2 } = window
   /* prep */
 
@@ -304,16 +304,16 @@ function* genFill (lines, { angle = 0, spacing = 0, offset = 0 } = {}) {
   offset = spacing * offset
 
   // degrees to radians
-  let rads = angle / 180 * Math.PI
+  const rads = angle / 180 * Math.PI
 
   // create angle basis
-  let toAngle = rotateTransform(rads)
-  let fromAngle = rotateTransform(-rads)
+  const toAngle = rotateTransform(rads)
+  const fromAngle = rotateTransform(-rads)
 
   /* build sorted line endpoints */
 
   // accumulate sorted transformed endpoints
-  let points = []
+  const points = []
 
   // sort by x
   const insertSorted = point => points.splice(sortedIndexBy(points, point, p => p.x), 0, point)
@@ -321,9 +321,9 @@ function* genFill (lines, { angle = 0, spacing = 0, offset = 0 } = {}) {
   for (let line of lines) {
     // TODO: probably don't need id or point.y
     // transform lines to angle basis
-    let id = line.id
-    let p1 = new V2(line.p1).transform(toAngle)
-    let p2 = new V2(line.p2).transform(toAngle)
+    const id = line.id
+    const p1 = new V2(line.p1).transform(toAngle)
+    const p2 = new V2(line.p2).transform(toAngle)
 
     // sort endpoints
     if (p1.x < p2.x) {
@@ -343,21 +343,21 @@ function* genFill (lines, { angle = 0, spacing = 0, offset = 0 } = {}) {
   let currentX = points[0].x + offset
 
   // keep track of what lines the cursor intersects
-  let currentLines = new Set()
+  const currentLines = new Set()
 
   // keep track of sorted y positions (for inner loop)
-  let ys = []
+  const ys = []
 
-  for (let point of points) {
+  for (const point of points) {
     // sweep through x-axis up to point.x, and accumlulate sorted y position intersections
     for (; currentX < point.x; currentX += spacing) {
       // iterate through lines the cursor is intersecting to acc for sweeping
-      for (let { p1, p2 } of currentLines.values()) {
+      for (const { p1, p2 } of currentLines.values()) {
         // get relative x position of cursor on currentLine
-        let t = (currentX - p1.x) / (p2.x - p1.x)
+        const t = (currentX - p1.x) / (p2.x - p1.x)
 
         // get y position of intersection btwn cursor and currentLine
-        let y = t * (p2.y - p1.y) + p1.y
+        const y = t * (p2.y - p1.y) + p1.y
 
         // insert sorted
         ys.splice(sortedIndex(ys, y), 0, y)
@@ -366,7 +366,7 @@ function* genFill (lines, { angle = 0, spacing = 0, offset = 0 } = {}) {
       // keep track of inside/outside fill
       let currentY = null
       // vertically sweep through lines
-      for (let y of ys) {
+      for (const y of ys) {
         if (currentY == null) {
           // enter fill
           currentY = y
@@ -399,8 +399,8 @@ function* genFill (lines, { angle = 0, spacing = 0, offset = 0 } = {}) {
 function rotateTransform (rads) {
   const { V2 } = window
 
-  let u = V2.from(1, 0).rot(rads)
-  let v = V2.from(0, 1).rot(rads)
+  const u = V2.from(1, 0).rot(rads)
+  const v = V2.from(0, 1).rot(rads)
 
   return [u.x, v.x, u.y, v.y, 0, 0]
 }

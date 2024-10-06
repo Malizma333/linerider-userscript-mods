@@ -52,7 +52,7 @@ const setSelectToolState = toolState => setToolState(SELECT_TOOL, toolState)
 const updateLines = (linesToRemove, linesToAdd, name) => ({
   type: 'UPDATE_LINES',
   payload: { linesToRemove, linesToAdd },
-  meta: { name: name }
+  meta: { name }
 })
 
 // add_line adds to active layer but we want to keep layers
@@ -133,7 +133,7 @@ class SliceMod {
 
       const selectToolState = getSelectToolState(this.store.getState())
 
-      let selectedPoints = selectToolState.selectedPoints
+      const selectedPoints = selectToolState.selectedPoints
 
       if (!setsEqual(this.selectedPoints, selectedPoints)) {
         this.selectedPoints = selectedPoints
@@ -237,7 +237,7 @@ function main () {
       }
     }
 
-    onToggleRemove() {
+    onToggleRemove () {
       this.setState(({ remove }) => ({ remove: !remove }))
     }
 
@@ -303,7 +303,7 @@ function setsEqual (a, b) {
   if (a.size !== b.size) {
     return false
   }
-  for (let x of a) {
+  for (const x of a) {
     if (!b.has(x)) {
       return false
     }
@@ -315,10 +315,10 @@ function getLinesFromPoints (points) {
   return new Set([...points].map(point => point >> 1))
 }
 
-function performSlice(selectedLines, selectLinesInRect, setLine, addLine) {
+function performSlice (selectedLines, selectLinesInRect, setLine, addLine) {
   let changed = false
-  for (let selectedLine of selectedLines) {
-    const {p1, p2} = selectedLine
+  for (const selectedLine of selectedLines) {
+    const { p1, p2 } = selectedLine
 
     const lines = selectLinesInRect({
       x: Math.min(p1.x, p2.x),
@@ -327,7 +327,7 @@ function performSlice(selectedLines, selectLinesInRect, setLine, addLine) {
       height: Math.abs(p1.y - p2.y)
     })
 
-    for (let line of lines) {
+    for (const line of lines) {
       // skip lines in selection
       if (selectedLines.has(line)) continue
 
@@ -357,23 +357,23 @@ function performSlice(selectedLines, selectLinesInRect, setLine, addLine) {
 }
 
 // takes an iterable of lines and returns an iterable of line IDs to remove
-function* genRemove (selectedLines, selectLinesInRect, {angle = 0} = {}) {
+function * genRemove (selectedLines, selectLinesInRect, { angle = 0 } = {}) {
   const { V2 } = window
   /* prep */
 
   // degrees to radians
-  let rads = angle / 180 * Math.PI
+  const rads = angle / 180 * Math.PI
 
   // create angle basis
-  let toAngle = rotateTransform(rads)
-  let fromAngle = rotateTransform(-rads)
+  const toAngle = rotateTransform(rads)
+  const fromAngle = rotateTransform(-rads)
 
   const linesToRemove = selectLinesInRect(getBBoxFromLines(selectedLines))
 
   /* build sorted line endpoints + line midpoints */
 
   // accumulate sorted transformed endpoints + line points
-  let points = []
+  const points = []
 
   // sort by x
   const insertSorted = point => points.splice(sortedIndexBy(points, point, p => p.x), 0, point)
@@ -381,9 +381,9 @@ function* genRemove (selectedLines, selectLinesInRect, {angle = 0} = {}) {
   for (let line of selectedLines) {
     // TODO: probably don't need id or point.y
     // transform lines to angle basis
-    let id = line.id
-    let p1 = new V2(line.p1).transform(toAngle)
-    let p2 = new V2(line.p2).transform(toAngle)
+    const id = line.id
+    const p1 = new V2(line.p1).transform(toAngle)
+    const p2 = new V2(line.p2).transform(toAngle)
 
     // sort endpoints
     if (p1.x < p2.x) {
@@ -397,7 +397,7 @@ function* genRemove (selectedLines, selectLinesInRect, {angle = 0} = {}) {
     insertSorted({ id, x: line.p2.x, y: line.p2.y, line })
   }
 
-  for (let line of linesToRemove) {
+  for (const line of linesToRemove) {
     if (selectedLines.has(line)) continue
 
     const mid = new V2(line.p1).add(line.p2).div(2).transform(toAngle)
@@ -408,22 +408,22 @@ function* genRemove (selectedLines, selectLinesInRect, {angle = 0} = {}) {
   /* sweep through endpoints and get line fill */
 
   // keep track of what lines the cursor intersects
-  let currentLines = new Set()
+  const currentLines = new Set()
 
   // keep track of sorted y positions (for inner loop)
-  let ys = []
+  const ys = []
 
-  for (let point of points) {
+  for (const point of points) {
     // put cursor on point-to-remove, and accumlulate sorted y position intersections
     if (point.remove) {
       const currentX = point.x
       // iterate through lines the cursor is intersecting to acc
-      for (let { p1, p2 } of currentLines.values()) {
+      for (const { p1, p2 } of currentLines.values()) {
         // get relative x position of cursor on currentLine
-        let t = (currentX - p1.x) / (p2.x - p1.x)
+        const t = (currentX - p1.x) / (p2.x - p1.x)
 
         // get y position of intersection btwn cursor and currentLine
-        let y = t * (p2.y - p1.y) + p1.y
+        const y = t * (p2.y - p1.y) + p1.y
 
         // insert sorted
         ys.splice(sortedIndex(ys, y), 0, y)
@@ -453,8 +453,8 @@ function* genRemove (selectedLines, selectLinesInRect, {angle = 0} = {}) {
 function rotateTransform (rads) {
   const { V2 } = window
 
-  let u = V2.from(1, 0).rot(rads)
-  let v = V2.from(0, 1).rot(rads)
+  const u = V2.from(1, 0).rot(rads)
+  const v = V2.from(0, 1).rot(rads)
 
   return [u.x, v.x, u.y, v.y, 0, 0]
 }
@@ -504,13 +504,13 @@ function lineLineIntersection (x0, y0, x1, y1, x2, y2, x3, y3, inclusive) {
   return _02cross23 / _01cross23
 }
 
-function getBBoxFromLines(lines) {
+function getBBoxFromLines (lines) {
   let x1 = Infinity
   let y1 = Infinity
   let x2 = -Infinity
   let y2 = -Infinity
 
-  for (let {p1, p2} of lines) {
+  for (const { p1, p2 } of lines) {
     x1 = Math.min(Math.min(x1, p1.x), p2.x)
     y1 = Math.min(Math.min(y1, p1.y), p2.y)
     x2 = Math.max(Math.max(x2, p1.x), p2.x)

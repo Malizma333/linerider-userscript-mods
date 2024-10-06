@@ -49,7 +49,7 @@ const setSelectToolState = toolState => setToolState(SELECT_TOOL, toolState)
 const updateLines = (linesToRemove, linesToAdd, name) => ({
   type: 'UPDATE_LINES',
   payload: { linesToRemove, linesToAdd },
-  meta: { name: name }
+  meta: { name }
 })
 
 const removeLines = (lineIds) => updateLines(lineIds, null, 'REMOVE_LINES')
@@ -103,7 +103,7 @@ class RemoveDupesMod {
   }
 
   onUpdate (nextState = this.state) {
-    let shouldUpdate = false;
+    let shouldUpdate = false
 
     if (!this.state.active && nextState.active) {
       window.previewLinesInFastSelect = true
@@ -126,7 +126,7 @@ class RemoveDupesMod {
 
       const selectToolState = getSelectToolState(this.store.getState())
 
-      let selectedPoints = selectToolState.selectedPoints
+      const selectedPoints = selectToolState.selectedPoints
 
       if (!setsEqual(this.selectedPoints, selectedPoints)) {
         this.selectedPoints = selectedPoints
@@ -134,24 +134,24 @@ class RemoveDupesMod {
       }
     }
 
-    if (!shouldUpdate) return;
+    if (!shouldUpdate) return
 
     if (this.changed) {
       this.store.dispatch(revertTrackChanges())
       this.changed = false
     }
 
-    if (!this.state.active || this.selectedPoints.size === 0) return;
+    if (!this.state.active || this.selectedPoints.size === 0) return
 
     const selectedLines = new Set([...getLinesFromPoints(this.selectedPoints)]
-                                  .map(id => this.track.getLine(id))
-                                  .filter(l => l))
+      .map(id => this.track.getLine(id))
+      .filter(l => l))
 
-    const linesToRemove = genRemove(selectedLines);
+    const linesToRemove = genRemove(selectedLines)
 
     if (linesToRemove.length > 0) {
       this.store.dispatch(removeLines(linesToRemove))
-      this.changed = true;
+      this.changed = true
     }
   }
 }
@@ -247,7 +247,7 @@ function setsEqual (a, b) {
   if (a.size !== b.size) {
     return false
   }
-  for (let x of a) {
+  for (const x of a) {
     if (!b.has(x)) {
       return false
     }
@@ -262,32 +262,32 @@ function getLinesFromPoints (points) {
 function genRemove (selectedLines) {
   const { V2 } = window
 
-  const ids = [];
-  const preserve = new Set();
+  const ids = []
+  const preserve = new Set()
 
   for (const line of selectedLines) {
-    const orderA = [line.x1, line.y1, line.x2, line.y2];
-    const orderB = [line.x2, line.y2, line.x1, line.y1];
-    let inPreserve = false;
+    const orderA = [line.x1, line.y1, line.x2, line.y2]
+    const orderB = [line.x2, line.y2, line.x1, line.y1]
+    let inPreserve = false
 
     for (const order of preserve) {
-      if(order[0] === orderA[0] && order[1] === orderA[1] && order[2] === orderA[2] && order[3] === orderA[3]) {
-        inPreserve = true;
-        break;
+      if (order[0] === orderA[0] && order[1] === orderA[1] && order[2] === orderA[2] && order[3] === orderA[3]) {
+        inPreserve = true
+        break
       }
 
-      if(order[0] === orderB[0] && order[1] === orderB[1] && order[2] === orderB[2] && order[3] === orderB[3]) {
-        inPreserve = true;
-        break;
+      if (order[0] === orderB[0] && order[1] === orderB[1] && order[2] === orderB[2] && order[3] === orderB[3]) {
+        inPreserve = true
+        break
       }
     }
 
-    if(!inPreserve) {
-      preserve.add(orderA);
+    if (!inPreserve) {
+      preserve.add(orderA)
     } else {
-      ids.push(line.id);
+      ids.push(line.id)
     }
   }
 
-  return ids;
+  return ids
 }
