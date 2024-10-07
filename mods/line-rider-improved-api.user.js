@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Container for linerider.com mods
-// @version      1.7.2
+// @version      1.8.0
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -133,6 +133,26 @@ function main () {
     borderBottom: '3px solid black'
   }
 
+  const minifyButtonStyle = {
+    height: '100%',
+    aspectRatio: '1/1',
+    border: 'none',
+    background: 'none'
+  }
+
+  const expandButtonStyle = {
+    visibility: 'hidden',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'fixed',
+    bottom: '1vh',
+    right: '1vw',
+    fontSize: 'xx-large',
+    aspectRatio: '1/1',
+    borderRadius: '100%'
+  }
+
   settingsContainerStyle.top = preferences.settingsTop
   settingsContainerStyle.left = preferences.settingsLeft
   settingsContainerStyle.width = preferences.settingsWidth
@@ -249,7 +269,8 @@ function main () {
       super()
 
       this.state = {
-        customSettings: []
+        customSettings: [],
+        searchTerm: ''
       }
     }
 
@@ -265,6 +286,7 @@ function main () {
         if (!containerAssigned) {
           containerAssigned = true
           Object.assign(settingsContainer.style, settingsContainerStyle)
+          Object.assign(expandButton.style, expandButtonStyle)
         }
       }
 
@@ -350,7 +372,15 @@ function main () {
         { style: { display: 'flex', height: '100%', width: '100%', flexDirection: 'column' } },
         e(
           'div',
-          { style: headerStyle, onMouseDown: (e) => this.onStartDrag(e) }
+          { style: headerStyle, onMouseDown: (e) => this.onStartDrag(e) },
+          e(
+            'button',
+            {
+              style: minifyButtonStyle,
+              onClick: () => { settingsContainer.style.visibility = 'hidden'; expandButton.style.visibility = 'visible' }
+            },
+            '-'
+          )
         ),
         e(
           'div',
@@ -358,7 +388,18 @@ function main () {
           this.state.customSettings.length > 0 && e(
             'div',
             { style: { width: '100%' } },
-            this.state.customSettings.map(
+            e(
+              'input',
+              {
+                style: { width: '100%' },
+                placeholder: 'Search...',
+                value: this.state.searchTerm,
+                onChange: (e) => { this.setState({ searchTerm: e.target.value }) }
+              }
+            ),
+            this.state.customSettings.filter(
+              (mod) => mod.name.toUpperCase().includes(this.state.searchTerm.toUpperCase())
+            ).map(
               (mod, index) => e(
                 'div',
                 { style: { borderTop: index > 0 ? '2px solid black' : null } },
@@ -370,6 +411,12 @@ function main () {
       )
     }
   }
+
+  const expandButton = document.createElement('button')
+  expandButton.innerHTML = '↖'
+  expandButton.title = 'Show ModAPI'
+  expandButton.onclick = () => { settingsContainer.style.visibility = 'visible'; expandButton.style.visibility = 'hidden' }
+  document.getElementById('content').appendChild(expandButton)
 
   const settingsContainer = document.createElement('div')
 
