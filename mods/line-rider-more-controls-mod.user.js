@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Provides a menu for viewing and editing specific track data
-// @version      1.1.1
+// @version      1.2.0
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -42,44 +42,10 @@ const getTrackDesc = state => state.trackData.description
 const getAutosaveEnabled = state => state.autosaveEnabled
 const getRiders = state => state.simulator.engine.engine.state.riders
 
-const defaultPreferences = {
-  containerTop: '10vh',
-  containerLeft: '10vw',
-  containerWidth: '20vw',
-  containerHeight: '25vh'
-}
-
-const preferencesKey = 'MORE_CONTROLS_MOD_WINDOW_PREFS'
-
-function loadPrefs () {
-  const storedPreferences = localStorage.getItem(preferencesKey)
-  if (storedPreferences) {
-    const nextPrefs = JSON.parse(storedPreferences)
-
-    Object.keys(defaultPreferences)
-      .filter(key => !Object.keys(nextPrefs).includes(key))
-      .forEach(key => {
-        nextPrefs[key] = defaultPreferences[key]
-      })
-    return nextPrefs
-  }
-
-  return defaultPreferences
-}
-
-function savePrefs (newPrefs) {
-  localStorage.setItem(
-    preferencesKey,
-    JSON.stringify(newPrefs)
-  )
-}
 
 function main () {
-  window.V2 = window.V2 || window.store.getState().simulator.engine.engine.state.startPoint.constructor
-
   const {
     React,
-    ReactDOM,
     store
   } = window
 
@@ -87,64 +53,16 @@ function main () {
   let playerRunning = getPlayerRunning(store.getState())
   let windowFocused = getWindowFocused(store.getState())
 
-  const preferences = loadPrefs()
-  savePrefs(preferences)
-
-  const rootStyle = {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'flex-start',
-    textAlign: 'left',
-    transition: 'opacity 225ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
-    flex: 1,
-    width: '100%',
-    overflow: 'auto'
-  }
-
-  const containerStyle = {
-    position: 'fixed',
-    minWidth: '15vw',
-    maxWidth: '40vw',
-    minHeight: '15vh',
-    maxHeight: '45vh',
-    border: '3px solid black',
-    backgroundColor: '#ffffff',
-    resize: 'both',
-    overflow: 'hidden',
-    opacity: 0,
-    pointerEvents: 'none'
-  }
-
-  const headerStyle = {
-    cursor: 'move',
-    minHeight: '3ch',
-    backgroundColor: '#aaaaaa',
-    zIndex: '10',
-    borderBottom: '3px solid black'
-  }
-
-  containerStyle.top = preferences.settingsTop
-  containerStyle.left = preferences.settingsLeft
-  containerStyle.width = preferences.settingsWidth
-  containerStyle.height = preferences.settingsHeight
-
-  store.subscribe(() => {
-    playerRunning = getPlayerRunning(store.getState())
-    windowFocused = getWindowFocused(store.getState())
-
-    const shouldBeVisible = !playerRunning && windowFocused
-
-    modContainer.style.opacity = shouldBeVisible ? 1 : 0
-    modContainer.style.pointerEvents = shouldBeVisible ? null : 'none'
-  })
-
-  const dragProps = { lastX: 0, lastY: 0 }
-
   class MoreControlsModComponent extends React.Component {
     constructor () {
       super()
 
       this.state = {
+        active: false,
+        showRiderData: false,
+        showCameraData: false,
+        showTimelineData: false,
+        showDetailsData: false,
         playbackCam: [0, 0],
         editorCam: [0, 0],
         stopEnd: false,
@@ -167,7 +85,6 @@ function main () {
     }
 
     componentDidMount () {
-      Object.assign(modContainer.style, containerStyle)
       window.addEventListener('resize', this.updateDimensions)
       this.matchState()
     }
@@ -199,68 +116,13 @@ function main () {
         this.setState({ selectedRider })
       }
     }
-
-    updateDimensions () {
-      if (modContainer.offsetLeft < 0) {
-        modContainer.style.left = `${0}vw`
-        preferences.settingsLeft = `${0}vw`
+    
+    onActivate () {
+      if (this.state.active) {
+        this.setState({ active: false })
+      } else {
+        this.setState({ active: true })
       }
-
-      if (modContainer.offsetLeft > window.innerWidth - modContainer.offsetWidth) {
-        modContainer.style.left = `${100 * (window.innerWidth - modContainer.offsetWidth) / window.innerWidth}vw`
-        preferences.settingsLeft = `${100 * (window.innerWidth - modContainer.offsetWidth) / window.innerWidth}vw`
-      }
-
-      if (modContainer.offsetTop < 0) {
-        modContainer.style.top = `${0}vh`
-        preferences.settingsTop = `${0}vh`
-      }
-
-      if (modContainer.offsetTop > window.innerHeight - modContainer.offsetHeight) {
-        modContainer.style.top = `${100 * (window.innerHeight - modContainer.offsetHeight) / window.innerHeight}vh`
-        preferences.settingsTop = `${100 * (window.innerHeight - modContainer.offsetHeight) / window.innerHeight}vh`
-      }
-
-      savePrefs(preferences)
-    }
-
-    onStartDrag (e) {
-      e = e || window.event
-      e.preventDefault()
-
-      dragProps.lastX = e.clientX
-      dragProps.lastY = e.clientY
-
-      document.onmousemove = this.onDrag
-      document.onmouseup = this.onCloseDrag
-    }
-
-    onDrag (e) {
-      e = e || window.event
-      e.preventDefault()
-
-      const newX = dragProps.lastX - e.clientX
-      const newY = dragProps.lastY - e.clientY
-      dragProps.lastX = e.clientX
-      dragProps.lastY = e.clientY
-
-      const nextOffsetX = modContainer.offsetLeft - newX
-      const nextOffsetY = modContainer.offsetTop - newY
-
-      if (nextOffsetX >= 0 && nextOffsetX <= window.innerWidth - modContainer.offsetWidth &&
-               nextOffsetY >= 0 && nextOffsetY <= window.innerHeight - modContainer.offsetHeight) {
-        modContainer.style.left = `${100 * (modContainer.offsetLeft - newX) / window.innerWidth}vw`
-        modContainer.style.top = `${100 * (modContainer.offsetTop - newY) / window.innerHeight}vh`
-        preferences.settingsLeft = `${100 * (modContainer.offsetLeft - newX) / window.innerWidth}vw`
-        preferences.settingsTop = `${100 * (modContainer.offsetTop - newY) / window.innerHeight}vh`
-      }
-
-      savePrefs(preferences)
-    }
-
-    onCloseDrag (e) {
-      document.onmouseup = null
-      document.onmousemove = null
     }
 
     onSetEditorCamX (parent, x) {
@@ -527,21 +389,27 @@ function main () {
         e('input', { style: { marginLeft: '.5em' }, type: 'checkbox', ...props })
       )
     }
+    
+    renderSection (key, title) {
+      return e('div', null,
+        e('button',
+          { id: key, style: { background: 'none', border: 'none' }, onClick: () => this.setState({ [key]: !this.state[key] }) },
+          this.state[key] ? '▲' : '▼'
+        ),
+        e('label', { for: key }, title)
+      )
+    }
 
     render () {
       return e(
         'div',
-        { style: { display: 'flex', height: '100%', width: '100%', flexDirection: 'column' } },
-        e(
+        null,
+        this.state.active && e(
           'div',
-          { style: headerStyle, onMouseDown: (e) => this.onStartDrag(e) }
-        ),
-        e(
-          'div',
-          { style: rootStyle },
-          e(
-            'div',
-            { style: { width: '100%' } },
+          { style: { width: '100%' } },
+          this.renderSection('showRiderData', 'Riders'),
+          this.state.showRiderData && e(
+            'div', null,
             this.renderButton('incRiders', '+', this.onIncrementRiders),
             this.renderButton('decRiders', '-', this.onDecrementRiders),
             getRiders(store.getState()).length > 1 && this.renderSingle('selectedRider', 'Selected Rider', true, true, this.onSelectRider),
@@ -551,51 +419,59 @@ function main () {
               this.renderDouble('riderVel', 'Rider Velocity', ['X', 'Y'], true, [this.onSetRiderVelX, this.onSetRiderVelY]),
               this.renderSingle('riderAngle', 'Rider Angle', true, true, this.onSetRiderAngle),
               this.renderCheckbox('riderRemountable', 'Remountable', this.onSetRiderRemountable)
-            ),
-            e('hr'),
+            )
+          ),
+          e('hr'),
+          this.renderSection('showCameraData', 'Camera'),
+          this.state.showCameraData && e(
+            'div', null,
             this.renderDouble('playbackCam', 'Playback Camera', ['X', 'Y'], false),
-            this.renderDouble('editorCam', 'Editor Camera', ['X', 'Y'], true, [this.onSetEditorCamX, this.onSetEditorCamY]),
-            e('hr'),
+            this.renderDouble('editorCam', 'Editor Camera', ['X', 'Y'], true, [this.onSetEditorCamX, this.onSetEditorCamY])
+          ),
+          e('hr'),
+          this.renderSection('showTimelineData', 'Timeline'),
+          this.state.showTimelineData && e(
+            'div', null,
             this.renderCheckbox('stopAtEnd', 'Stop at End', this.onToggleStopEnd),
             this.renderSingle('index', 'Index', true, true, this.onSetIndex),
             this.renderSingle('maxIndex', 'Max Index', true, true, this.onSetMaxIndex),
             this.renderDouble('onionSkin', 'Onion Skins', ['Before', 'After'], true, [this.onSetOnionSkinBefore, this.onSetOnionSkinAfter]),
-            this.renderSingle('fps', 'Player FPS', true, true, this.onSetFPS),
-            e('hr'),
+            this.renderSingle('fps', 'Player FPS', true, true, this.onSetFPS)
+          ),
+          e('hr'),
+          this.renderSection('showDetailsData', 'Track Details'),
+          this.state.showDetailsData && e(
+            'div', null,
             this.renderSingle('title', 'Title', true, false, this.onSetTrackTitle),
             this.renderSingle('creator', 'Creator', true, false, this.onSetTrackCreator),
             this.renderSingle('desc', 'Description', true, false, this.onSetTrackDesc),
             this.renderCheckbox('autosave', 'Autosave', this.onToggleAutosave)
           )
+        ),
+        e('button',
+          {
+            style: {
+              backgroundColor: this.state.active ? 'lightblue' : null
+            },
+            onClick: this.onActivate.bind(this)
+          },
+          'More Controls Mod'
         )
       )
     }
   }
 
-  const modContainer = document.createElement('div')
-
-  document.getElementById('content').appendChild(modContainer)
-
-  ReactDOM.render(
-    e(MoreControlsModComponent),
-    modContainer
-  )
-
-  const resizeObserver = new ResizeObserver(() => {
-    preferences.settingsWidth = `${100 * modContainer.offsetWidth / window.innerWidth}vw`
-    preferences.settingsHeight = `${100 * modContainer.offsetHeight / window.innerHeight}vh`
-    savePrefs(preferences)
-  })
-
-  resizeObserver.observe(modContainer)
+  // this is a setting and not a standalone tool because it extends the select tool
+  window.registerCustomSetting(MoreControlsModComponent)
 }
 
-if (window.store) {
+/* init */
+if (window.registerCustomSetting) {
   main()
 } else {
-  const prevInit = window.onAppReady
-  window.onAppReady = () => {
-    if (prevInit) prevInit()
+  const prevCb = window.onCustomToolsApiReady
+  window.onCustomToolsApiReady = () => {
+    if (prevCb) prevCb()
     main()
   }
 }
