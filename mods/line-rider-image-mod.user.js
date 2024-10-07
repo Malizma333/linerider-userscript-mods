@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Generates colored line arrays from image data
-// @version      1.6.0
+// @version      1.7.0
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -146,7 +146,7 @@ function main () {
     store
   } = window
 
-  const create = React.createElement
+  const e = React.createElement
 
   class ImageModComponent extends React.Component {
     constructor (props) {
@@ -196,10 +196,10 @@ function main () {
         }
       }
 
-      return create(
+      return e(
         'div', null,
         title,
-        create('input', { type: 'range', ...props, onFocus: create => create.target.blur() })
+        e('input', { type: 'range', ...props, onFocus: create => create.target.blur() })
       )
     }
 
@@ -220,14 +220,14 @@ function main () {
     }
 
     render () {
-      return create(
+      return e(
         'div', null,
-        this.state.active && create(
+        this.state.active && e(
           'div', null,
-          create(
+          e(
             'div', null,
             'Image: ',
-            create(
+            e(
               'input',
               {
                 type: 'file',
@@ -239,25 +239,33 @@ function main () {
                   console.error(err.message)
                 })
               }),
-            this.renderSlider('clamping', 'Color Resolution', { min: 1, max: 3, step: 1 }),
-            create('img', { id: 'output', style: { display: 'none' } })
+            e('br'),
+            'Color Resolution',
+            e(
+              'div',
+              { style: { display: 'flex', flexDirection: 'row' } },
+              'High',
+              this.renderSlider('clamping', '', { min: 0, max: 3, step: 1 }),
+              'Low'
+            ),
+            e('img', { id: 'output', style: { display: 'none' } })
           ),
-          create(
+          e(
             'div', null,
             this.state.message
           ),
-          create(
+          e(
             'button',
             { style: { float: 'left' }, onClick: () => this.onCommit() },
             'Commit'
           ),
-          this.state.imageData && create(
+          this.state.imageData && e(
             'button',
             { style: { float: 'left' }, onClick: () => this.imageMod.draw(this.state) },
             'Render'
           )
         ),
-        create(
+        e(
           'button',
           {
             style: {
