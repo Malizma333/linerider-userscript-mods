@@ -1,1 +1,9 @@
 .vscode
+update_changelog.sh
+
+# Docs
+_site
+.sass-cache
+.jekyll-cache
+.jekyll-metadata
+vendor
