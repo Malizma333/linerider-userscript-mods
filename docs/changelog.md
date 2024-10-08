@@ -7,6 +7,7 @@ permalink: /changelog/
 <style>
   h3 {
     text-decoration: underline;
+    margin: 2em 0 0 0;
   }
 </style>
 
