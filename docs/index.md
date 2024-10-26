@@ -59,5 +59,3 @@ Adds some formatting improvements to the custom tools API, namely a dropdown and
 ### [More Controls](https://github.com/Malizma333/linerider-userscript-mods/raw/refs/heads/master/mods/line-rider-more-controls-mod.user.js)
 
 Adds some UI to hidden or hard to edit track properties.
-
-<sub>*Last Modified: {% last_modified_at %}*</sub>

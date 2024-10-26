@@ -11,6 +11,19 @@ permalink: /changelog/
   }
 </style>
 
+### 2024-10-26
+#### Command Editor
+- Added gravity triggers
+- Added undo/redo
+
+### 2024-10-25
+#### Command Editor
+- Added crash detection and autosaving
+- Added settings saving to local storage
+- Updated save/load system
+- Updated UI layout
+- Fixed firefox not rendering skin
+
 ### 2024-10-06
 #### Image Mod
 - Updated mod UI and added higher resolution option
