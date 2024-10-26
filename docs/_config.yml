@@ -8,4 +8,4 @@ repository: Malizma333/linerider-userscript-mods
 theme: minima
 plugins:
   - jekyll-feed
-  - jekyll-last-modified-at
+  - jekyll-target-blank
