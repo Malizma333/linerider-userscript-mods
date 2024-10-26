@@ -11,4 +11,8 @@
 // @match        https://*.surge.sh/*
 // @grant        none
 // @require      https://github.com/Malizma333/line-rider-command-editor-userscript/raw/master/command-editor.min.js
+// @downloadURL  https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-bookmark-mod.user.js
+// @updateURL    https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-bookmark-mod.user.js
+// @homepageURL  https://github.com/Malizma333/linerider-userscript-mods
+// @supportURL   https://github.com/Malizma333/linerider-userscript-mods/issues
 // ==/UserScript==
