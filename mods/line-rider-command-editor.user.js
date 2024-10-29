@@ -3,7 +3,7 @@
 // @author       Malizma
 // @description  Adds UI to API commands in linerider.com
 // @namespace    https://www.linerider.com/
-// @version      2.2.0
+// @version      2.2.1
 // @icon         https://www.linerider.com/favicon.ico
 // @match        https://www.linerider.com/*
 // @match        https://*.official-linerider.com/*
