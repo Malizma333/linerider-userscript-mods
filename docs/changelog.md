@@ -11,6 +11,11 @@ permalink: /changelog/
   }
 </style>
 
+### 2024-11-09
+#### Command Editor
+- Changed print script to copy script button
+- UI changes
+
 ### 2024-10-26
 #### Command Editor
 - Added gravity triggers
