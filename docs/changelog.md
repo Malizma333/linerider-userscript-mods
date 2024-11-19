@@ -11,6 +11,11 @@ permalink: /changelog/
   }
 </style>
 
+### 2024-11-18
+#### Command Editor
+- Added multiple riders option to gravity triggers
+- Backwards compatibility fix with previous files
+
 ### 2024-10-26
 #### Command Editor
 - Added gravity triggers
