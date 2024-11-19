@@ -16,6 +16,11 @@ permalink: /changelog/
 - Added multiple riders option to gravity triggers
 - Backwards compatibility fix with previous files
 
+### 2024-11-09
+#### Command Editor
+- Changed print script to copy script button
+- UI changes
+
 ### 2024-10-26
 #### Command Editor
 - Added gravity triggers
