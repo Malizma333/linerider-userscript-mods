@@ -11,6 +11,10 @@ permalink: /changelog/
   }
 </style>
 
+### 2024-11-23
+#### Binary Formatter
+- Created prototype binary formatter mod for saving and loading tracks in proposed binary format
+
 ### 2024-11-18
 #### Command Editor
 - Added multiple riders option to gravity triggers
