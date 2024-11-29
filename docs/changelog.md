@@ -18,6 +18,8 @@ permalink: /changelog/
 - Created mod to add number picker for scenery width
 #### Selection Transform
 - Added option to scale scenery width in addition to overall shape
+#### Bezier Tool
+- Added option for scenery width
 
 ### 2024-11-23
 #### Binary Formatter
