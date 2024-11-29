@@ -20,6 +20,8 @@ permalink: /changelog/
 - Added option to scale scenery width in addition to overall shape
 #### Bezier Tool
 - Added option for scenery width
+#### SVG Exporter
+- Line width exports to stroke size
 
 ### 2024-11-23
 #### Binary Formatter

@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Generates an svg file from a selection of lines
-// @version      1.1.1
+// @version      1.1.2
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -291,7 +291,8 @@ function getSVG (selectedLines, layerColors, useColor) {
       y1: line.y1,
       x2: line.x2,
       y2: line.y2,
-      color: colorMap[layerID]
+      color: colorMap[layerID],
+      width: line.width
     })
   }
 
@@ -321,7 +322,7 @@ function getSVG (selectedLines, layerColors, useColor) {
         lineElem.setAttribute('stroke', 'black')
       }
       lineElem.setAttribute('stroke-linecap', 'round')
-      lineElem.setAttribute('stroke-width', 2)
+      lineElem.setAttribute('stroke-width', (line.width || 1) * 2)
       svg.appendChild(lineElem)
     }
   }
