@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       David Lu, Ethan Li & Malizma
 // @description  Adds ability to transform selections
-// @version      0.7.0
+// @version      0.7.1
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -194,6 +194,7 @@ class TransformMod {
         ),
         anchor, postTransform, alongPerspX, alongPerspY, preCenter
       ).add(nudge)
+
       const p2 = restorePoint(
         transformPersp(
           new V2(line.p2).sub(anchor).transform(transform),
@@ -202,12 +203,15 @@ class TransformMod {
         anchor, postTransform, alongPerspX, alongPerspY, preCenter
       ).add(nudge)
 
+      const jsonLine = line.original.toJSON()
+
       transformedLines.push({
-        ...line.original.toJSON(),
+        ...jsonLine,
         x1: p1.x,
         y1: p1.y,
         x2: p2.x,
-        y2: p2.y
+        y2: p2.y,
+        width: this.state.preserveWidth ? jsonLine.width : (jsonLine.width || 1) * this.state.scale
       })
     }
     this.store.dispatch(setLines(transformedLines))
@@ -336,6 +340,7 @@ function main () {
         skewY: 0,
         scaleX: 1,
         scaleY: 1,
+        preserveWidth: true,
         flipX: false,
         flipY: false,
         rotate: 0,
@@ -459,6 +464,7 @@ function main () {
                   this.renderSlider('scaleX', { min: 0, max: 10, step: 0.01 }, 'Scale X'),
                   this.renderSlider('scaleY', { min: 0, max: 10, step: 0.01 }, 'Scale Y'),
                   this.renderSlider('scale', { min: 0, max: 10, step: 0.01 }, 'Scale'),
+                  this.renderCheckbox('preserveWidth', 'Preserve Scenery Width'),
                   this.renderCheckbox('flipX', 'Flip X'),
                   this.renderCheckbox('flipY', 'Flip Y'),
                   this.renderSlider('rotate', { min: -180, max: 180, step: 1 }, 'Rotation'),
