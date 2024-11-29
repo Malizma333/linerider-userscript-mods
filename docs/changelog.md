@@ -14,12 +14,16 @@ permalink: /changelog/
 ### 2024-11-29
 #### Selection Metadata
 - Added option for editing scenery thickness
+
 #### Scenery Width Picker
 - Created mod to add number picker for scenery width
+
 #### Selection Transform
 - Added option to scale scenery width in addition to overall shape
+
 #### Bezier Tool
 - Added option for scenery width
+
 #### SVG Exporter
 - Line width exports to stroke size
 
