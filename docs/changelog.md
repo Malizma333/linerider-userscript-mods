@@ -11,6 +11,14 @@ permalink: /changelog/
   }
 </style>
 
+### 2024-11-29
+#### Selection Metadata
+- Added option for editing scenery thickness
+#### Scenery Width Picker
+- Created mod to add number picker for scenery width
+#### Selection Transform
+- Added option to scale scenery width in addition to overall shape
+
 ### 2024-11-23
 #### Binary Formatter
 - Created prototype binary formatter mod for saving and loading tracks in proposed binary format
