@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Generates colored line arrays from image data
-// @version      1.7.0
+// @version      1.7.1
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -20,27 +20,15 @@
 
 // ==/UserScript==
 
-const updateLines = (linesToRemove, linesToAdd) => ({
-  type: 'UPDATE_LINES',
-  payload: { linesToRemove, linesToAdd }
-})
-
+const updateLines = (linesToRemove, linesToAdd) => ({ type: 'UPDATE_LINES', payload: { linesToRemove, linesToAdd }})
 const addLines = (line) => updateLines(null, line, 'ADD_LINES')
+const addLayer = (name) => ({ type: 'ADD_LAYER', payload: { name } })
+const moveLayer = (id, index) => ({ type: 'MOVE_LAYER', payload: {id, index} })
+const addFolder = (name) => ({ type: 'ADD_FOLDER', payload: {name} })
+const commitTrackChanges = () => ({ type: 'COMMIT_TRACK_CHANGES' })
+const revertTrackChanges = () => ({ type: 'REVERT_TRACK_CHANGES' })
 
-const addLayer = () => ({ type: 'ADD_LAYER' })
-
-const renameLayer = (id, name) => ({
-  type: 'RENAME_LAYER',
-  payload: { id, name }
-})
-
-const commitTrackChanges = () => ({
-  type: 'COMMIT_TRACK_CHANGES'
-})
-
-const revertTrackChanges = () => ({
-  type: 'REVERT_TRACK_CHANGES'
-})
+const getLayers = (state) => state.simulator.engine.engine.state.layers
 
 class ImageMod {
   constructor (store) {
@@ -84,25 +72,19 @@ class ImageMod {
 
     this.changed = true
 
-    const bufferLen = this.store.getState().simulator.engine.engine.state.layers.size()
-    let layerIndex = bufferLen
-    const actionArray = []
+    const layers = getLayers(this.store.getState())
+    const folderId = Math.max(...layers.map(layer => layer.id)) + 1
+    const actionArray = [addFolder("New Image")]
+    const targetIndex = layers.size()
+
+    let nextId = folderId + 1
 
     for (const { type, color, x1, y1, x2, y2, layer } of genLines(state)) {
       if (type == 'layer') {
-        actionArray.push(addLayer())
-        actionArray.push(renameLayer(layerIndex++, color))
+        actionArray.push(addLayer(color))
+        actionArray.push(moveLayer(nextId++, targetIndex))
       } else {
-        actionArray.push(
-          addLines([{
-            layer: layer + bufferLen,
-            x1,
-            y1,
-            x2,
-            y2,
-            type: 2
-          }])
-        )
+        actionArray.push(addLines([{ layer: layer + folderId + 1, x1, y1, x2, y2, type: 2 }]))
       }
     }
 

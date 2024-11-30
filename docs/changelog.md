@@ -11,6 +11,10 @@ permalink: /changelog/
   }
 </style>
 
+### 2024-11-30
+#### Image Mod
+- Works with new layer folder api
+
 ### 2024-11-29
 #### Selection Metadata
 - Added option for editing scenery thickness
