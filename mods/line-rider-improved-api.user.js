@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Container for linerider.com mods
-// @version      1.8.1
+// @version      1.8.2
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -77,25 +77,6 @@ function main () {
 
   const preferences = loadPrefs()
   savePrefs(preferences)
-
-  const rootStyle = {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'flex-start',
-    textAlign: 'left',
-    transition: 'opacity 225ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
-    flex: 1,
-    width: '100%',
-    overflowY: 'auto',
-    overflowX: 'hidden'
-  }
-
-  const boxStyle = {
-    display: 'flex',
-    flexDirection: 'column-reverse',
-    padding: 8,
-    width: '100%'
-  }
 
   const settingsContainerStyle = {
     position: 'fixed',
@@ -215,6 +196,24 @@ function main () {
 
     render () {
       const activeCustomTool = this.state.customTools[this.state.activeTool]
+
+      const rootStyle = {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+        textAlign: 'left',
+        flex: 1,
+        width: '100%',
+        overflowY: 'auto',
+        overflowX: 'hidden'
+      }
+    
+      const boxStyle = {
+        display: 'flex',
+        flexDirection: 'column-reverse',
+        padding: 8,
+        width: '100%'
+      }
 
       return e(
         'div',
@@ -357,13 +356,22 @@ function main () {
     }
 
     render () {
+      const rootStyle = {
+        height: '100%',
+        overflowY: 'scroll',
+        overflowX: 'hidden',
+        display: 'flex',
+        flexDirection: 'column-reverse',
+        textAlign: 'right'
+      }
+
       this.state.customSettings.sort(function (modA, modB) {
         const modAName = modA.name.toUpperCase()
         const modBName = modB.name.toUpperCase()
-        return (modAName < modBName) ? -1 : (modAName > modBName) ? 1 : 0
+        return -((modAName < modBName) ? -1 : (modAName > modBName) ? 1 : 0)
       })
 
-      return e(
+      return this.state.customSettings.length > 0 && e(
         'div',
         { style: { display: 'flex', height: '100%', width: '100%', flexDirection: 'column' } },
         e(
@@ -379,28 +387,24 @@ function main () {
           )
         ),
         e(
+          'input',
+          {
+            style: { width: '100%' },
+            placeholder: 'Search...',
+            value: this.state.searchTerm,
+            onChange: (e) => { this.setState({ searchTerm: e.target.value }) }
+          }
+        ),
+        e(
           'div',
           { style: rootStyle },
-          this.state.customSettings.length > 0 && e(
-            'div',
-            { style: { width: '100%' } },
-            e(
-              'input',
-              {
-                style: { width: '100%' },
-                placeholder: 'Search...',
-                value: this.state.searchTerm,
-                onChange: (e) => { this.setState({ searchTerm: e.target.value }) }
-              }
-            ),
-            this.state.customSettings.filter(
-              (mod) => mod.name.toUpperCase().includes(this.state.searchTerm.toUpperCase())
-            ).map(
-              (mod, index) => e(
-                'div',
-                { style: { borderTop: index > 0 ? '2px solid black' : null } },
-                e(mod)
-              )
+          this.state.customSettings.filter(
+            (mod) => mod.name.toUpperCase().includes(this.state.searchTerm.toUpperCase())
+          ).map(
+            (mod) => e(
+              'div',
+              { style: { width: '100%', borderTop: '2px solid black' } },
+              e(mod)
             )
           )
         )
