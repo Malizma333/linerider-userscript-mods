@@ -14,6 +14,10 @@ permalink: /changelog/
 ### 2024-11-30
 #### Image Mod
 - Works with new layer folder api
+#### Shade Mod
+- Subtracted slightly from offset value
+#### Improved API
+- Edited spacing values
 
 ### 2024-11-29
 #### Selection Metadata
