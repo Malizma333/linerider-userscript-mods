@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Scenery slider temp fix
-// @version      0.1.0
+// @version      0.1.1
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -43,7 +43,7 @@ function main () {
 
       this.state = {
         active: false,
-        sceneryWidth: 1
+        sceneryWidth: 0
       }
 
       store.subscribe(() => this.matchState())
@@ -68,33 +68,38 @@ function main () {
     }
 
     onChooseWidth (parent, newWidth) {
-      const width = getSceneryWidth(store.getState())
-      const parsedWidth = parseFloat(newWidth)
-
-      parent.setState({ sceneryWidth: parsedWidth })
-
-      if (parsedWidth < 0.01 || parsedWidth > 1000) return
-
+      parent.setState({ sceneryWidth: newWidth })
       store.dispatch({
         type: "SELECT_SCENERY_WIDTH",
-        payload: parsedWidth
+        payload: Math.pow(10, newWidth)
       })
     }
 
-    renderSingle (key, label, editable, isNumber, action) {
-      const props = {
+    renderSlider (key, props, title, action) {
+      const rangeProps = {
+        min: props.min,
+        max: props.max,
+        step: props.step,
         id: key,
-        type: isNumber ? 'number' : 'text',
-        readOnly: !editable,
         value: this.state[key],
-        onChange: e => action(this, isNumber ? Number(e.target.value) : e.target.value)
+        onChange: e => action(this, parseFloat(e.target.value))
       }
 
-      return e(
-        'div',
-        null,
-        e('label', { style: { width: '4em' }, htmlFor: key }, label),
-        e('input', { style: { marginLeft: '.5em' }, ...props })
+      const numberProps = {
+        min: Math.pow(10, props.min),
+        max: Math.pow(10, props.max),
+        step: props.step,
+        id: key,
+        value: Math.pow(10, this.state[key]),
+        onChange: e => action(this, Math.log10(parseFloat(e.target.value)))
+      }
+      
+      return e('div', null,
+        e('label', { for: key }, title),
+        e('div', null,
+          e('input', { style: { width: '4em' }, type: 'number', ...numberProps }),
+          e('input', { style: { width: '8em' }, type: 'range', ...rangeProps, onFocus: e => e.target.blur() })
+        )
       )
     }
 
@@ -105,7 +110,7 @@ function main () {
         this.state.active && e(
           'div',
           { style: { width: '100%' } },
-            this.renderSingle('sceneryWidth', 'Scenery Width', true, true, this.onChooseWidth)
+            this.renderSlider('sceneryWidth', { min: -3, max: 3, step: 0.1 }, 'Scenery Width', this.onChooseWidth)
         ),
         e('button',
           {
