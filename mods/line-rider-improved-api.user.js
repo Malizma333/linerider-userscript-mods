@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Container for linerider.com mods
-// @version      1.8.0
+// @version      1.8.1
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -99,10 +99,6 @@ function main () {
 
   const settingsContainerStyle = {
     position: 'fixed',
-    minWidth: '15vw',
-    maxWidth: '40vw',
-    minHeight: '15vh',
-    maxHeight: '45vh',
     border: '3px solid black',
     backgroundColor: '#ffffff',
     resize: 'both',
@@ -113,12 +109,12 @@ function main () {
 
   const toolContainerStyle = {
     position: 'fixed',
-    width: '200px',
+    width: '150px',
     height: '16%',
     overflowY: 'auto',
     overflowX: 'hidden',
     top: '8px',
-    right: '250px',
+    right: '225px',
     border: '1px solid black',
     backgroundColor: '#ffffff',
     pointerEvents: 'none',
@@ -229,7 +225,7 @@ function main () {
           e(
             'select',
             {
-              style: { textAlign: 'center', width: '200px' },
+              style: { textAlign: 'center', width: '150px' },
               maxMenuHeight: 100,
               value: this.state.activeTool,
               onChange: e => store.dispatch(setTool(e.target.value))
