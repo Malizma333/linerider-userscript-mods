@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       David Lu & Malizma
 // @description  Adds ability to shade in selections
-// @version      0.5.1
+// @version      0.5.2
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -185,7 +185,7 @@ function main () {
       this.state = {
         active: false,
         angle: 0,
-        spacing: -0.2,
+        spacing: 0,
         offset: 0
       }
 
@@ -238,7 +238,7 @@ function main () {
         null,
         this.state.active && e('div', null,
           this.renderSlider('angle', { min: 0, max: 360, step: 1 }),
-          this.renderSlider('spacing', { min: -0.2, max: 10, step: 0.01 }),
+          this.renderSlider('spacing', { min: 0, max: 10, step: 0.01 }),
           this.renderSlider('offset', { min: 0, max: 1, step: 0.01 }),
           e('button', { style: { float: 'left' }, onClick: () => this.onCommit() },
             'Commit'
@@ -298,7 +298,7 @@ function * genFill (lines, { angle = 0, spacing = 0, offset = 0 } = {}) {
   /* prep */
 
   // actual spacing
-  spacing = LINE_WIDTH * (1 + spacing)
+  spacing = LINE_WIDTH * (0.9 + spacing)
 
   // actual offset
   offset = spacing * offset
