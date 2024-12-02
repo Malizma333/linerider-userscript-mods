@@ -3,8 +3,8 @@
 // @name         Scenery Width Number Picker
 // @namespace    https://www.linerider.com/
 // @author       Malizma
-// @description  Scenery slider temp fix
-// @version      0.1.1
+// @description  Scenery slider component
+// @version      0.1.2
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -34,8 +34,6 @@ function main () {
   } = window
 
   const e = React.createElement
-  let playerRunning = getPlayerRunning(store.getState())
-  let windowFocused = getWindowFocused(store.getState())
 
   class SceneryWidthModComponent extends React.Component {
     constructor () {
@@ -43,57 +41,43 @@ function main () {
 
       this.state = {
         active: false,
-        sceneryWidth: 0
+        sceneryWidth: 1
       }
 
-      store.subscribe(() => this.matchState())
-    }
-
-    componentDidMount () {
-      window.addEventListener('resize', this.updateDimensions)
-      this.matchState()
-    }
-
-    matchState () {
-      const state = store.getState()
-      this.setState({ width: getSceneryWidth(state) })
+      store.subscribe(() => this.setState({ sceneryWidth: getSceneryWidth(store.getState()) }))
     }
 
     onActivate () {
-      if (this.state.active) {
-        this.setState({ active: false })
-      } else {
-        this.setState({ active: true })
-      }
+      this.setState({ active: !this.state.active })
     }
 
     onChooseWidth (parent, newWidth) {
       parent.setState({ sceneryWidth: newWidth })
-      store.dispatch({
-        type: "SELECT_SCENERY_WIDTH",
-        payload: Math.pow(10, newWidth)
-      })
+
+      if (0.001 <= newWidth && newWidth <= 1000) {
+        store.dispatch({ type: "SELECT_SCENERY_WIDTH", payload: newWidth })
+      }
     }
 
-    renderSlider (key, props, title, action) {
+    renderSlider (key, title, action) {
       const rangeProps = {
-        min: props.min,
-        max: props.max,
-        step: props.step,
+        min: -3,
+        max: 3,
+        step: 0.1,
+        id: key,
+        value: Math.log10(this.state[key]),
+        onChange: e => action(this, Math.pow(10, parseFloat(e.target.value)))
+      }
+
+      const numberProps = {
+        min: 0.001,
+        max: 1000,
+        step: 0.1,
         id: key,
         value: this.state[key],
         onChange: e => action(this, parseFloat(e.target.value))
       }
 
-      const numberProps = {
-        min: Math.pow(10, props.min),
-        max: Math.pow(10, props.max),
-        step: props.step,
-        id: key,
-        value: Math.pow(10, this.state[key]),
-        onChange: e => action(this, Math.log10(parseFloat(e.target.value)))
-      }
-      
       return e('div', null,
         e('label', { for: key }, title),
         e('div', null,
@@ -109,8 +93,8 @@ function main () {
         null,
         this.state.active && e(
           'div',
-          { style: { width: '100%' } },
-            this.renderSlider('sceneryWidth', { min: -3, max: 3, step: 0.1 }, 'Scenery Width', this.onChooseWidth)
+          null,
+          this.renderSlider('sceneryWidth', 'Scenery Width', this.onChooseWidth)
         ),
         e('button',
           {
@@ -125,11 +109,9 @@ function main () {
     }
   }
 
-  // this is a setting and not a standalone tool because it extends the select tool
   window.registerCustomSetting(SceneryWidthModComponent)
 }
 
-/* init */
 if (window.registerCustomSetting) {
   main()
 } else {
