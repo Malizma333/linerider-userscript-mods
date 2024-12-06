@@ -73,8 +73,6 @@ function main () {
         lineA.p2.x === lineB.p2.x && lineA.p2.y === lineB.p2.y && !(lineA.p1.x === lineB.p1.x && lineA.p1.y === lineB.p1.y)
       )
 
-      let linesAdded = 0
-
       // Worse case O(N^2)...
       while (lineQueue.length > 0) {
         const currentLine = track.getLine(lineQueue.pop())
@@ -83,12 +81,9 @@ function main () {
             lineQueue.push(line.id)
             selectedPoints.add(line.id * 2)
             selectedPoints.add(line.id * 2 + 1)
-            linesAdded += 1
           }
         }
       }
-
-      console.log(linesAdded)
 
       store.dispatch(setSelectToolState({ selectedPoints }))
 
