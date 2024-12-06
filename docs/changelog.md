@@ -11,11 +11,17 @@ permalink: /changelog/
   }
 </style>
 
+### 2024-12-06
+#### Chain Select Mod
+- Added tool for selecting chain of lines
+
 ### 2024-11-30
 #### Image Mod
 - Works with new layer folder api
+
 #### Shade Mod
 - Subtracted slightly from offset value
+
 #### Improved API
 - Edited spacing values
 
