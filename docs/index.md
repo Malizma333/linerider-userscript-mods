@@ -58,6 +58,10 @@ Allows for creating multiple bookmarked timestamps (flags), as opposed to having
 
 Adds UI to certain console features. See in-depth readme explanation [here](https://github.com/Malizma333/line-rider-command-editor-userscript/tree/master#readme)
 
+#### [Metadata Editor](https://github.com/Malizma333/linerider-userscript-mods/raw/refs/heads/master/mods/line-rider-selection-metadata.user.js)
+
+Adds UI for editing internal line properties.
+
 #### [More Controls](https://github.com/Malizma333/linerider-userscript-mods/blob/master/mods/line-rider-more-controls-mod.user.js)
 
-Adds some UI to hidden or hard to edit track properties.
+Adds UI to hidden or hard to edit track properties.
