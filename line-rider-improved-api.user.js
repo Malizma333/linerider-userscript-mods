@@ -365,8 +365,7 @@ function main () {
         overflowX: 'hidden',
         display: 'flex',
         flexDirection: 'column-reverse',
-        textAlign: 'right',
-        direction: 'rtl'
+        textAlign: 'right'
       }
 
       this.state.customSettings.sort(function (modA, modB) {
