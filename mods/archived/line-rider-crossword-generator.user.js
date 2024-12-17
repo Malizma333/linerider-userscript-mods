@@ -10,7 +10,6 @@
 // @match        https://www.linerider.com/*
 // @match        https://*.official-linerider.com/*
 // @match        http://localhost:*/*
-// @match        https://*.surge.sh/*
 
 // @downloadURL  _
 // @updateURL    _
