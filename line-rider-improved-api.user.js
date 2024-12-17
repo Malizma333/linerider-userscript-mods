@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Container for linerider.com mods
-// @version      1.8.4
+// @version      1.8.5
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -207,7 +207,7 @@ function main () {
         overflowY: 'auto',
         overflowX: 'hidden'
       }
-    
+
       const boxStyle = {
         display: 'flex',
         flexDirection: 'column-reverse',
@@ -365,7 +365,8 @@ function main () {
         overflowX: 'hidden',
         display: 'flex',
         flexDirection: 'column-reverse',
-        textAlign: 'right'
+        textAlign: 'right',
+        direction: 'rtl'
       }
 
       this.state.customSettings.sort(function (modA, modB) {
@@ -406,7 +407,7 @@ function main () {
           ).map(
             (mod) => e(
               'div',
-              { style: { width: '100%', borderTop: '2px solid black' } },
+              { style: { width: '100%', borderTop: '2px solid black', direction: 'ltr' } },
               e(mod)
             )
           )
