@@ -9,7 +9,6 @@
 
 // @match        https://www.linerider.com/*
 // @match        https://*.official-linerider.com/*
-// @match        http://localhost:*/*
 
 // @downloadURL  _
 // @updateURL    _
