@@ -4,7 +4,7 @@ These scripts can be pasted in the console to do cool things. Here is a little m
 
 ## Platformer Controller
 
-Turns on relative gravity, and allows you to control the rider with the A and D keys to move left and right, relative to the sled's orientation.
+Allows you to control the rider with the A and D keys to move left and right.
 
 ## WASD Controller
 
