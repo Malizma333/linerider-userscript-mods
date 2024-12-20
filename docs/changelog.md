@@ -11,6 +11,14 @@ permalink: /changelog/
   }
 </style>
 
+### 2024-12-20
+#### Command Editor
+- Added camera capture button
+
+### 2024-12-17
+#### Improved API
+- Move scrollbar to left side
+
 ### 2024-12-06
 #### Chain Select Mod
 - Added tool for selecting chain of lines
