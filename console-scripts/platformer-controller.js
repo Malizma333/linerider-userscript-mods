@@ -47,7 +47,7 @@
     const curIndex = Math.max(1, Math.min(cFrames.length, Math.floor(store.getState().player.index)))
     const rider = cFrames[curIndex - 1].snapshot.entities[0].entities[0]
 
-    let gravity = { x: 0, y: 0 }
+    let gravity = { x: 0, y: 0.175 }
 
     if (keyPressed.r) {
       keyPressed.r = false
@@ -66,8 +66,8 @@
       const thrustAngle = Math.atan2(dy, dx) + (keyPressed.a ? Math.PI : 0)
       const percentLeft = Math.max(0, 1 - speedMag / maxSpeedScaled)
       const angleDiff = Math.abs(thrustAngle - speedAngle)
-      const angleDiffMod = angleDiff > Math.PI * 2 ? angleDiff - Math.PI * 2 : angleDiff
-      const shouldScale = angleDiffMod < Math.PI / 2
+      const angleDiffMod = Math.max(angleDiff, Math.PI * 2 - angleDiff) % (Math.PI * 2)
+      const shouldScale = angleDiffMod > Math.PI * 3/2
       gravity.x += thrustMag * (shouldScale ? percentLeft : 1) * Math.cos(thrustAngle)
       gravity.y -= thrustMag * (shouldScale ? percentLeft : 1) * Math.sin(thrustAngle)
     }
