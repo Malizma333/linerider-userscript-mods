@@ -4,7 +4,7 @@ window.CMD_EDITOR_DEBUG=false
 // @author       Malizma
 // @description  Adds UI to API commands in linerider.com
 // @namespace    https://www.linerider.com/
-// @version      372.0
+// @version      375.0
 // @icon         https://www.linerider.com/favicon.ico
 // @match        https://www.linerider.com/*
 // @match        https://*.official-linerider.com/*
