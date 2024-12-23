@@ -11,6 +11,11 @@ permalink: /changelog/
   }
 </style>
 
+### 2024-12-23
+#### Command Editor
+- Fixed gravity multirider issues
+- Attempted fix for gravity crash issues
+
 ### 2024-12-20
 #### Command Editor
 - Added camera capture button
