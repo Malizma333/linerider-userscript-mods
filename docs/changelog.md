@@ -11,6 +11,10 @@ permalink: /changelog/
   }
 </style>
 
+### 2025-01-04
+#### ZigZag Mod
+- Added height noise slider
+
 ### 2024-12-23
 #### Command Editor
 - Fixed gravity multirider issues
