@@ -11,6 +11,10 @@ permalink: /changelog/
   }
 </style>
 
+### 2025-01-05
+#### Realistic Tree Generator
+- Created mod for generating realistic tree outlines
+
 ### 2025-01-04
 #### ZigZag Mod
 - Added height noise slider
