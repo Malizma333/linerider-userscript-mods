@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Generates zig-zags
-// @version      1.2.0
+// @version      1.3.0
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -168,6 +168,7 @@ function main () {
         active: false,
         width: 5,
         height: 5,
+        noise: 0,
         offsetMode: false
       }
 
@@ -238,6 +239,7 @@ function main () {
                        this.renderCheckbox('offsetMode', 'Offset Mode'),
                        this.renderSlider('width', 'Width', { min: 1, max: 100, step: 0.1 }),
                        this.renderSlider('height', 'Height', { min: -100, max: 100, step: 0.1 }),
+                       this.renderSlider('noise', 'Height Noise', { min: 0, max: 100, step: 0.1 }),
                        e('button',
                          { style: { float: 'left' }, onClick: () => this.onCommit() },
                          'Commit'
@@ -379,7 +381,7 @@ function interpolateLine (line, width, offset, startFromP1) {
   return { points, remaining }
 }
 
-function * genZigZag (selectedLines, { width = 5, height = 5, offsetMode = false } = {}) {
+function * genZigZag (selectedLines, { width = 5, height = 5, noise = 0, offsetMode = false } = {}) {
   const { V2 } = window
 
   const shapesArray = findShapes(selectedLines)
@@ -394,7 +396,8 @@ function * genZigZag (selectedLines, { width = 5, height = 5, offsetMode = false
     dataStack.length = 0
 
     const initDirection = Math.atan2(shape[0].endpoints.p2.y - shape[0].endpoints.p1.y, shape[0].endpoints.p2.x - shape[0].endpoints.p1.x) - Math.PI / 2
-    const initHeightVector = { x: height * Math.cos(initDirection), y: height * Math.sin(initDirection) }
+    const randomHeight = height + noise * Math.random() - noise / 2
+    const initHeightVector = { x: randomHeight * Math.cos(initDirection), y: randomHeight * Math.sin(initDirection) }
     const initLastPoint = V2.from(shape[0].endpoints.p1.x + initHeightVector.x, shape[0].endpoints.p1.y + initHeightVector.y)
 
     dataStack.push({ currentLine: shape[0], offset: 0, startFromP1: true, lastPoint: initLastPoint, flipped: -1 })
@@ -420,7 +423,8 @@ function * genZigZag (selectedLines, { width = 5, height = 5, offsetMode = false
         }
 
         const currentDirection = currentPoint.a + flipTracker * Math.PI / 2
-        const heightVector = { x: height * Math.cos(currentDirection), y: height * Math.sin(currentDirection) }
+        const randomHeight = height + noise * Math.random() - noise / 2
+        const heightVector = { x: randomHeight * Math.cos(currentDirection), y: randomHeight * Math.sin(currentDirection) }
 
         yield {
           p1: V2.from(currentPoint.x + heightVector.x, currentPoint.y + heightVector.y),
