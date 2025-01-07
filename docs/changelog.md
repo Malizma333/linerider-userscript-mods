@@ -11,6 +11,11 @@ permalink: /changelog/
   }
 </style>
 
+### 2025-01-06
+#### Realistic Tree Generator
+- Ported recursive tree generator as option
+- Added support for generating 3d-projected meshes based off of [proctree.js](https://github.com/supereggbert/proctree.js/)
+
 ### 2025-01-05
 #### Realistic Tree Generator
 - Created mod for generating realistic tree outlines
