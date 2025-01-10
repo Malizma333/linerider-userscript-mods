@@ -11,6 +11,10 @@ permalink: /changelog/
   }
 </style>
 
+### 2025-01-09
+#### 3D Renderer Mod
+- Created mod to render STL files
+
 ### 2025-01-06
 #### Realistic Tree Generator
 - Ported recursive tree generator as option
