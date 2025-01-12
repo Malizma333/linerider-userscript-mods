@@ -11,6 +11,10 @@ permalink: /changelog/
   }
 </style>
 
+### 2025-01-12
+#### Noise Mod
+- Created mod to generate randomly transformed shapes
+
 ### 2025-01-09
 #### 3D Renderer Mod
 - Created mod to render STL files
