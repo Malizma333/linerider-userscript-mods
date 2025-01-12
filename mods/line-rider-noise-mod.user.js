@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Generates a captured shape over an area with random transforms
-// @version      1.0.0
+// @version      1.1.0
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -123,6 +123,13 @@ function main () {
       const camera = store.getState().camera.editorPosition;
 
       let lines = [];
+      const dx = this.state.boundWidth / 2;
+      const dy = this.state.boundHeight / 2;
+
+      lines.push({ x1: camera.x + dx, y1: camera.y + dy, x2: camera.x + dx, y2: camera.y - dy, type: 2, width: 0.125 })
+      lines.push({ x1: camera.x + dx, y1: camera.y - dy, x2: camera.x - dx, y2: camera.y - dy, type: 2, width: 0.125 })
+      lines.push({ x1: camera.x - dx, y1: camera.y - dy, x2: camera.x - dx, y2: camera.y + dy, type: 2, width: 0.125 })
+      lines.push({ x1: camera.x - dx, y1: camera.y + dy, x2: camera.x + dx, y2: camera.y + dy, type: 2, width: 0.125 })
 
       for (let j = 0; j < this.state.iterations; j++) {
         const xPos = Math.random() * this.state.boundWidth + camera.x - this.state.boundWidth / 2;
