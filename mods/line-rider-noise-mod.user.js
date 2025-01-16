@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Generates a captured shape over an area with random transforms
-// @version      1.1.0
+// @version      1.2.0
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -62,9 +62,7 @@ function main () {
         iterations: 100,
         rotStep: 1,
         minScale: 1,
-        maxScale: 1,
-        minWidth: 1,
-        maxWidth: 1
+        maxScale: 1
       };
 
       this.currentShape = [];
@@ -108,7 +106,8 @@ function main () {
           shape[i].x1 - midX,
           shape[i].y1 - midY,
           shape[i].x2 - midX,
-          shape[i].y2 - midY
+          shape[i].y2 - midY,
+          shape[i].width
         ]);
       }
     }
@@ -136,7 +135,6 @@ function main () {
         const yPos = Math.random() * this.state.boundHeight + camera.y - this.state.boundHeight / 2;
         const rot = 2 * Math.PI * Math.round(Math.random() * this.state.rotStep) / this.state.rotStep;
         const scale = Math.random() * (this.state.maxScale - this.state.minScale) + this.state.minScale;
-        const width = Math.random() * (this.state.maxWidth - this.state.minWidth) + this.state.minWidth;
 
         for (let i = 0; i < this.currentShape.length; i++) {
           lines.push({
@@ -145,7 +143,7 @@ function main () {
             x2: (Math.cos(rot) * this.currentShape[i][2] - Math.sin(rot) * this.currentShape[i][3]) * scale + xPos,
             y2: (Math.sin(rot) * this.currentShape[i][2] + Math.cos(rot) * this.currentShape[i][3]) * scale + yPos,
             type: 2,
-            width
+            width: this.currentShape[i][4] * scale
           })
         }
       }
@@ -197,8 +195,6 @@ function main () {
           this.renderSlider('rotStep', 'Rotation Variation', { min: 1, max: 360, step: 1 }),
           this.renderSlider('maxScale', 'Max Scale', { min: 0.01, max: 10, step: 0.01 }),
           this.renderSlider('minScale', 'Min Scale', { min: 0.01, max: 10, step: 0.01 }),
-          this.renderSlider('maxWidth', 'Max Width', { min: 0.01, max: 10, step: 0.01 }),
-          this.renderSlider('minWidth', 'Min Width', { min: 0.01, max: 10, step: 0.01 }),
           e("button", {
             onClick: () => this.onCapture() },
             "Capture Selected Shape"
