@@ -11,6 +11,10 @@ permalink: /changelog/
   }
 </style>
 
+### 2025-01-16
+#### Noise Mod
+- Fixed line width implementation
+
 ### 2025-01-12
 #### Noise Mod
 - Created mod to generate randomly transformed shapes
