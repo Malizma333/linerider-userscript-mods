@@ -11,6 +11,12 @@ permalink: /changelog/
   }
 </style>
 
+### 2025-01-19
+#### Command Editor
+- Fixed skins not updating for multiriders
+- Fixed gravity crash caused by cache reset
+- Refactored gravity function
+
 ### 2025-01-16
 #### Noise Mod
 - Fixed line width implementation
