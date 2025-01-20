@@ -11,6 +11,10 @@ permalink: /changelog/
   }
 </style>
 
+### 2025-01-20
+#### Alternative Mod API
+- Created alternative mod api hybrid
+
 ### 2025-01-19
 #### Command Editor
 - Fixed skins not updating for multiriders
