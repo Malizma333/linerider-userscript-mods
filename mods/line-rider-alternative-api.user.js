@@ -184,11 +184,11 @@ function main () {
           this.state.customSettings.filter(
             (mod) => mod.name.toUpperCase().includes(this.state.searchTerm.toUpperCase())
           ).map((mod) => e(mod)),
-          ...Object.keys(this.state.customTools).map(toolName => {
+          ...Object.keys(this.state.customTools).filter(toolName => toolName.toUpperCase().includes(this.state.searchTerm.toUpperCase())).map(toolName => {
             return e(
               'div',
               null,
-              // this.state.activeTool === toolName && e(this.state.customTools[this.state.activeTool].component),
+              this.state.activeTool === toolName && e(this.state.customTools[this.state.activeTool].component),
               e('button',
                 {
                   key: toolName,
