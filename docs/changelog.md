@@ -14,6 +14,8 @@ permalink: /changelog/
 ### 2025-01-20
 #### Alternative Mod API
 - Created alternative mod api hybrid
+#### Remove Duplicates Mod
+- Removed commit button for less button presses
 
 ### 2025-01-19
 #### Command Editor
