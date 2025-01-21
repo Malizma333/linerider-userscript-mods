@@ -11,6 +11,10 @@ permalink: /changelog/
   }
 </style>
 
+### 2025-01-21
+#### Transform Mod
+- Renamed "preserve scenery width" checkbox to "scale width"
+
 ### 2025-01-20
 #### Alternative Mod API
 - Created alternative mod api hybrid
