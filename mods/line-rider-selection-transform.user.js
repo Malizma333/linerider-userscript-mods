@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       David Lu, Ethan Li & Malizma
 // @description  Adds ability to transform selections
-// @version      0.7.1
+// @version      0.7.2
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -211,7 +211,7 @@ class TransformMod {
         y1: p1.y,
         x2: p2.x,
         y2: p2.y,
-        width: this.state.preserveWidth ? jsonLine.width : (jsonLine.width || 1) * this.state.scale
+        width: this.state.scaleWidth ? (jsonLine.width || 1) * this.state.scale : jsonLine.width
       })
     }
     this.store.dispatch(setLines(transformedLines))
@@ -340,7 +340,7 @@ function main () {
         skewY: 0,
         scaleX: 1,
         scaleY: 1,
-        preserveWidth: true,
+        scaleWidth: false,
         flipX: false,
         flipY: false,
         rotate: 0,
@@ -464,7 +464,7 @@ function main () {
                   this.renderSlider('scaleX', { min: 0, max: 10, step: 0.01 }, 'Scale X'),
                   this.renderSlider('scaleY', { min: 0, max: 10, step: 0.01 }, 'Scale Y'),
                   this.renderSlider('scale', { min: 0, max: 10, step: 0.01 }, 'Scale'),
-                  this.renderCheckbox('preserveWidth', 'Preserve Scenery Width'),
+                  this.renderCheckbox('scaleWidth', 'Scale Width'),
                   this.renderCheckbox('flipX', 'Flip X'),
                   this.renderCheckbox('flipY', 'Flip Y'),
                   this.renderSlider('rotate', { min: -180, max: 180, step: 1 }, 'Rotation'),
