@@ -11,6 +11,11 @@ permalink: /changelog/
   }
 </style>
 
+### 2025-02-01
+#### Command Editor
+- Refactored everything into JSX reusable components
+- Updated UI styles
+
 ### 2025-01-21
 #### Transform Mod
 - Renamed "preserve scenery width" checkbox to "scale width"
