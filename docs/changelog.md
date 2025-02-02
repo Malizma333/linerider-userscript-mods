@@ -15,6 +15,7 @@ permalink: /changelog/
 #### Command Editor
 - Refactored everything into JSX reusable components
 - Updated UI styles
+- Moved trigger dropdowns to top
 
 #### Alternative Mod API
 - Fixed styling issues
