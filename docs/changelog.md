@@ -16,6 +16,12 @@ permalink: /changelog/
 - Refactored everything into JSX reusable components
 - Updated UI styles
 
+#### Alternative Mod API
+- Fixed styling issues
+
+#### More Controls Mod
+- Fixed loading track crash
+
 ### 2025-01-21
 #### Transform Mod
 - Renamed "preserve scenery width" checkbox to "scale width"
@@ -23,6 +29,7 @@ permalink: /changelog/
 ### 2025-01-20
 #### Alternative Mod API
 - Created alternative mod api hybrid
+
 #### Remove Duplicates Mod
 - Removed commit button for less button presses
 
