@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Container for linerider.com mods
-// @version      2.0.0
+// @version      2.0.1
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -53,7 +53,8 @@ function main () {
     transition: 'opacity 225ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
     bottom: '70px',
     right: '8px',
-    height: '35vh'
+    height: '35vh',
+    borderRadius: '10px'
   }
 
   const minifyButtonStyle = {
@@ -227,6 +228,8 @@ function main () {
     const active = !playerRunning && windowFocused
     settingsContainer.style.opacity = active ? 1 : 0
     settingsContainer.style.pointerEvents = active ? null : 'none'
+    expandButton.style.opacity = active ? 1 : 0
+    expandButton.style.pointerEvents = active ? null : 'none'
   })
 }
 
