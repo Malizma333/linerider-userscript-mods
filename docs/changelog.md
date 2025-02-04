@@ -11,6 +11,10 @@ permalink: /changelog/
   }
 </style>
 
+### 2025-02-03
+#### TenPC Mod
+- Changed from using multilines to accurate multipliers
+
 ### 2025-02-01
 #### Command Editor
 - Refactored everything into JSX reusable components
