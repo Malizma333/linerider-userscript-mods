@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       David Lu, Ethan Li & Malizma
 // @description  Adds ability to transform selections
-// @version      0.7.2
+// @version      0.7.3
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -364,12 +364,22 @@ function main () {
       this.transformMod = new TransformMod(store, this.state)
 
       store.subscribe(() => {
+        if (!this._mounted) return;
+
         const selectToolActive = getActiveTool(store.getState()) === SELECT_TOOL
 
         if (this.state.active && !selectToolActive) {
           this.setState({ active: false })
         }
       })
+    }
+
+    componentDidMount() {
+      this._mounted = true;
+    }
+
+    componentWillUnmount() {
+      this._mounted = false;
     }
 
     componentWillUpdate (nextProps, nextState) {
