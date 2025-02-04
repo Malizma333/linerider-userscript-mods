@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Generates a captured shape over an area with random transforms
-// @version      1.2.0
+// @version      1.2.1
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -68,8 +68,18 @@ function main () {
       this.currentShape = [];
     }
 
-    componentDidUpdate () {
-      this.onRefresh();
+    componentDidUpdate (_, prevState) {
+      let diff = false;
+
+      for (let key in this.state) {
+        if (this.state[key] !== prevState[key]) {
+          diff = true;
+        }
+      }
+
+      if (diff) {
+        this.onRefresh();
+      }
     }
 
     onActivate () {
