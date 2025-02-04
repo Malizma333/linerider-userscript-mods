@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Generates ten point cannons
-// @version      1.3.0
+// @version      1.3.1
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -291,6 +291,8 @@ if (window.registerCustomSetting) {
   }
 }
 
+// Based on LRA's implementation
+
 function * GenerateCannon ({ xSpeed = 0, ySpeed = 0, rotation = 0, selectedRider = 1 } = {}) {
   const { V2 } = window
 
@@ -324,21 +326,12 @@ function * GenerateCannon ({ xSpeed = 0, ySpeed = 0, rotation = 0, selectedRider
     target.add(riderRotated)
     target.add(V2.from(xSpeed, ySpeed))
 
-    const offset = 1.0 + Math.random()
-
-    const lineStack = GenerateSingleLine(curRider.points[i], nextRider.points[i], target, offset)
-
-    for (let m = 0; m < lineStack.length; m++) {
-      yield lineStack[m]
-    }
+    yield GenerateLine(curRider.points[i], nextRider.points[i], target)
   }
 }
 
-function GenerateSingleLine (pointCur, pointNext, pointTarget, offset = 1.0) {
+function GenerateLine (pointCur, pointNext, pointTarget) {
   const { V2 } = window
-
-  const yDisplacement = 1.0e-3
-  const width = 1.0e-5
 
   let inverse = false
   const targetDir = pointTarget.copy().sub(pointNext.pos)
@@ -356,31 +349,13 @@ function GenerateSingleLine (pointCur, pointNext, pointTarget, offset = 1.0) {
     normDir = V2.from(targetDir.y, -targetDir.x)
   }
 
-  let multiReq = speedReq * 10.0
-  const linesReq = Math.ceil(multiReq / 255.0)
-  multiReq /= linesReq
-
   const curPos = V2.from(pointCur.pos.x, pointCur.pos.y)
-  const lineCenter = curPos.copy().sub(normDir.copy().mul(yDisplacement * offset))
-  const lineLeft = lineCenter.copy().sub(targetDir.copy().mul(0.5 * width))
-  const lineRight = lineCenter.copy().add(targetDir.copy().mul(0.5 * width))
-  const yShift = normDir.copy().mul(yDisplacement / 100.0)
+  const lineCenter = curPos.copy().sub(normDir.copy().mul(1.0e-3 * (1 + Math.random())))
 
-  const lineStack = []
-
-  for (let i = 0; i < linesReq; i++) {
-    const newLine = {
-      p1: lineLeft,
-      p2: lineRight,
-      f: inverse,
-      m: multiReq
-    }
-
-    lineStack.push(newLine)
-
-    lineLeft.add(yShift)
-    lineRight.add(yShift)
+  return {
+    p1: lineCenter.copy().sub(targetDir.copy().mul(0.5 * 1.0e-5)),
+    p2: lineCenter.copy().add(targetDir.copy().mul(0.5 * 1.0e-5)),
+    f: inverse,
+    m: speedReq * 10.0
   }
-
-  return lineStack
 }
