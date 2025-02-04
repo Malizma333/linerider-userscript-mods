@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       David Lu & Malizma
 // @description  Adds ability to shade in selections
-// @version      0.5.2
+// @version      0.5.3
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -192,12 +192,22 @@ function main () {
       this.shadeMod = new ShadeMod(store, this.state)
 
       store.subscribe(() => {
+        if (!this._mounted) return;
+
         const selectToolActive = getActiveTool(store.getState()) === SELECT_TOOL
 
         if (this.state.active && !selectToolActive) {
           this.setState({ active: false })
         }
       })
+    }
+
+    componentDidMount() {
+      this._mounted = true;
+    }
+
+    componentWillUnmount() {
+      this._mounted = false;
     }
 
     componentWillUpdate (nextProps, nextState) {
