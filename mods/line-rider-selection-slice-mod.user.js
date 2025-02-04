@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       David Lu & Malizma
 // @description  Adds ability to slice lines with a selection
-// @version      0.5.1
+// @version      0.5.2
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -209,12 +209,22 @@ function main () {
       this.sliceMod = new SliceMod(store, this.state)
 
       store.subscribe(() => {
+        if (!this._mounted) return;
+        
         const selectToolActive = getActiveTool(store.getState()) === SELECT_TOOL
 
         if (this.state.active && !selectToolActive) {
           this.setState({ active: false })
         }
       })
+    }
+
+    componentDidMount() {
+      this._mounted = true;
+    }
+
+    componentWillUnmount() {
+      this._mounted = false;
     }
 
     componentWillUpdate (nextProps, nextState) {
