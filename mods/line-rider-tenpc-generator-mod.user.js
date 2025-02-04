@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Generates ten point cannons
-// @version      1.3.1
+// @version      1.3.2
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -187,6 +187,8 @@ function main () {
       this.mod = new TenPCMod(store, this.state)
 
       store.subscribe(() => {
+        if (!this._mounted) return;
+
         if (sidebarOpen(window.store.getState())) {
           this.mod.revert()
           this.setState({ active: false })
@@ -197,6 +199,14 @@ function main () {
           this.setState({ selectedRider: Math.min(this.state.riderCount, this.state.selectedRider) })
         }
       })
+    }
+
+    componentDidMount() {
+      this._mounted = true;
+    }
+
+    componentWillUnmount() {
+      this._mounted = false;
     }
 
     componentWillUpdate (nextProps, nextState) {
