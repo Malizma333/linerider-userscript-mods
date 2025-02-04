@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Provides a menu for viewing and editing specific track data
-// @version      1.2.1
+// @version      1.2.2
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -81,7 +81,15 @@ function main () {
         selectedRider: 0
       }
 
-      store.subscribe(() => this.matchState())
+      store.subscribe(() => this._mounted && this.matchState())
+    }
+
+    componentDidMount() {
+      this._mounted = true;
+    }
+
+    componentWillUnmount() {
+      this._mounted = false;
     }
 
     componentDidMount () {
