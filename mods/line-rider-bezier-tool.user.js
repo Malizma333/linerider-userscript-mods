@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       David Lu & Malizma
 // @description  Adds tool to create bezier curves
-// @version      0.4.1
+// @version      0.4.2
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -678,6 +678,7 @@ function main() {
       window.bezierToolFlipped = false
 
       store.subscribe(() => {
+        if (!this._mounted) return;
         const changed =
           getSimulatorTrack(store.getState()) !==
           getSimulatorCommittedTrack(store.getState());
@@ -685,6 +686,14 @@ function main() {
           this.setState({ changed });
         }
       });
+    }
+    
+    componentDidMount() {
+      this._mounted = true;
+    }
+
+    componentWillUnmount() {
+      this._mounted = false;
     }
 
     onCommit() {
