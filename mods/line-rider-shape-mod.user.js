@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Generates regular polygons
-// @version      1.1.0
+// @version      1.1.1
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -188,12 +188,22 @@ function main () {
       this.shapeMod = new ShapeMod(store, this.state)
 
       store.subscribe(() => {
+        if (!this._mounted) return;
+
         const selectToolActive = getActiveTool(store.getState()) === SELECT_TOOL
 
         if (this.state.active && !selectToolActive) {
           this.setState({ active: false })
         }
       })
+    }
+
+    componentDidMount() {
+      this._mounted = true;
+    }
+
+    componentWillUnmount() {
+      this._mounted = false;
     }
 
     componentWillUpdate (nextProps, nextState) {
