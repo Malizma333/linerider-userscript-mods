@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Scenery slider component
-// @version      0.1.2
+// @version      0.1.3
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -44,7 +44,15 @@ function main () {
         sceneryWidth: 1
       }
 
-      store.subscribe(() => this.setState({ sceneryWidth: getSceneryWidth(store.getState()) }))
+      store.subscribe(() => this._mounted && this.setState({ sceneryWidth: getSceneryWidth(store.getState()) }))
+    }
+
+    componentDidMount() {
+      this._mounted = true;
+    }
+
+    componentWillUnmount() {
+      this._mounted = false;
     }
 
     onActivate () {
