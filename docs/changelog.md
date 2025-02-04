@@ -12,6 +12,8 @@ permalink: /changelog/
 </style>
 
 ### 2025-02-03
+- Mass fixed subscription issue with unmounted components
+
 #### TenPC Mod
 - Changed from using multilines to accurate multipliers
 
