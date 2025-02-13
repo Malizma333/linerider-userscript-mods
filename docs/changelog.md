@@ -11,6 +11,10 @@ permalink: /changelog/
   }
 </style>
 
+### 2025-02-12
+#### Command Editor
+- Added support for layer automation (40 and 60 fps)
+
 ### 2025-02-03
 - Mass fixed subscription issue with unmounted components
 
