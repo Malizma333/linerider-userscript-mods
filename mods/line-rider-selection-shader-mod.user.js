@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       David Lu & Malizma
 // @description  Adds ability to shade in selections
-// @version      0.5.3
+// @version      0.5.4
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -33,7 +33,6 @@ const sortedIndexBy = window.lodash.sortedindexby
 /* constants */
 const SELECT_TOOL = 'SELECT_TOOL'
 const EMPTY_SET = new Set()
-const LINE_WIDTH = 2
 
 /* actions */
 const setTool = (tool) => ({
@@ -71,6 +70,7 @@ const getToolState = (state, toolId) => state.toolState[toolId]
 const getSelectToolState = state => getToolState(state, SELECT_TOOL)
 const getSimulatorCommittedTrack = state => state.simulator.committedEngine
 const getTrackLinesLocked = state => state.trackLinesLocked
+const getSceneryWidth = state => state.selectedSceneryWidth
 
 class ShadeMod {
   constructor (store, initState) {
@@ -157,7 +157,8 @@ class ShadeMod {
             y1: p1.y,
             x2: p2.x,
             y2: p2.y,
-            type: 2
+            type: 2,
+            width: this.state.sceneryWidth
           })
         }
 
@@ -186,7 +187,8 @@ function main () {
         active: false,
         angle: 0,
         spacing: 0,
-        offset: 0
+        offset: 0,
+        sceneryWidth: 1
       }
 
       this.shadeMod = new ShadeMod(store, this.state)
@@ -199,6 +201,8 @@ function main () {
         if (this.state.active && !selectToolActive) {
           this.setState({ active: false })
         }
+
+        this.setState({ sceneryWidth: getSceneryWidth(store.getState()) })
       })
     }
 
@@ -303,12 +307,12 @@ function getLinesFromPoints (points) {
 }
 
 // takes an iterable of lines and properties and returns an iterable of lines of alternating fill
-function * genFill (lines, { angle = 0, spacing = 0, offset = 0 } = {}) {
+function * genFill (lines, { angle = 0, spacing = 0, offset = 0, sceneryWidth = 1 } = {}) {
   const { V2 } = window
   /* prep */
 
   // actual spacing
-  spacing = LINE_WIDTH * (0.9 + spacing)
+  spacing = 2 * sceneryWidth * (0.9 + spacing)
 
   // actual offset
   offset = spacing * offset
