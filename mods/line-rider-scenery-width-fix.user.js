@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Scenery slider component
-// @version      0.1.3
+// @version      0.2.0
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -30,17 +30,26 @@ const getSceneryWidth = state => state.selectedSceneryWidth
 function main () {
   const {
     React,
+    ReactDOM,
     store
   } = window
 
   const e = React.createElement
+  const sceneryWidthContainer = document.createElement('div')
+  const sceneryWidthContainerStyle = {
+    position: 'fixed',
+    opacity: 0,
+    pointerEvents: 'none',
+    transition: 'opacity 225ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
+    top: '25px',
+    left: '65vw'
+  }
 
   class SceneryWidthModComponent extends React.Component {
     constructor () {
       super()
 
       this.state = {
-        active: false,
         sceneryWidth: 1
       }
 
@@ -49,75 +58,45 @@ function main () {
 
     componentDidMount() {
       this._mounted = true;
+      Object.assign(sceneryWidthContainer.style, sceneryWidthContainerStyle)
     }
 
     componentWillUnmount() {
       this._mounted = false;
     }
 
-    onActivate () {
-      this.setState({ active: !this.state.active })
-    }
-
-    onChooseWidth (parent, newWidth) {
-      parent.setState({ sceneryWidth: newWidth })
-
-      if (0.001 <= newWidth && newWidth <= 1000) {
-        store.dispatch({ type: "SELECT_SCENERY_WIDTH", payload: newWidth })
-      }
-    }
-
-    renderSlider (key, title, action) {
-      const rangeProps = {
-        min: -3,
-        max: 3,
-        step: 0.1,
-        id: key,
-        value: Math.log10(this.state[key]),
-        onChange: e => action(this, Math.pow(10, parseFloat(e.target.value)))
-      }
-
-      const numberProps = {
-        min: 0.001,
-        max: 1000,
-        step: 0.1,
-        id: key,
-        value: this.state[key],
-        onChange: e => action(this, parseFloat(e.target.value))
-      }
-
-      return e('div', null,
-        e('label', { for: key }, title),
-        e('div', null,
-          e('input', { style: { width: '4em' }, type: 'number', ...numberProps }),
-          e('input', { style: { width: '8em' }, type: 'range', ...rangeProps, onFocus: e => e.target.blur() })
-        )
-      )
+    onChooseWidth (sceneryWidth) {
+      if (sceneryWidth === 0) return;
+      store.dispatch({ type: "SELECT_SCENERY_WIDTH", payload: sceneryWidth })
+      this.setState({ sceneryWidth })
     }
 
     render () {
       return e(
         'div',
         null,
-        this.state.active && e(
-          'div',
-          null,
-          this.renderSlider('sceneryWidth', 'Scenery Width', this.onChooseWidth)
-        ),
-        e('button',
-          {
-            style: {
-              backgroundColor: this.state.active ? 'lightblue' : null
-            },
-            onClick: this.onActivate.bind(this)
-          },
-          'Scenery Width Mod'
-        )
+        e('input', { style: { width: '4em' }, type: 'number', min: 0, max: 1000, step: 0.01, value: this.state.sceneryWidth, onChange: e => this.onChooseWidth(parseFloat(e.target.value)) }),
+        e('input', { style: { width: '7em' }, type: 'range', min: -2, max: 3, step: 0.1, value: Math.log10(this.state.sceneryWidth), onChange: e => this.onChooseWidth(Math.pow(10, parseFloat(e.target.value))), onFocus: e => e.target.blur() })
       )
     }
   }
 
-  window.registerCustomSetting(SceneryWidthModComponent)
+  sceneryWidthContainer.style
+
+  document.getElementById('content').appendChild(sceneryWidthContainer)
+
+  ReactDOM.render(
+    e(SceneryWidthModComponent),
+    sceneryWidthContainer
+  )
+
+  store.subscribe(() => {
+    let playerRunning = getPlayerRunning(store.getState())
+    let windowFocused = getWindowFocused(store.getState())
+    const active = !playerRunning && windowFocused
+    sceneryWidthContainer.style.opacity = active ? 1 : 0
+    sceneryWidthContainer.style.pointerEvents = active ? null : 'none'
+  })
 }
 
 if (window.registerCustomSetting) {
