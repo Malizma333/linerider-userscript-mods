@@ -18,6 +18,9 @@ permalink: /changelog/
 #### Shade Mod
 - Added scenery thickness support
 
+#### Scenery Width Mod
+- Width picker now mounts near toolbar
+
 ### 2025-02-12
 #### Command Editor
 - Added support for layer automation (40 and 60 fps)
