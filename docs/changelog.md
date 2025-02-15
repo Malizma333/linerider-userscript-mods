@@ -11,6 +11,10 @@ permalink: /changelog/
   }
 </style>
 
+### 2025-02-15
+#### Transform Mod
+- Added animation section with camera locking
+
 ### 2025-02-14
 #### Command Editor
 - Fixed multirider issues
