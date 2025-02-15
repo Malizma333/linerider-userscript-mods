@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       David Lu, Ethan Li & Malizma
 // @description  Adds ability to transform selections
-// @version      0.8.0
+// @version      0.8.1
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -281,15 +281,20 @@ class TransformMod {
 
       pretransformedLines.length = 0;
 
-      const camera = getCameraPosAtFrame(this.playerIndex + i * (this.sixty ? 2/3 : 1), this.track);
+      const offset = { x: 0, y: 0 }
+      if (this.state.camLock) {
+          const camera = getCameraPosAtFrame(this.playerIndex + i * (this.sixty ? 2/3 : 1), this.track);
+          offset.x = camera.x - initCamera.x;
+          offset.y = camera.y - initCamera.y;
+      }
 
       for (const line of posttransformedLines) {
         allLines.push({
           id: this.state.aLength === 0 ? line.id : undefined,
-          x1: line.p1.x + camera.x - initCamera.x,
-          y1: line.p1.y + camera.y - initCamera.y,
-          x2: line.p2.x + camera.x - initCamera.x,
-          y2: line.p2.y + camera.y - initCamera.y,
+          x1: line.p1.x + offset.x,
+          y1: line.p1.y + offset.y,
+          x2: line.p2.x + offset.x,
+          y2: line.p2.y + offset.y,
           width: line.width,
           type: line.type
         });
@@ -353,8 +358,7 @@ class TransformMod {
       this.state.rotate !== 0 ||
       this.state.perspX || this.state.perspY ||
       this.state.nudgeXSmall !== 0 || this.state.nudgeXBig !== 0 ||
-      this.state.nudgeYSmall !== 0 || this.state.nudgeYBig !== 0 ||
-      this.state.aLength !== 0
+      this.state.nudgeYSmall !== 0 || this.state.nudgeYBig !== 0
     );
   }
 
