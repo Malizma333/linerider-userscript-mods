@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       David Lu, Ethan Li & Malizma
 // @description  Adds ability to transform selections
-// @version      0.8.1
+// @version      0.8.2
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -39,8 +39,7 @@ const updateLines = (linesToRemove, linesToAdd) => ({
   payload: { linesToRemove, linesToAdd }
 });
 
-const addLines = (line) => updateLines(null, line, "ADD_LINES");
-const setLines = (line) => updateLines(null, line);
+const addLines = (line) => updateLines(null, line);
 
 const commitTrackChanges = () => ({
   type: "COMMIT_TRACK_CHANGES"
@@ -181,7 +180,8 @@ class TransformMod {
           p1: line.p1,
           p2: line.p2,
           type: line.type,
-          width: line.width
+          width: line.width,
+          layer: line.layer
         });
       }
     }
@@ -207,7 +207,8 @@ class TransformMod {
           p1: preparePointAlong(new V2(line.p1), preCenter, this.state.alongPerspX, this.state.alongPerspY, preTransform),
           p2: preparePointAlong(new V2(line.p2), preCenter, this.state.alongPerspX, this.state.alongPerspY, preTransform),
           type: line.type,
-          width: line.width
+          width: line.width,
+          layer: line.layer
         });
       }
 
@@ -255,28 +256,35 @@ class TransformMod {
         );
       }
 
-      for (const prevLine of selectedLines) {
+      for (const line of selectedLines) {
         const p1 = restorePoint(
           transformPersp(
-            new V2(prevLine.p1).sub(anchor).transform(transform),
+            new V2(line.p1).sub(anchor).transform(transform),
             perspX, perspY, perspSafety
           ),
           anchor, postTransform, alongPerspX, alongPerspY, preCenter
         ).add(nudge);
         const p2 = restorePoint(
           transformPersp(
-            new V2(prevLine.p2).sub(anchor).transform(transform),
+            new V2(line.p2).sub(anchor).transform(transform),
             perspX, perspY, perspSafety
           ),
           anchor, postTransform, alongPerspX, alongPerspY, preCenter
         ).add(nudge);
 
-        let width = prevLine.width || 1;
+        let width = line.width || 1;
         if (this.state.scaleWidth) {
           width *= this.state.scale;
         }
 
-        posttransformedLines.push({ id: prevLine.id, type: prevLine.type, p1, p2, width });
+        posttransformedLines.push({
+            id: line.id,
+            type: line.type,
+            p1,
+            p2,
+            width,
+            layer: line.layer
+        });
       }
 
       pretransformedLines.length = 0;
@@ -296,13 +304,15 @@ class TransformMod {
           x2: line.p2.x + offset.x,
           y2: line.p2.y + offset.y,
           width: line.width,
-          type: line.type
+          type: line.type,
+          layer: line.layer
         });
         pretransformedLines.push({
           p1: new V2(line.p1),
           p2: new V2(line.p2),
           width: line.width,
-          type: line.type
+          type: line.type,
+          layer: line.layer
         })
       }
 
@@ -318,11 +328,7 @@ class TransformMod {
     }
 
     if (allLines.length > 0) {
-      if (this.state.aLength === 0) {
-        this.store.dispatch(setLines(allLines));
-      } else {
-        this.store.dispatch(addLines(allLines));
-      }
+      this.store.dispatch(addLines(allLines));
       this.changed = true;
     }
 
