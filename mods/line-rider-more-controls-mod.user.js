@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Provides a menu for viewing and editing specific track data
-// @version      1.2.2
+// @version      1.2.3
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -41,7 +41,12 @@ const getTrackCreator = state => state.trackData.creator
 const getTrackDesc = state => state.trackData.description
 const getAutosaveEnabled = state => state.autosaveEnabled
 const getRiders = state => state.simulator.engine.engine.state.riders
-
+const getNumSelectedLines = (state) => {
+    if (state.toolState && state.toolState.SELECT_TOOL && state.toolState.SELECT_TOOL.selectedPoints) {
+        return new Set([...state.toolState.SELECT_TOOL.selectedPoints].map(point => point >> 1)).size;
+    }
+    return 0;
+}
 
 function main () {
   const {
@@ -78,14 +83,11 @@ function main () {
         riderVel: [0, 0],
         riderAngle: 0,
         riderRemountable: true,
-        selectedRider: 0
+        selectedRider: 0,
+        selectedLines: 0
       }
 
       store.subscribe(() => this._mounted && this.matchState())
-    }
-
-    componentDidMount() {
-      this._mounted = true;
     }
 
     componentWillUnmount() {
@@ -93,6 +95,7 @@ function main () {
     }
 
     componentDidMount () {
+      this._mounted = true;
       window.addEventListener('resize', this.updateDimensions)
       this.matchState()
     }
@@ -116,6 +119,7 @@ function main () {
       this.setState({ creator: getTrackCreator(state) })
       this.setState({ desc: getTrackDesc(state) })
       this.setState({ autosave: getAutosaveEnabled(state) })
+      this.setState({ selectedLines: getNumSelectedLines(state) })
 
       if (riders.length > 0) {
         const selectedRider = Math.min(this.state.selectedRider, riders.length - 1)
@@ -417,6 +421,7 @@ function main () {
         this.state.active && e(
           'div',
           { style: { width: '100%' } },
+          `Selected Lines: ${this.state.selectedLines}`,
           this.renderSection('showRiderData', 'Riders'),
           this.state.showRiderData && e(
             'div', null,
