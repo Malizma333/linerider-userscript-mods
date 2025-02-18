@@ -11,6 +11,10 @@ permalink: /changelog/
   }
 </style>
 
+### 2025-02-16
+#### More Controls Mod
+- Added label for number of lines selected
+
 ### 2025-02-15
 #### Transform Mod
 - Added animation section with camera locking
