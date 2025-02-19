@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Generates a captured shape over an area with random transforms
-// @version      1.2.1
+// @version      1.2.2
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -37,6 +37,11 @@ const commitTrackChanges = () => ({
 
 const revertTrackChanges = () => ({
   type: "REVERT_TRACK_CHANGES"
+});
+
+const setEditScene = (scene) => ({
+  type: "SET_RENDERER_SCENE",
+  payload: { key: "edit", scene }
 });
 
 const getToolState = (state, toolId) => state.toolState[toolId];
@@ -132,13 +137,17 @@ function main () {
       const camera = store.getState().camera.editorPosition;
 
       let lines = [];
-      const dx = this.state.boundWidth / 2;
-      const dy = this.state.boundHeight / 2;
+      const boundingBox = genMillionsBox(
+        camera.x - this.state.boundWidth / 2,
+        camera.y - this.state.boundHeight / 2,
+        this.state.boundWidth,
+        this.state.boundHeight,
+        new Millions.Color(0, 0, 0, 255),
+        1,
+        1
+      )
 
-      lines.push({ x1: camera.x + dx, y1: camera.y + dy, x2: camera.x + dx, y2: camera.y - dy, type: 2, width: 0.125 })
-      lines.push({ x1: camera.x + dx, y1: camera.y - dy, x2: camera.x - dx, y2: camera.y - dy, type: 2, width: 0.125 })
-      lines.push({ x1: camera.x - dx, y1: camera.y - dy, x2: camera.x - dx, y2: camera.y + dy, type: 2, width: 0.125 })
-      lines.push({ x1: camera.x - dx, y1: camera.y + dy, x2: camera.x + dx, y2: camera.y + dy, type: 2, width: 0.125 })
+      store.dispatch(setEditScene(Millions.Scene.fromEntities(boundingBox)));
 
       for (let j = 0; j < this.state.iterations; j++) {
         const xPos = Math.random() * this.state.boundWidth + camera.x - this.state.boundWidth / 2;
@@ -164,6 +173,7 @@ function main () {
     onCommit () {
       store.dispatch(commitTrackChanges());
       store.dispatch(revertTrackChanges());
+      store.dispatch(setEditScene(new Millions.Scene()));
       this.setState({ active: false });
     }
 
@@ -243,4 +253,19 @@ if (window.registerCustomSetting) {
     if (prevCb) prevCb();
     main();
   };
+}
+
+function genMillionsBox(x, y, width, height, color, thickness, zIndex) {
+  return [
+    genMillionsLine(x, y, x + width, y, color, thickness, zIndex),
+    genMillionsLine(x + width, y, x + width, y + height, color, thickness, zIndex + 0.1),
+    genMillionsLine(x + width, y + height, x, y + height, color, thickness, zIndex + 0.2),
+    genMillionsLine(x, y + height, x, y, color, thickness, zIndex + 0.3),
+  ]
+}
+
+function genMillionsLine(x1, y1, x2, y2, color, thickness, zIndex) {
+  const p1 = { x: x1, y: y1, colorA: color, colorB: color, thickness }
+  const p2 = { x: x2, y: y2, colorA: color, colorB: color, thickness }
+  return new Millions.Line(p1, p2, 3, zIndex)
 }
