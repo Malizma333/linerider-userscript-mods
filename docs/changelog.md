@@ -11,6 +11,10 @@ permalink: /changelog/
   }
 </style>
 
+### 2025-02-18
+#### Noise Mod
+- Replaced line bounding box with tool scene bounding box
+
 ### 2025-02-16
 #### More Controls Mod
 - Added label for number of lines selected
