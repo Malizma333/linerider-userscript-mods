@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       David Lu & Malizma
 // @description  Adds ability to slice lines with a selection
-// @version      0.5.2
+// @version      0.5.3
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -175,13 +175,11 @@ class SliceMod {
           }
         )
 
-        if (this.state.remove) {
-          const linesToRemove = [...genRemove(selectedLines, selectLinesInRect, this.state)]
+        const linesToRemove = [...genRemove(selectedLines, selectLinesInRect, this.state)]
 
-          if (linesToRemove.length > 0) {
-            this.store.dispatch(removeLines(linesToRemove))
-            this.changed = true
-          }
+        if (linesToRemove.length > 0) {
+          this.store.dispatch(removeLines(linesToRemove))
+          this.changed = true
         }
       }
     }
@@ -202,8 +200,7 @@ function main () {
 
       this.state = {
         active: false,
-        angle: 0,
-        remove: true
+        angle: 0
       }
 
       this.sliceMod = new SliceMod(store, this.state)
@@ -247,10 +244,6 @@ function main () {
       }
     }
 
-    onToggleRemove () {
-      this.setState(({ remove }) => ({ remove: !remove }))
-    }
-
     renderSlider (key, props) {
       props = {
         ...props,
@@ -268,11 +261,7 @@ function main () {
       return e('div',
         null,
         this.state.active && e('div', null,
-          e('label', null,
-            'Remove',
-            e('input', { type: 'checkbox', checked: this.state.remove, onClick: () => this.onToggleRemove() })
-          ),
-          this.renderSlider('angle', { min: 0, max: 360, step: 1, disabled: !this.state.remove }),
+          this.renderSlider('angle', { min: 0, max: 360, step: 1 }),
           e('button', { style: { float: 'left' }, onClick: () => this.onCommit() },
             'Commit'
           )
