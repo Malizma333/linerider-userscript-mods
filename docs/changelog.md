@@ -12,8 +12,14 @@ permalink: /changelog/
 </style>
 
 ### 2025-02-18
+#### More Controls Mod
+- Reduced amount of fields
+
 #### Noise Mod
 - Replaced line bounding box with tool scene bounding box
+
+#### Slice Mod
+- Removed "remove" checkbox
 
 ### 2025-02-16
 #### More Controls Mod
