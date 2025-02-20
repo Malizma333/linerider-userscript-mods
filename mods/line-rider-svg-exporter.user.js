@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Generates an svg file from a selection of lines
-// @version      1.1.2
+// @version      1.1.3
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -275,10 +275,10 @@ function getSVG (selectedLines, layerColors, useColor) {
   }
 
   for (const line of selectedLines) {
-    const minLX = Math.min(line.x1, line.x2)
-    const minLY = Math.min(line.y1, line.y2)
-    const maxLX = Math.max(line.x1, line.x2)
-    const maxLY = Math.max(line.y1, line.y2)
+    const minLX = Math.min(line.x1, line.x2) - line.width
+    const minLY = Math.min(line.y1, line.y2) - line.width
+    const maxLX = Math.max(line.x1, line.x2) + line.width
+    const maxLY = Math.max(line.y1, line.y2) + line.width
 
     if (bounds.minX > minLX) { bounds.minX = minLX }
     if (bounds.minY > minLY) { bounds.minY = minLY }
