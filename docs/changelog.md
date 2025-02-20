@@ -11,6 +11,10 @@ permalink: /changelog/
   }
 </style>
 
+### 2025-02-19
+#### SVG Mod
+- Updated SVG mod with camera centered generation
+
 ### 2025-02-18
 #### More Controls Mod
 - Reduced amount of fields
