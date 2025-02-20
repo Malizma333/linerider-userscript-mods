@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Conqu3red & Malizma
 // @description  Linerider.com userscript for converting svgs to lines
-// @version      1.1.0
+// @version      1.1.1
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -603,14 +603,15 @@ function* textToLines({
     offset[1] = yOffs + offset[1] * -scale;
     let path = glyph.data.path.toPathData(10);
 
-    yield* pathToLines(path, {
-      xOffs: offset[0],
-      yOffs: offset[1],
-      xScale: scale,
-      yScale: -scale,
-      tolerance
-    })
-
+    if (glyph.data.name !== 'space') {
+      yield* pathToLines(path, {
+        xOffs: offset[0],
+        yOffs: offset[1],
+        xScale: scale,
+        yScale: -scale,
+        tolerance
+      })
+    }
   }
 }
 
