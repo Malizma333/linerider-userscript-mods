@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Generates ten point cannons
-// @version      1.3.2
+// @version      1.4.0
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -36,13 +36,18 @@ const revertTrackChanges = () => ({
   type: 'REVERT_TRACK_CHANGES'
 })
 
+const setEditScene = (scene) => ({
+  type: "SET_RENDERER_SCENE",
+  payload: { key: "edit", scene }
+});
+
 const getSimulatorCommittedTrack = state => state.simulator.committedEngine
 const getRiders = state => state.simulator.engine.engine.state.riders
 const getNumRiders = (state) => getRiders(state).length
 const sidebarOpen = (state) => state.views.Sidebar
 
 class TenPCMod {
-  constructor (store, initState) {
+  constructor(store, initState) {
     this.store = store
     this.state = initState
 
@@ -57,23 +62,25 @@ class TenPCMod {
     })
   }
 
-  commit () {
+  commit() {
     if (this.changed) {
       this.store.dispatch(commitTrackChanges())
       this.store.dispatch(revertTrackChanges())
+      this.store.dispatch(setEditScene(new Millions.Scene()));
       this.changed = false
       return true
     }
   }
 
-  revert () {
+  revert() {
     if (this.changed) {
-      this.store.dispatch(revertTrackChanges())
+      this.store.dispatch(revertTrackChanges());
+      this.store.dispatch(setEditScene(new Millions.Scene()));
       this.changed = false
     }
   }
 
-  onUpdate (nextState = this.state) {
+  onUpdate(nextState = this.state) {
     let shouldUpdate = false
 
     if (!this.state.active && nextState.active) {
@@ -109,23 +116,37 @@ class TenPCMod {
       }
     }
 
-    if (!shouldUpdate) return
+    if (!shouldUpdate) return;
 
     if (this.changed) {
-      this.store.dispatch(revertTrackChanges())
-      this.changed = false
+      this.store.dispatch(revertTrackChanges());
+      this.changed = false;
     }
 
-    if (!this.state.active) return
+    if (!this.state.active) return;
 
-    let iterations = 0
-    const MAX_ITERATIONS = 1000
+    const currentFrame = Math.ceil(window.store.getState().player.index);
+    const engine = window.store.getState().simulator.engine.engine;
+    const curRider = engine.getFrame(currentFrame).snapshot.entities[0].entities[this.state.selectedRider - 1];
+    const nextRider = engine.getFrame(currentFrame + 1).snapshot.entities[0].entities[this.state.selectedRider - 1];
+    const targetRider = calcTransformedRider(this.state, curRider.points[0]);
 
-    while (true) {
-      const myLines = []
+    const projection = drawRider(targetRider);
+    this.store.dispatch(setEditScene(Millions.Scene.fromEntities(projection)));
 
-      for (const { p1, p2, f, m } of GenerateCannon(this.state)) {
-        myLines.push({
+    let mounted = false;
+    let i = 0;
+
+    while (i < 100 && !mounted) {
+      if (i > 0) {
+        window.store.dispatch(revertTrackChanges());
+        this.changed = false;
+      }
+
+      const lines = [];
+
+      for (const { p1, p2, f, m } of GenerateCannon(curRider, nextRider, targetRider)) {
+        lines.push({
           x1: p1.x,
           y1: p1.y,
           x2: p2.x,
@@ -135,34 +156,21 @@ class TenPCMod {
           leftExtended: false,
           rightExtended: false,
           multiplier: m
-        })
+        });
       }
 
-      if (myLines.length > 0) {
-        this.store.dispatch(addLines(myLines))
-        this.changed = true
-      }
+      this.store.dispatch(addLines(lines));
+      this.changed = true;
 
-      if (!this.state.forceLive) break
-
-      const engine = window.store.getState().simulator.engine.engine
-      const currentFrame = Math.ceil(window.store.getState().player.index)
-      const nextRider = engine.getFrame(currentFrame + 1).snapshot.entities[0].entities[this.state.selectedRider - 1]
-
-      if (nextRider.riderMounted) {
-        break
-      }
-      window.store.dispatch(revertTrackChanges())
-
-      if (iterations++ >= MAX_ITERATIONS) {
-        console.error('Max iterations reached')
-        return 'MAX_ITERATIONS'
-      }
+      const engine = window.store.getState().simulator.engine.engine;
+      const newNextRider = engine.getFrame(currentFrame + 1).snapshot.entities[0].entities[this.state.selectedRider - 1];
+      mounted = newNextRider.riderMounted;
+      i += 1;
     }
   }
 }
 
-function main () {
+function main() {
   const {
     React,
     store
@@ -171,7 +179,7 @@ function main () {
   const create = React.createElement
 
   class TenPCModComponent extends React.Component {
-    constructor (props) {
+    constructor(props) {
       super(props)
 
       this.state = {
@@ -180,8 +188,7 @@ function main () {
         ySpeed: 0,
         rotation: 0,
         selectedRider: 1,
-        riderCount: 1,
-        forceLive: false
+        riderCount: 1
       }
 
       this.mod = new TenPCMod(store, this.state)
@@ -209,32 +216,27 @@ function main () {
       this._mounted = false;
     }
 
-    componentWillUpdate (nextProps, nextState) {
-      const error = this.mod.onUpdate(nextState)
-      if (error == 'MAX_ITERATIONS') {
-        this.setState({ forceLive: false })
-        this.setState({ active: false })
-      }
+    componentWillUpdate(_, nextState) {
+      this.mod.onUpdate(nextState)
     }
 
-    onActivate () {
+    onActivate() {
       if (this.state.active || sidebarOpen(window.store.getState())) {
-        this.setState({ forceLive: false })
-        this.setState({ active: false })
+        this.setState({ active: false });
+        store.dispatch(setEditScene(new Millions.Scene()));
       } else {
-        this.setState({ active: true })
+        this.setState({ active: true });
       }
     }
 
-    onCommit () {
+    onCommit() {
       const committed = this.mod.commit()
       if (committed) {
-        this.setState({ forceLive: false })
         this.setState({ active: false })
       }
     }
 
-    renderCheckbox (key, title, props) {
+    renderCheckbox(key, title, props) {
       props = {
         ...props,
         checked: this.state[key],
@@ -247,7 +249,7 @@ function main () {
       )
     }
 
-    renderSlider (key, title, props) {
+    renderSlider(key, title, props) {
       props = {
         ...props,
         value: this.state[key],
@@ -261,15 +263,13 @@ function main () {
       )
     }
 
-    render () {
+    render() {
       return create('div', null,
         this.state.active && create('div', null,
           this.renderSlider('xSpeed', 'X Speed', { min: -99, max: 99, step: 1 }),
           this.renderSlider('ySpeed', 'Y Speed', { min: -99, max: 99, step: 1 }),
           this.renderSlider('rotation', 'Rotation', { min: 0, max: 360, step: 1 }),
           this.state.riderCount > 1 && this.renderSlider('selectedRider', 'Rider', { min: 1, max: this.state.riderCount, step: 1 }),
-          this.renderCheckbox('forceLive', 'Force Live (Warning: Causes Lag) '),
-
           create('button', { style: { float: 'left' }, onClick: () => this.onCommit() },
             'Commit'
           )
@@ -303,69 +303,70 @@ if (window.registerCustomSetting) {
 
 // Based on LRA's implementation
 
-function * GenerateCannon ({ xSpeed = 0, ySpeed = 0, rotation = 0, selectedRider = 1 } = {}) {
-  const { V2 } = window
-
-  const cpArray = [
-    V2.from(0, 0),
-    V2.from(0, 5),
-    V2.from(15, 5),
-    V2.from(17.5, 0),
-    V2.from(5, 0),
-    V2.from(5, -5.5),
-    V2.from(11.5, -5),
-    V2.from(11.5, -5),
-    V2.from(10, 5),
-    V2.from(10, 5)
-  ]
-
-  const engine = window.store.getState().simulator.engine.engine
-  const currentFrame = Math.ceil(window.store.getState().player.index)
-  const curRider = engine.getFrame(currentFrame).snapshot.entities[0].entities[selectedRider - 1]
-  const nextRider = engine.getFrame(currentFrame + 1).snapshot.entities[0].entities[selectedRider - 1]
-  const theta = Math.PI * rotation / 180
-  const rotationMatrix = [[Math.cos(theta), -Math.sin(theta)], [Math.sin(theta), Math.cos(theta)]]
+function calcTransformedRider({ xSpeed = 0, ySpeed = 0, rotation = 0 } = {}, origin) {
+  const { V2 } = window;
+  const cpArray = [V2.from(0, 0), V2.from(0, 5), V2.from(15, 5), V2.from(17.5, 0), V2.from(5, 0), V2.from(5, -5.5), V2.from(11.5, -5), V2.from(11.5, -5), V2.from(10, 5), V2.from(10, 5)];
+  const theta = Math.PI * rotation / 180;
+  const rotationMatrix = [[Math.cos(theta), -Math.sin(theta)], [Math.sin(theta), Math.cos(theta)]];
+  const transformedRider = [];
 
   for (let i = 0; i < cpArray.length; i++) {
-    const riderRotated = V2.from(
-      rotationMatrix[0][0] * cpArray[i].x + rotationMatrix[1][0] * cpArray[i].y,
-      rotationMatrix[0][1] * cpArray[i].x + rotationMatrix[1][1] * cpArray[i].y
-    )
+    transformedRider.push(V2.from(
+      rotationMatrix[0][0] * cpArray[i].x + rotationMatrix[1][0] * cpArray[i].y + origin.pos.x + xSpeed,
+      rotationMatrix[0][1] * cpArray[i].x + rotationMatrix[1][1] * cpArray[i].y + origin.pos.y + ySpeed
+    ));
+  }
 
-    const target = V2.from(curRider.points[0].pos.x, curRider.points[0].pos.y)
-    target.add(riderRotated)
-    target.add(V2.from(xSpeed, ySpeed))
+  return transformedRider;
+}
 
-    yield GenerateLine(curRider.points[i], nextRider.points[i], target)
+function* GenerateCannon(curRider, nextRider, targetRider) {
+  const { V2 } = window;
+
+  for (let i = 0; i < 10; i++) {
+    let inverse = false;
+    const targetDir = targetRider[i].copy().sub(nextRider.points[i].pos);
+    const speedReq = targetDir.len();
+
+    if (targetDir.len() > 0) {
+      targetDir.div(targetDir.len());
+    }
+
+    const curVel = V2.from(curRider.points[i].vel.x, curRider.points[i].vel.y);
+    let normDir = V2.from(-targetDir.y, targetDir.x);
+
+    if (curVel.dot(normDir) <= 0) {
+      inverse = true;
+      normDir = V2.from(targetDir.y, -targetDir.x);
+    }
+
+    const curPos = V2.from(curRider.points[i].pos.x, curRider.points[i].pos.y);
+    const lineCenter = curPos.copy().sub(normDir.copy().mul(1.0e-3 * (1 + Math.random())));
+
+    yield {
+      p1: lineCenter.copy().sub(targetDir.copy().mul(0.5 * 1.0e-5)),
+      p2: lineCenter.copy().add(targetDir.copy().mul(0.5 * 1.0e-5)),
+      f: inverse,
+      m: speedReq * 10.0
+    };
   }
 }
 
-function GenerateLine (pointCur, pointNext, pointTarget) {
-  const { V2 } = window
+function drawRider(targetRider) {
+  const color = new Millions.Color(0, 0, 0, 255);
+  return [
+    genMillionsLine(targetRider[0], targetRider[1], color, 0.1, 1.01),
+    genMillionsLine(targetRider[1], targetRider[2], color, 0.1, 1.02),
+    genMillionsLine(targetRider[2], targetRider[3], color, 0.1, 1.03),
+    genMillionsLine(targetRider[3], targetRider[0], color, 0.1, 1.04),
+    genMillionsLine(targetRider[4], targetRider[5], color, 0.1, 1.05),
+    genMillionsLine(targetRider[5], targetRider[6], color, 0.1, 1.06),
+    genMillionsLine(targetRider[4], targetRider[8], color, 0.1, 1.08),
+  ]
+}
 
-  let inverse = false
-  const targetDir = pointTarget.copy().sub(pointNext.pos)
-  const speedReq = targetDir.len()
-
-  if (targetDir.len() > 0) {
-    targetDir.div(targetDir.len())
-  }
-
-  const curVel = V2.from(pointCur.vel.x, pointCur.vel.y)
-  let normDir = V2.from(-targetDir.y, targetDir.x)
-
-  if (curVel.dot(normDir) <= 0) {
-    inverse = true
-    normDir = V2.from(targetDir.y, -targetDir.x)
-  }
-
-  const curPos = V2.from(pointCur.pos.x, pointCur.pos.y)
-  const lineCenter = curPos.copy().sub(normDir.copy().mul(1.0e-3 * (1 + Math.random())))
-
-  return {
-    p1: lineCenter.copy().sub(targetDir.copy().mul(0.5 * 1.0e-5)),
-    p2: lineCenter.copy().add(targetDir.copy().mul(0.5 * 1.0e-5)),
-    f: inverse,
-    m: speedReq * 10.0
-  }
+function genMillionsLine(p1, p2, color, thickness, zIndex) {
+  const p1m = { x: p1.x, y: p1.y, colorA: color, colorB: color, thickness };
+  const p2m = { x: p2.x, y: p2.y, colorA: color, colorB: color, thickness };
+  return new Millions.Line(p1m, p2m, 3, zIndex);
 }
