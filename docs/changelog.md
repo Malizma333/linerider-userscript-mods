@@ -11,6 +11,12 @@ permalink: /changelog/
   }
 </style>
 
+### 2025-02-20
+#### TenPC Mod
+- Removed force live toggle, making it always on for reduced number of iterations
+- Added preview skeleton of where rider is attempting to be placed
+- Slight optimizations to cannon generation
+
 ### 2025-02-19
 #### SVG Mod
 - Updated SVG mod with camera centered generation
