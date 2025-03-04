@@ -52,7 +52,7 @@ const getToolState = (state, toolId) => state.toolState[toolId];
 const getSelectToolState = state => getToolState(state, SELECT_TOOL);
 const getSimulatorCommittedTrack = state => state.simulator.committedEngine;
 const getTrackLinesLocked = state => state.trackLinesLocked;
-const getSelectedLineType = state => getTrackLinesLocked(state) ? 2 : state.selectedLineType;
+const getSelectedLineType = state => (getTrackLinesLocked(state) ? 2 : state.selectedLineType);
 
 class FontMod {
   constructor (store, initState) {

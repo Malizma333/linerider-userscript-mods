@@ -460,7 +460,7 @@ function main () {
     }
 
     // TODO: Manage key conflicts
-    handleKeyDown = (e, keyID) => {
+    handleKeyDown (e, keyID) {
       e.preventDefault();
       const key = e.key;
 
@@ -511,7 +511,7 @@ function main () {
 
       this.setState({ keyCombination });
       e.target.value = keyCombination.join(" + ").toUpperCase();
-    };
+    }
 
     handleFocus (e) {
       e.target.value = this.state.keyCombination;

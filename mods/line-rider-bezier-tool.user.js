@@ -63,7 +63,7 @@ const getSimulatorTrack = state => state.simulator.engine;
 const getSimulatorCommittedTrack = state => state.simulator.committedEngine;
 const getTrackLinesLocked = state => state.trackLinesLocked;
 const getSelectedLineType = state =>
-  getTrackLinesLocked(state) ? 2 : state.selectedLineType;
+  (getTrackLinesLocked(state) ? 2 : state.selectedLineType);
 
 class State {}
 class InitState extends State {}

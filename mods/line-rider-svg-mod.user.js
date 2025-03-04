@@ -406,7 +406,7 @@ if (window.registerCustomSetting) {
 }
 
 function applyScaleThenOffset(path, xOffs, yOffs, xScale, yScale) {
-  return path.map((e) => [e[0], ...e.slice(1).map((v, index) => index % 2 === 0 ? xOffs + v * xScale : yOffs + v * yScale)])
+  return path.map((e) => [e[0], ...e.slice(1).map((v, index) => (index % 2 === 0 ? xOffs + v * xScale : yOffs + v * yScale))])
 }
 
 function RaphaelPathToDescribedPath(path) {
@@ -933,7 +933,7 @@ function computeLayout(font, text, opt) {
   function measure(text, start, end, width) {
     return computeMetrics(font, text, start, end, width, letterSpacing);
   }
-};
+}
 
 function getRightSideBearing(glyph) {
   var glyphWidth = (glyph.xMax || 0) - (glyph.xMin || 0);

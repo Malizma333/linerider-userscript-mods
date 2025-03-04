@@ -99,7 +99,7 @@ class ImageMod {
     let currentAction = 0
     let start
 
-    function dispatchAction (t, ts) {
+    const dispatchAction = (t, ts) => {
       if (start === undefined) {
         start = ts
       }
@@ -116,7 +116,7 @@ class ImageMod {
         t.drawTask = false
         t.animEvent = 0
       }
-    };
+    }
 
     this.animEvent = requestAnimationFrame((ts) => dispatchAction(this, ts))
   }

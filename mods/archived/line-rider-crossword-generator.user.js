@@ -216,7 +216,7 @@ function isAlpha(str) {
       }
   }
   return true;
-};
+}
 
 function drawText(word, position, size) {
   const origin = getEditorPos(window.store.getState());

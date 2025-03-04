@@ -174,7 +174,7 @@ class TransformMod {
     
     for (const id of getLinesFromPoints(this.selectedPoints)) {
       const line = this.track.getLine(id);
-      if (!!line) {
+      if (line) {
         pretransformedLines.push({
           id,
           p1: line.p1,
