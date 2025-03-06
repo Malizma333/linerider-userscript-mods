@@ -11,6 +11,10 @@ permalink: /changelog/
   }
 </style>
 
+### 2025-03-05
+#### Command Editor Mod
+- Updated user interface design
+
 ### 2025-02-20
 #### TenPC Mod
 - Removed force live toggle, making it always on for reduced number of iterations
