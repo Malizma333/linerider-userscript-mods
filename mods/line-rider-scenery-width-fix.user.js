@@ -53,16 +53,11 @@ function main () {
         sceneryWidth: 1
       }
 
-      store.subscribe(() => this._mounted && this.setState({ sceneryWidth: getSceneryWidth(store.getState()) }))
+      store.subscribe(() => this.setState({ sceneryWidth: getSceneryWidth(store.getState()) }))
     }
 
     componentDidMount() {
-      this._mounted = true;
       Object.assign(sceneryWidthContainer.style, sceneryWidthContainerStyle)
-    }
-
-    componentWillUnmount() {
-      this._mounted = false;
     }
 
     onChooseWidth (sceneryWidth) {
@@ -80,8 +75,6 @@ function main () {
       )
     }
   }
-
-  sceneryWidthContainer.style
 
   document.getElementById('content').appendChild(sceneryWidthContainer)
 
