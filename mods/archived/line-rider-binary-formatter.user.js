@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Adds support for loading and saving track data to the LRB data format
-// @version      0.1.0
+// @version      0.1.1
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -37,7 +37,7 @@ function main () {
             {name: "base.simline", version: 0, numSections: 1, optional: false},
             {name: "base.redmult", version: 0, numSections: 1, optional: false},
             {name: "base.scnline", version: 0, numSections: 1, optional: false},
-            {name: "base.physver", version: 0, numSections: 1, optional: false},
+            {name: "base.gridver", version: 0, numSections: 1, optional: false},
             {name: "web.script", version: 0, numSections: 1, optional: true, msg: "Scripts are web-only"},
             {name: "web.layers", version: 0, numSections: 3, optional: true, msg: "Layers are web-only"},
             {name: "web.riders", version: 0, numSections: 1, optional: true, msg: "Riders are web-only"},
@@ -73,7 +73,7 @@ function main () {
                 return
             }
 
-            if (x !== 8 && x !== 16 && x != 32) {
+            if (x !== 8 && x !== 16 && x !== 32) {
                 console.error(`Invalid option ${x}`)
                 return
             }
@@ -250,23 +250,17 @@ function main () {
                     writeSectionEntry(sectionPointerDict[mod.name], sectionPointer, binArray.length - sectionPointer)
                     break
                 }
-                case "base.physver": {
+                case "base.gridver": {
                     /*
                     Section 1
-                    Length: U8 = Length of the version string
-                    Script: utf8[Length] = Version string
+                    GridVersion: U8 = Version of grid algorithm
                     */
-                    let { version } = jsonData.trackData
-
-                    version = version || "6.2"
+                    let version = jsonData.trackData.version || "6.2"
+                    let versionNum = {"6.0": 0, "6.1": 1, "6.2": 2}[version]
 
                     sectionPointer = binArray.length
 
-                    pushU_X(version.length, 8)
-
-                    for(let i = 0; i < version.length; i++) {
-                        pushU_X(version.charCodeAt(i), 8)
-                    }
+                    pushU_X(versionNum, 8)
 
                     writeSectionEntry(sectionPointerDict[mod.name], sectionPointer, binArray.length - sectionPointer)
                     break
@@ -578,13 +572,10 @@ function main () {
                         newTrack.duration = (secView[0] << 24) | (secView[1] << 16) | (secView[2] << 8) | secView[3]
                         break
                     }
-                    case "base.physver": {
-                        const versionLength = secView[0]
-                        let version = []
-                        for (let i = 0; i < versionLength; i++) {
-                            version.push(secView[i + 1])
-                        }
-                        newTrack.version = String.fromCharCode(...version)
+                    case "base.gridver": {
+                        const versionNum = secView[0]
+                        const version = ["6.0", "6.1", "6.2"][versionNum]
+                        newTrack.version = version
                         break
                     }
                     case "web.riders": {
