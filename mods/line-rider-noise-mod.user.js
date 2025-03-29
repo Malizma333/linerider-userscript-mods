@@ -145,7 +145,7 @@ function main () {
         new Millions.Color(0, 0, 0, 255),
         1,
         1
-      )
+      );
 
       store.dispatch(setEditScene(Millions.Scene.fromEntities(boundingBox)));
 
@@ -163,7 +163,7 @@ function main () {
             y2: (Math.sin(rot) * this.currentShape[i][2] + Math.cos(rot) * this.currentShape[i][3]) * scale + yPos,
             type: 2,
             width: this.currentShape[i][4] * scale
-          })
+          });
         }
       }
 
@@ -178,17 +178,17 @@ function main () {
     }
 
     renderCheckbox (key, title = null) {
-      if (!title) title = key
+      if (!title) title = key;
 
       const props = {
         id: key,
         checked: this.state[key],
         onChange: e => this.setState({ [key]: e.target.checked })
-      }
-      return e('div', null,
-        e('label', { style: { width: '4em' }, for: key }, title),
-        e('input', { style: { marginLeft: '.5em' }, type: 'checkbox', ...props })
-      )
+      };
+      return e("div", null,
+        e("label", { style: { width: "4em" }, for: key }, title),
+        e("input", { style: { marginLeft: ".5em" }, type: "checkbox", ...props })
+      );
     }
 
     renderSlider (key, title, props) {
@@ -196,37 +196,37 @@ function main () {
         ...props,
         value: this.state[key],
         onChange: e => this.setState({ [key]: parseFloat(e.target.value) })
-      }
+      };
 
       return e(
-        'div', null,
+        "div", null,
         title,
-        e('input', { style: { width: '3em' }, type: 'number', ...props }),
-        e('input', { type: 'range', ...props, onFocus: e => e.target.blur() })
-      )
+        e("input", { style: { width: "3em" }, type: "number", ...props }),
+        e("input", { type: "range", ...props, onFocus: e => e.target.blur() })
+      );
     }
 
     render () {
       return e("div", null,
         this.state.active && e("div", null,
-          this.renderSlider('boundWidth', 'Boundary Width', { min: 0, max: 10000, step: 1 }),
-          this.renderSlider('boundHeight', 'Boundary Height', { min: 0, max: 10000, step: 1 }),
-          this.renderSlider('iterations', 'Count', { min: 1, max: 10000, step: 1 }),
-          this.renderSlider('rotStep', 'Rotation Variation', { min: 1, max: 360, step: 1 }),
-          this.renderSlider('maxScale', 'Max Scale', { min: 0.01, max: 10, step: 0.01 }),
-          this.renderSlider('minScale', 'Min Scale', { min: 0.01, max: 10, step: 0.01 }),
+          this.renderSlider("boundWidth", "Boundary Width", { min: 0, max: 10000, step: 1 }),
+          this.renderSlider("boundHeight", "Boundary Height", { min: 0, max: 10000, step: 1 }),
+          this.renderSlider("iterations", "Count", { min: 1, max: 10000, step: 1 }),
+          this.renderSlider("rotStep", "Rotation Variation", { min: 1, max: 360, step: 1 }),
+          this.renderSlider("maxScale", "Max Scale", { min: 0.01, max: 10, step: 0.01 }),
+          this.renderSlider("minScale", "Min Scale", { min: 0.01, max: 10, step: 0.01 }),
           e("button", {
             onClick: () => this.onCapture() },
-            "Capture Selected Shape"
+          "Capture Selected Shape"
           ),
           e("button", {
             onClick: () => this.onRefresh() },
-            "Refresh Visual"
+          "Refresh Visual"
           ),
           e("button", {
             style: { float: "left" },
             onClick: () => this.onCommit() },
-            "Commit"
+          "Commit"
           )
         ),
         e("button",
@@ -261,11 +261,11 @@ function genMillionsBox(x, y, width, height, color, thickness, zIndex) {
     genMillionsLine(x + width, y, x + width, y + height, color, thickness, zIndex + 0.1),
     genMillionsLine(x + width, y + height, x, y + height, color, thickness, zIndex + 0.2),
     genMillionsLine(x, y + height, x, y, color, thickness, zIndex + 0.3),
-  ]
+  ];
 }
 
 function genMillionsLine(x1, y1, x2, y2, color, thickness, zIndex) {
-  const p1 = { x: x1, y: y1, colorA: color, colorB: color, thickness }
-  const p2 = { x: x2, y: y2, colorA: color, colorB: color, thickness }
-  return new Millions.Line(p1, p2, 3, zIndex)
+  const p1 = { x: x1, y: y1, colorA: color, colorB: color, thickness };
+  const p2 = { x: x2, y: y2, colorA: color, colorB: color, thickness };
+  return new Millions.Line(p1, p2, 3, zIndex);
 }

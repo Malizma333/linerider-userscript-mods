@@ -23,81 +23,81 @@
 // jshint asi: true
 // jshint esversion: 6
 
-const getWindowFocused = state => state.views.Main
-const getPlayerRunning = state => state.player.running
-const getSceneryWidth = state => state.selectedSceneryWidth
+const getWindowFocused = state => state.views.Main;
+const getPlayerRunning = state => state.player.running;
+const getSceneryWidth = state => state.selectedSceneryWidth;
 
 function main () {
   const {
     React,
     ReactDOM,
     store
-  } = window
+  } = window;
 
-  const e = React.createElement
-  const sceneryWidthContainer = document.createElement('div')
+  const e = React.createElement;
+  const sceneryWidthContainer = document.createElement("div");
   const sceneryWidthContainerStyle = {
-    position: 'fixed',
+    position: "fixed",
     opacity: 0,
-    pointerEvents: 'none',
-    transition: 'opacity 225ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
-    top: '25px',
-    left: '65vw'
-  }
+    pointerEvents: "none",
+    transition: "opacity 225ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
+    top: "25px",
+    left: "65vw"
+  };
 
   class SceneryWidthModComponent extends React.Component {
     constructor () {
-      super()
+      super();
 
       this.state = {
         sceneryWidth: 1
-      }
+      };
 
-      store.subscribe(() => this.setState({ sceneryWidth: getSceneryWidth(store.getState()) }))
+      store.subscribe(() => this.setState({ sceneryWidth: getSceneryWidth(store.getState()) }));
     }
 
     componentDidMount() {
-      Object.assign(sceneryWidthContainer.style, sceneryWidthContainerStyle)
+      Object.assign(sceneryWidthContainer.style, sceneryWidthContainerStyle);
     }
 
     onChooseWidth (sceneryWidth) {
       if (sceneryWidth === 0) return;
-      store.dispatch({ type: "SELECT_SCENERY_WIDTH", payload: sceneryWidth })
-      this.setState({ sceneryWidth })
+      store.dispatch({ type: "SELECT_SCENERY_WIDTH", payload: sceneryWidth });
+      this.setState({ sceneryWidth });
     }
 
     render () {
       return e(
-        'div',
+        "div",
         null,
-        e('input', { style: { width: '4em' }, type: 'number', min: 0, max: 1000, step: 0.01, value: this.state.sceneryWidth, onChange: e => this.onChooseWidth(parseFloat(e.target.value)) }),
-        e('input', { style: { width: '7em' }, type: 'range', min: -2, max: 3, step: 0.1, value: Math.log10(this.state.sceneryWidth), onChange: e => this.onChooseWidth(Math.pow(10, parseFloat(e.target.value))), onFocus: e => e.target.blur() })
-      )
+        e("input", { style: { width: "4em" }, type: "number", min: 0, max: 1000, step: 0.01, value: this.state.sceneryWidth, onChange: e => this.onChooseWidth(parseFloat(e.target.value)) }),
+        e("input", { style: { width: "7em" }, type: "range", min: -2, max: 3, step: 0.1, value: Math.log10(this.state.sceneryWidth), onChange: e => this.onChooseWidth(Math.pow(10, parseFloat(e.target.value))), onFocus: e => e.target.blur() })
+      );
     }
   }
 
-  document.getElementById('content').appendChild(sceneryWidthContainer)
+  document.getElementById("content").appendChild(sceneryWidthContainer);
 
   ReactDOM.render(
     e(SceneryWidthModComponent),
     sceneryWidthContainer
-  )
+  );
 
   store.subscribe(() => {
-    let playerRunning = getPlayerRunning(store.getState())
-    let windowFocused = getWindowFocused(store.getState())
-    const active = !playerRunning && windowFocused
-    sceneryWidthContainer.style.opacity = active ? 1 : 0
-    sceneryWidthContainer.style.pointerEvents = active ? null : 'none'
-  })
+    let playerRunning = getPlayerRunning(store.getState());
+    let windowFocused = getWindowFocused(store.getState());
+    const active = !playerRunning && windowFocused;
+    sceneryWidthContainer.style.opacity = active ? 1 : 0;
+    sceneryWidthContainer.style.pointerEvents = active ? null : "none";
+  });
 }
 
 if (window.registerCustomSetting) {
-  main()
+  main();
 } else {
-  const prevCb = window.onCustomToolsApiReady
+  const prevCb = window.onCustomToolsApiReady;
   window.onCustomToolsApiReady = () => {
-    if (prevCb) prevCb()
-    main()
-  }
+    if (prevCb) prevCb();
+    main();
+  };
 }

@@ -23,8 +23,10 @@
 
 // ==/UserScript==
 
+/* globals Raphael, opentype */
+
 const updateLines = (linesToRemove, linesToAdd, name) => ({
-  type: 'UPDATE_LINES',
+  type: "UPDATE_LINES",
   payload: {
     linesToRemove,
     linesToAdd
@@ -32,86 +34,86 @@ const updateLines = (linesToRemove, linesToAdd, name) => ({
   meta: {
     name: name
   }
-})
+});
 
-const addLines = (line) => updateLines(null, line, 'ADD_LINES')
+const addLines = (line) => updateLines(null, line, "ADD_LINES");
 
 const commitTrackChanges = () => ({
-  type: 'COMMIT_TRACK_CHANGES'
-})
+  type: "COMMIT_TRACK_CHANGES"
+});
 
 const revertTrackChanges = () => ({
-  type: 'REVERT_TRACK_CHANGES'
-})
+  type: "REVERT_TRACK_CHANGES"
+});
 
-const getSimulatorCommittedTrack = state => state.simulator.committedEngine
+const getSimulatorCommittedTrack = state => state.simulator.committedEngine;
 const getEditorPosition = state => state.camera.editorPosition;
 
 class SvgMod {
   constructor(store, initState) {
-    this.store = store
-    this.state = initState
+    this.store = store;
+    this.state = initState;
 
-    this.changed = false
+    this.changed = false;
     this.nlines = 0;
 
-    this.track = getSimulatorCommittedTrack(this.store.getState())
-    this.camPos = getEditorPosition(this.store.getState())
+    this.track = getSimulatorCommittedTrack(this.store.getState());
+    this.camPos = getEditorPosition(this.store.getState());
 
     store.subscribeImmediate(() => {
-      this.onUpdate()
-    })
+      this.onUpdate();
+    });
   }
 
   commit() {
     if (this.changed) {
-      this.store.dispatch(commitTrackChanges())
-      this.store.dispatch(revertTrackChanges())
-      this.changed = false
-      return true
+      this.store.dispatch(commitTrackChanges());
+      this.store.dispatch(revertTrackChanges());
+      this.changed = false;
+      return true;
     }
   }
 
   onUpdate(nextState = this.state) {
-    let shouldUpdate = false
+    let shouldUpdate = false;
 
     if (!this.state.active && nextState.active) {
-      window.previewLinesInFastSelect = true
+      window.previewLinesInFastSelect = true;
     }
     if (this.state.active && !nextState.active) {
-      window.previewLinesInFastSelect = false
+      window.previewLinesInFastSelect = false;
     }
 
     if (this.state !== nextState) {
-      this.state = nextState
-      shouldUpdate = true
+      this.state = nextState;
+      shouldUpdate = true;
     }
 
     if (this.state.active) {
-      const track = getSimulatorCommittedTrack(this.store.getState())
+      const track = getSimulatorCommittedTrack(this.store.getState());
 
       if (this.track !== track) {
-        this.track = track
-        shouldUpdate = true
+        this.track = track;
+        shouldUpdate = true;
       }
 
-      const camPos = getEditorPosition(this.store.getState())
+      const camPos = getEditorPosition(this.store.getState());
 
       if (this.camPos !== camPos) {
-        this.camPos = camPos
-        shouldUpdate = true
+        this.camPos = camPos;
+        shouldUpdate = true;
       }
     }
 
     if (shouldUpdate) {
 
       if (this.changed) {
-        this.store.dispatch(revertTrackChanges())
-        this.changed = false
+        this.store.dispatch(revertTrackChanges());
+        this.changed = false;
       }
 
       if (this.state.active) {
-        let myLines = []
+        let myLines = [];
 
         this.nlines = 0;
 
@@ -125,14 +127,14 @@ class SvgMod {
             x2: p2.x + this.camPos.x,
             y2: p2.y + this.camPos.y,
             type: 2
-          })
+          });
         }
 
         console.timeEnd("GenLines");
 
         if (myLines.length > 0) {
-          this.store.dispatch(addLines(myLines))
-          this.changed = true
+          this.store.dispatch(addLines(myLines));
+          this.changed = true;
         }
       }
     }
@@ -140,13 +142,13 @@ class SvgMod {
 }
 
 function main() {
-  const { React, store } = window
+  const { React, store } = window;
 
-  const e = React.createElement
+  const e = React.createElement;
 
   class SvgModComponent extends React.Component {
     constructor(props) {
-      super(props)
+      super(props);
 
       this.state = {
         active: false,
@@ -169,13 +171,13 @@ function main() {
         svgFile: null,
         svgName: "",
         scale: 1,
-      }
+      };
 
-      this.mod = new SvgMod(store, this.state)
+      this.mod = new SvgMod(store, this.state);
     }
 
     componentWillUpdate(_, nextState) {
-      this.mod.onUpdate(nextState)
+      this.mod.onUpdate(nextState);
     }
 
     onActivate() {
@@ -183,11 +185,11 @@ function main() {
         this.setState({
           active: false,
           text: ""
-        })
+        });
       } else {
         this.setState({
           active: true
-        })
+        });
       }
     }
 
@@ -205,7 +207,7 @@ function main() {
             console.log("Error when parsing: Unsupported font");
             console.log(e);
           }
-        }
+        };
         fileReader.readAsArrayBuffer(file);
       });
     }
@@ -218,24 +220,24 @@ function main() {
         fileReader.onloadend = (e) => {
           try {
             const result = fileReader.result;
-            const dom = new DOMParser().parseFromString(result, "image/svg+xml")
+            const dom = new DOMParser().parseFromString(result, "image/svg+xml");
             resolve([fileReader.fileName, dom]);
           } catch (e) {
             console.log("Error when parsing: Unsupported svg");
             console.log(e);
           }
-        }
+        };
         fileReader.readAsText(file, "utf8");
       });
     }
 
     onCommit() {
-      const committed = this.mod.commit()
+      const committed = this.mod.commit();
       if (committed) {
         this.setState({
           active: false,
           text: ""
-        })
+        });
       }
     }
 
@@ -246,23 +248,23 @@ function main() {
         onChange: create => this.setState({
           [key]: parseFloat(create.target.value)
         })
-      }
+      };
 
-      return e('div', null,
+      return e("div", null,
         title,
-        e('input', {
+        e("input", {
           style: {
-            width: '4em'
+            width: "4em"
           },
-          type: 'number',
+          type: "number",
           ...props
         }),
-        e('input', {
-          type: 'range',
+        e("input", {
+          type: "range",
           ...props,
           onFocus: create => create.target.blur()
         })
-      )
+      );
     }
 
     renderEnumChoices(key, title, items, props) {
@@ -270,7 +272,7 @@ function main() {
         title,
         ...items.map((i) => this.renderRadioButton(key, i[0], i[1], {})),
         props,
-      )
+      );
     }
 
     renderRadioButton(key, internalValue, title, props) {
@@ -281,32 +283,32 @@ function main() {
         onChange: create => this.setState({
           [key]: create.target.value
         })
-      }
+      };
 
-      return e('div', null,
+      return e("div", null,
         title,
-        e('input', {
-          type: 'radio',
+        e("input", {
+          type: "radio",
           ...props,
           onFocus: create => create.target.blur()
         })
-      )
+      );
     }
 
     render() {
-      return e('div', null,
-        this.state.active && e('div', null, this.renderEnumChoices("mode", "Mode", [
+      return e("div", null,
+        this.state.active && e("div", null, this.renderEnumChoices("mode", "Mode", [
           ["TEXT", "Text Mode"],
           ["SVG", "SVG Mode"],
         ]),
 
-          this.state.mode == "TEXT" &&
+        this.state.mode == "TEXT" &&
           e("div", null,
 
-            e('div', null,
-              'Font: ',
-              e('input', {
-                type: 'file',
+            e("div", null,
+              "Font: ",
+              e("input", {
+                type: "file",
                 onChange: create => this.onFontFileChange().then(result => {
                   //result = normalizeLines(result);
                   let [fileName, res] = result;
@@ -322,34 +324,34 @@ function main() {
               })
             ),
 
-            this.state.fontFile != null && e('div', null, 'Loaded: ' + this.state.fontName),
-            this.state.fontFile != null && e('div', null,
+            this.state.fontFile != null && e("div", null, "Loaded: " + this.state.fontName),
+            this.state.fontFile != null && e("div", null,
               "Text: ",
-              e('textArea', {
+              e("textArea", {
                 style: {
-                  width: '88%'
+                  width: "88%"
                 },
-                type: 'text',
+                type: "text",
                 value: this.state.text,
                 onChange: create => this.setState({
                   text: create.target.value
                 })
               })
             ),
-            this.renderSlider('tolerance', 'Tolerance', { min: 0.001, max: 0.5, step: 0.001 }),
-            this.renderSlider('xOffs', 'X Offset', { min: -500, max: 500, step: 10 }),
-            this.renderSlider('yOffs', 'Y Offset', { min: -500, max: 500, step: 10 }),
-            this.renderSlider('fontSize', 'Font Size', { min: 10, max: 250, step: 1 }),
-            this.renderSlider('width', 'Wrap Width', { min: 100, max: 2000, step: 100 }),
-            this.renderSlider('letterSpacing', 'Extra Letter Spacing', { min: 0, max: 50, step: 1 }),
-            this.renderSlider('lineHeight', 'Line Height', { min: 0, max: 2, step: 0.005 }),
+            this.renderSlider("tolerance", "Tolerance", { min: 0.001, max: 0.5, step: 0.001 }),
+            this.renderSlider("xOffs", "X Offset", { min: -500, max: 500, step: 10 }),
+            this.renderSlider("yOffs", "Y Offset", { min: -500, max: 500, step: 10 }),
+            this.renderSlider("fontSize", "Font Size", { min: 10, max: 250, step: 1 }),
+            this.renderSlider("width", "Wrap Width", { min: 100, max: 2000, step: 100 }),
+            this.renderSlider("letterSpacing", "Extra Letter Spacing", { min: 0, max: 50, step: 1 }),
+            this.renderSlider("lineHeight", "Line Height", { min: 0, max: 2, step: 0.005 }),
           ),
-          this.state.mode == "SVG" &&
+        this.state.mode == "SVG" &&
           e("div", null,
-            e('div', null,
-              'SVG File: ',
-              e('input', {
-                type: 'file',
+            e("div", null,
+              "SVG File: ",
+              e("input", {
+                type: "file",
                 onChange: _ => this.onSvgFileChange().then(result => {
                   let [fileName, res] = result;
                   this.setState({
@@ -364,49 +366,49 @@ function main() {
               })
             ),
 
-            this.state.svgFile != null && e('div', null, 'Loaded: ' + this.state.svgName),
-            this.renderSlider('tolerance', 'Tolerance', { min: 0.001, max: 0.5, step: 0.001 }),
-            this.renderSlider('xOffs', 'X Offset', { min: -500, max: 500, step: 10 }),
-            this.renderSlider('yOffs', 'Y Offset', { min: -500, max: 500, step: 10 }),
+            this.state.svgFile != null && e("div", null, "Loaded: " + this.state.svgName),
+            this.renderSlider("tolerance", "Tolerance", { min: 0.001, max: 0.5, step: 0.001 }),
+            this.renderSlider("xOffs", "X Offset", { min: -500, max: 500, step: 10 }),
+            this.renderSlider("yOffs", "Y Offset", { min: -500, max: 500, step: 10 }),
             this.renderSlider("scale", "Scale", { min: 0.1, max: 10, step: 0.05 })
           ),
-          e('div', null, `Lines: ${this.mod.nlines}`),
-          e('button', {
-            style: {
-              float: 'left'
-            },
-            onClick: () => this.onCommit()
-          },
-            'Commit'
-          )
-        ),
-        e('button', {
+        e("div", null, `Lines: ${this.mod.nlines}`),
+        e("button", {
           style: {
-            backgroundColor: this.state.active ? 'lightblue' : null
+            float: "left"
+          },
+          onClick: () => this.onCommit()
+        },
+        "Commit"
+        )
+        ),
+        e("button", {
+          style: {
+            backgroundColor: this.state.active ? "lightblue" : null
           },
           onClick: this.onActivate.bind(this)
         },
-          'SVG Mod'
+        "SVG Mod"
         )
-      )
+      );
     }
   }
 
-  window.registerCustomSetting(SvgModComponent)
+  window.registerCustomSetting(SvgModComponent);
 }
 
 if (window.registerCustomSetting) {
-  main()
+  main();
 } else {
-  const prevCb = window.onCustomToolsApiReady
+  const prevCb = window.onCustomToolsApiReady;
   window.onCustomToolsApiReady = () => {
-    if (prevCb) prevCb()
-    main()
-  }
+    if (prevCb) prevCb();
+    main();
+  };
 }
 
 function applyScaleThenOffset(path, xOffs, yOffs, xScale, yScale) {
-  return path.map((e) => [e[0], ...e.slice(1).map((v, index) => (index % 2 === 0 ? xOffs + v * xScale : yOffs + v * yScale))])
+  return path.map((e) => [e[0], ...e.slice(1).map((v, index) => (index % 2 === 0 ? xOffs + v * xScale : yOffs + v * yScale))]);
 }
 
 function RaphaelPathToDescribedPath(path) {
@@ -414,36 +416,36 @@ function RaphaelPathToDescribedPath(path) {
   for (const e of path) {
     let newEntry;
     switch (e[0]) {
-      case "M":
-      case "L":
-        newEntry = {
-          code: e[0],
-          x: e[1],
-          y: e[2]
-        }
-        break;
-      case "C":
-        newEntry = {
-          code: e[0],
-          x1: e[1],
-          y1: e[2],
-          x2: e[3],
-          y2: e[4],
-          x: e[5],
-          y: e[6],
-        }
-        break;
-      case "Z":
-        newEntry = {
-          code: e[0],
-        }
-        break;
+    case "M":
+    case "L":
+      newEntry = {
+        code: e[0],
+        x: e[1],
+        y: e[2]
+      };
+      break;
+    case "C":
+      newEntry = {
+        code: e[0],
+        x1: e[1],
+        y1: e[2],
+        x2: e[3],
+        y2: e[4],
+        x: e[5],
+        y: e[6],
+      };
+      break;
+    case "Z":
+      newEntry = {
+        code: e[0],
+      };
+      break;
     }
 
-    newPath.push(newEntry)
+    newPath.push(newEntry);
   }
 
-  return newPath
+  return newPath;
 }
 
 function generatePolys(pathSections, opts = undefined) {
@@ -489,31 +491,31 @@ function generatePolys(pathSections, opts = undefined) {
   let prev = null;
   for (const cmd of pathSections) {
     switch (cmd.code) {
-      case 'M':
-        allLines.push(curLines = [
-          [cmd.x, cmd.y]
-        ]);
+    case "M":
+      allLines.push(curLines = [
+        [cmd.x, cmd.y]
+      ]);
       // intentional flow-through
-      case 'L':
-      case 'H':
-      case 'V':
-      case 'Z':
+    case "L":
+    case "H":
+    case "V":
+    case "Z":
+      add(cmd.x, cmd.y);
+      // if (cmd.code === 'Z') curLines.closed = true;
+      break;
+
+    case "C":
+      if (cmd.x1 == prev.x && cmd.x2 == cmd.x && cmd.y1 == prev.y && cmd.y2 == cmd.y)
         add(cmd.x, cmd.y);
-        // if (cmd.code === 'Z') curLines.closed = true;
-        break;
+      else {
+        sampleCubicBézier(prev.x, prev.y, cmd.x1, cmd.y1, cmd.x2, cmd.y2, cmd.x, cmd.y);
+        add(cmd.x, cmd.y);
+      }
 
-      case 'C':
-        if (cmd.x1 == prev.x && cmd.x2 == cmd.x && cmd.y1 == prev.y && cmd.y2 == cmd.y)
-          add(cmd.x, cmd.y);
-        else {
-          sampleCubicBézier(prev.x, prev.y, cmd.x1, cmd.y1, cmd.x2, cmd.y2, cmd.x, cmd.y);
-          add(cmd.x, cmd.y);
-        }
+      break;
 
-        break;
-
-      default:
-        console.error(`'${cmd.command}' is not supported`);
+    default:
+      console.error(`'${cmd.command}' is not supported`);
     }
 
     prev = cmd;
@@ -529,7 +531,7 @@ function* pathToLines(path, {
   yScale = -1,
   tolerance = 1
 } = {}) {
-  tolerance = tolerance == 0 ? 0.001 : tolerance
+  tolerance = tolerance == 0 ? 0.001 : tolerance;
 
   // Turns path into just cubic bezier curves and moves
   let curvePath = Raphael.path2curve(path);
@@ -540,7 +542,7 @@ function* pathToLines(path, {
 
   let polys = generatePolys(labledCurvePath, {
     tolerance: tolerance
-  })
+  });
 
   for (const poly of polys) {
     if (poly.length < 2) continue;
@@ -554,7 +556,7 @@ function* pathToLines(path, {
           poly[i][0],
           poly[i][1]
         ),
-      }
+      };
     }
   }
 }
@@ -578,9 +580,9 @@ function* textToLines({
 } = {}) {
   const {
     V2
-  } = window
+  } = window;
 
-  tolerance = tolerance == 0 ? 0.001 : tolerance
+  tolerance = tolerance == 0 ? 0.001 : tolerance;
 
   if (fontFile === null) return;
 
@@ -603,14 +605,14 @@ function* textToLines({
     offset[1] = yOffs + offset[1] * -scale;
     let path = glyph.data.path.toPathData(10);
 
-    if (glyph.data.name !== 'space') {
+    if (glyph.data.name !== "space") {
       yield* pathToLines(path, {
         xOffs: offset[0],
         yOffs: offset[1],
         xScale: scale,
         yScale: -scale,
         tolerance
-      })
+      });
     }
   }
 }
@@ -624,9 +626,9 @@ function* svgToLines({
 } = {}) {
   const {
     V2
-  } = window
+  } = window;
 
-  tolerance = tolerance == 0 ? 0.001 : tolerance
+  tolerance = tolerance == 0 ? 0.001 : tolerance;
 
   if (svgFile === null) return;
   let paths = Array.from(svgFile.getElementsByTagName("path"), path => path.getAttribute("d"));
@@ -640,7 +642,7 @@ function* svgToLines({
       xScale: scale,
       yScale: scale,
       tolerance
-    })
+    });
 
   }
 }
@@ -695,132 +697,132 @@ function* genLines({
 
 // npm: word-wrapper
 
-var newline = /\n/
-var newlineChar = '\n'
-var whitespace = /\s/
+var newline = /\n/;
+var newlineChar = "\n";
+var whitespace = /\s/;
 
 function wrap(text, opt) {
-  var lines = wordWrapLines(text, opt)
+  var lines = wordWrapLines(text, opt);
   return lines.map(function (line) {
-    return text.substring(line.start, line.end)
-  }).join('\n')
+    return text.substring(line.start, line.end);
+  }).join("\n");
 }
 
 function wordWrapLines(text, opt) {
-  opt = opt || {}
+  opt = opt || {};
 
   //zero width results in nothing visible
-  if (opt.width === 0 && opt.mode !== 'nowrap')
-    return []
+  if (opt.width === 0 && opt.mode !== "nowrap")
+    return [];
 
-  text = text || ''
-  var width = typeof opt.width === 'number' ? opt.width : Number.MAX_VALUE
-  var start = Math.max(0, opt.start || 0)
-  var end = typeof opt.end === 'number' ? opt.end : text.length
-  var mode = opt.mode
+  text = text || "";
+  var width = typeof opt.width === "number" ? opt.width : Number.MAX_VALUE;
+  var start = Math.max(0, opt.start || 0);
+  var end = typeof opt.end === "number" ? opt.end : text.length;
+  var mode = opt.mode;
 
-  var measure = opt.measure || monospace
-  if (mode === 'pre')
-    return pre(measure, text, start, end, width)
+  var measure = opt.measure || monospace;
+  if (mode === "pre")
+    return pre(measure, text, start, end, width);
   else
-    return greedy(measure, text, start, end, width, mode)
+    return greedy(measure, text, start, end, width, mode);
 }
 
 function idxOf(text, chr, start, end) {
-  var idx = text.indexOf(chr, start)
+  var idx = text.indexOf(chr, start);
   if (idx === -1 || idx > end)
-    return end
-  return idx
+    return end;
+  return idx;
 }
 
 function isWhitespace(chr) {
-  return whitespace.test(chr)
+  return whitespace.test(chr);
 }
 
 function pre(measure, text, start, end, width) {
-  var lines = []
-  var lineStart = start
+  var lines = [];
+  var lineStart = start;
   for (var i = start; i < end && i < text.length; i++) {
-    var chr = text.charAt(i)
-    var isNewline = newline.test(chr)
+    var chr = text.charAt(i);
+    var isNewline = newline.test(chr);
 
     //If we've reached a newline, then step down a line
     //Or if we've reached the EOF
     if (isNewline || i === end - 1) {
-      var lineEnd = isNewline ? i : i + 1
-      var measured = measure(text, lineStart, lineEnd, width)
-      lines.push(measured)
+      var lineEnd = isNewline ? i : i + 1;
+      var measured = measure(text, lineStart, lineEnd, width);
+      lines.push(measured);
 
-      lineStart = i + 1
+      lineStart = i + 1;
     }
   }
-  return lines
+  return lines;
 }
 
 function greedy(measure, text, start, end, width, mode) {
   //A greedy word wrapper based on LibGDX algorithm
   //https://github.com/libgdx/libgdx/blob/master/gdx/src/com/badlogic/gdx/graphics/g2d/BitmapFontCache.java
-  var lines = []
+  var lines = [];
 
-  var testWidth = width
+  var testWidth = width;
   //if 'nowrap' is specified, we only wrap on newline chars
-  if (mode === 'nowrap')
-    testWidth = Number.MAX_VALUE
+  if (mode === "nowrap")
+    testWidth = Number.MAX_VALUE;
 
   while (start < end && start < text.length) {
     //get next newline position
-    var newLine = idxOf(text, newlineChar, start, end)
+    var newLine = idxOf(text, newlineChar, start, end);
 
     //eat whitespace at start of line
     while (start < newLine) {
       if (!isWhitespace(text.charAt(start)))
-        break
-      start++
+        break;
+      start++;
     }
 
     //determine visible # of glyphs for the available width
-    var measured = measure(text, start, newLine, testWidth)
+    var measured = measure(text, start, newLine, testWidth);
 
-    var lineEnd = start + (measured.end - measured.start)
-    var nextStart = lineEnd + newlineChar.length
+    var lineEnd = start + (measured.end - measured.start);
+    var nextStart = lineEnd + newlineChar.length;
 
     //if we had to cut the line before the next newline...
     if (lineEnd < newLine) {
       //find char to break on
       while (lineEnd > start) {
         if (isWhitespace(text.charAt(lineEnd)))
-          break
-        lineEnd--
+          break;
+        lineEnd--;
       }
       if (lineEnd === start) {
-        if (nextStart > start + newlineChar.length) nextStart--
-        lineEnd = nextStart // If no characters to break, show all.
+        if (nextStart > start + newlineChar.length) nextStart--;
+        lineEnd = nextStart; // If no characters to break, show all.
       } else {
-        nextStart = lineEnd
+        nextStart = lineEnd;
         //eat whitespace at end of line
         while (lineEnd > start) {
           if (!isWhitespace(text.charAt(lineEnd - newlineChar.length)))
-            break
-          lineEnd--
+            break;
+          lineEnd--;
         }
       }
     }
     if (lineEnd >= start) {
-      var result = measure(text, start, lineEnd, testWidth)
-      lines.push(result)
+      var result = measure(text, start, lineEnd, testWidth);
+      lines.push(result);
     }
-    start = nextStart
+    start = nextStart;
   }
-  return lines
+  return lines;
 }
 
 //determines the visible number of glyphs within a given width
 function monospace(text, start, end, width) {
-  var glyphs = Math.min(width, end - start)
+  var glyphs = Math.min(width, end - start);
   return {
     start: start,
     end: start + glyphs
-  }
+  };
 }
 
 
@@ -830,10 +832,10 @@ function monospace(text, start, end, width) {
 var DEFAULT_LINE_HEIGHT = 1.175;
 
 function computeLayout(font, text, opt) {
-  if (!font) throw new TypeError('Must specify a font from Opentype.js');
+  if (!font) throw new TypeError("Must specify a font from Opentype.js");
   opt = opt || {};
-  text = text || '';
-  var align = opt.align || 'left';
+  text = text || "";
+  var align = opt.align || "left";
   var letterSpacing = opt.letterSpacing || 0;
   var width = opt.width || Infinity;
 
@@ -875,7 +877,7 @@ function computeLayout(font, text, opt) {
 
       // TODO:
       // Align center & right are off by a couple pixels, need to revisit.
-      if (j === start && align === 'right') {
+      if (j === start && align === "right") {
         x -= glyph.leftSideBearing;
       }
 
@@ -886,9 +888,9 @@ function computeLayout(font, text, opt) {
 
       // Align text
       var tx = 0;
-      if (align === 'center') {
+      if (align === "center") {
         tx = (preferredWidth - lineWidth) / 2;
-      } else if (align === 'right') {
+      } else if (align === "right") {
         tx = preferredWidth - lineWidth;
       }
 
@@ -913,8 +915,8 @@ function computeLayout(font, text, opt) {
 
   // Compute left & right values
   var left = 0;
-  if (align === 'center') left = (preferredWidth - maxLineWidth) / 2;
-  else if (align === 'right') left = preferredWidth - maxLineWidth;
+  if (align === "center") left = (preferredWidth - maxLineWidth) / 2;
+  else if (align === "right") left = preferredWidth - maxLineWidth;
   var right = Math.max(0, preferredWidth - maxLineWidth - left);
 
   return {
@@ -988,8 +990,8 @@ function computeMetrics(font, text, start, end, width, letterSpacing) {
 }
 
 function getGlyph(font, char) {
-  var isTab = char === '\t';
-  return font.charToGlyph(isTab ? ' ' : char);
+  var isTab = char === "\t";
+  return font.charToGlyph(isTab ? " " : char);
 }
 
 function getAdvance(glyph, char) {

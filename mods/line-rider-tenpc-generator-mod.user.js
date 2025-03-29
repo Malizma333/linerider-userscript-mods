@@ -21,54 +21,54 @@
 // ==/UserScript==
 
 const updateLines = (linesToRemove, linesToAdd, name) => ({
-  type: 'UPDATE_LINES',
+  type: "UPDATE_LINES",
   payload: { linesToRemove, linesToAdd },
   meta: { name }
-})
+});
 
-const addLines = (line) => updateLines(null, line, 'ADD_LINES')
+const addLines = (line) => updateLines(null, line, "ADD_LINES");
 
 const commitTrackChanges = () => ({
-  type: 'COMMIT_TRACK_CHANGES'
-})
+  type: "COMMIT_TRACK_CHANGES"
+});
 
 const revertTrackChanges = () => ({
-  type: 'REVERT_TRACK_CHANGES'
-})
+  type: "REVERT_TRACK_CHANGES"
+});
 
 const setEditScene = (scene) => ({
   type: "SET_RENDERER_SCENE",
   payload: { key: "edit", scene }
 });
 
-const getSimulatorCommittedTrack = state => state.simulator.committedEngine
-const getRiders = state => state.simulator.engine.engine.state.riders
-const getNumRiders = (state) => getRiders(state).length
-const sidebarOpen = (state) => state.views.Sidebar
+const getSimulatorCommittedTrack = state => state.simulator.committedEngine;
+const getRiders = state => state.simulator.engine.engine.state.riders;
+const getNumRiders = (state) => getRiders(state).length;
+const sidebarOpen = (state) => state.views.Sidebar;
 
 class TenPCMod {
   constructor(store, initState) {
-    this.store = store
-    this.state = initState
+    this.store = store;
+    this.state = initState;
 
-    this.changed = false
+    this.changed = false;
 
-    this.track = getSimulatorCommittedTrack(this.store.getState())
-    this.numRiders = getNumRiders(this.store.getState())
-    this.selectedRider = 1
+    this.track = getSimulatorCommittedTrack(this.store.getState());
+    this.numRiders = getNumRiders(this.store.getState());
+    this.selectedRider = 1;
 
     store.subscribeImmediate(() => {
-      this.onUpdate()
-    })
+      this.onUpdate();
+    });
   }
 
   commit() {
     if (this.changed) {
-      this.store.dispatch(commitTrackChanges())
-      this.store.dispatch(revertTrackChanges())
+      this.store.dispatch(commitTrackChanges());
+      this.store.dispatch(revertTrackChanges());
       this.store.dispatch(setEditScene(new Millions.Scene()));
-      this.changed = false
-      return true
+      this.changed = false;
+      return true;
     }
   }
 
@@ -76,43 +76,43 @@ class TenPCMod {
     if (this.changed) {
       this.store.dispatch(revertTrackChanges());
       this.store.dispatch(setEditScene(new Millions.Scene()));
-      this.changed = false
+      this.changed = false;
     }
   }
 
   onUpdate(nextState = this.state) {
-    let shouldUpdate = false
+    let shouldUpdate = false;
 
     if (!this.state.active && nextState.active) {
-      window.previewLinesInFastSelect = true
+      window.previewLinesInFastSelect = true;
     }
     if (this.state.active && !nextState.active) {
-      window.previewLinesInFastSelect = false
+      window.previewLinesInFastSelect = false;
     }
 
     if (this.state !== nextState) {
-      this.state = nextState
-      shouldUpdate = true
+      this.state = nextState;
+      shouldUpdate = true;
     }
 
     if (this.state.active) {
-      const track = getSimulatorCommittedTrack(this.store.getState())
+      const track = getSimulatorCommittedTrack(this.store.getState());
 
       if (this.track !== track) {
-        this.track = track
-        shouldUpdate = true
+        this.track = track;
+        shouldUpdate = true;
       }
 
-      const numRiders = getNumRiders(this.store.getState())
+      const numRiders = getNumRiders(this.store.getState());
 
       if (this.numRiders !== numRiders) {
-        this.numRiders = numRiders
-        shouldUpdate = true
+        this.numRiders = numRiders;
+        shouldUpdate = true;
       }
 
       if (this.selectedRider !== nextState.selectedRider) {
-        this.selectedRider = Math.min(this.numRiders, nextState.selectedRider)
-        shouldUpdate = true
+        this.selectedRider = Math.min(this.numRiders, nextState.selectedRider);
+        shouldUpdate = true;
       }
     }
 
@@ -174,13 +174,13 @@ function main() {
   const {
     React,
     store
-  } = window
+  } = window;
 
-  const create = React.createElement
+  const create = React.createElement;
 
   class TenPCModComponent extends React.Component {
     constructor(props) {
-      super(props)
+      super(props);
 
       this.state = {
         active: false,
@@ -189,23 +189,23 @@ function main() {
         rotation: 0,
         selectedRider: 1,
         riderCount: 1
-      }
+      };
 
-      this.mod = new TenPCMod(store, this.state)
+      this.mod = new TenPCMod(store, this.state);
 
       store.subscribe(() => {
         if (!this._mounted) return;
 
         if (sidebarOpen(window.store.getState())) {
-          this.mod.revert()
-          this.setState({ active: false })
+          this.mod.revert();
+          this.setState({ active: false });
         }
 
         if (this.state.riderCount != this.mod.numRiders) {
-          this.setState({ riderCount: this.mod.numRiders })
-          this.setState({ selectedRider: Math.min(this.state.riderCount, this.state.selectedRider) })
+          this.setState({ riderCount: this.mod.numRiders });
+          this.setState({ selectedRider: Math.min(this.state.riderCount, this.state.selectedRider) });
         }
-      })
+      });
     }
 
     componentDidMount() {
@@ -217,7 +217,7 @@ function main() {
     }
 
     componentWillUpdate(_, nextState) {
-      this.mod.onUpdate(nextState)
+      this.mod.onUpdate(nextState);
     }
 
     onActivate() {
@@ -230,9 +230,9 @@ function main() {
     }
 
     onCommit() {
-      const committed = this.mod.commit()
+      const committed = this.mod.commit();
       if (committed) {
-        this.setState({ active: false })
+        this.setState({ active: false });
       }
     }
 
@@ -241,12 +241,12 @@ function main() {
         ...props,
         checked: this.state[key],
         onChange: e => this.setState({ [key]: e.target.checked })
-      }
+      };
 
-      return create('div', null,
+      return create("div", null,
         title,
-        create('input', { type: 'checkbox', ...props })
-      )
+        create("input", { type: "checkbox", ...props })
+      );
     }
 
     renderSlider(key, title, props) {
@@ -254,51 +254,51 @@ function main() {
         ...props,
         value: this.state[key],
         onChange: create => this.setState({ [key]: parseFloat(create.target.value) })
-      }
+      };
 
-      return create('div', null,
+      return create("div", null,
         title,
-        create('input', { style: { width: '4em' }, type: 'number', ...props }),
-        create('input', { type: 'range', ...props, onFocus: create => create.target.blur() })
-      )
+        create("input", { style: { width: "4em" }, type: "number", ...props }),
+        create("input", { type: "range", ...props, onFocus: create => create.target.blur() })
+      );
     }
 
     render() {
-      return create('div', null,
-        this.state.active && create('div', null,
-          this.renderSlider('xSpeed', 'X Speed', { min: -99, max: 99, step: 1 }),
-          this.renderSlider('ySpeed', 'Y Speed', { min: -99, max: 99, step: 1 }),
-          this.renderSlider('rotation', 'Rotation', { min: 0, max: 360, step: 1 }),
-          this.state.riderCount > 1 && this.renderSlider('selectedRider', 'Rider', { min: 1, max: this.state.riderCount, step: 1 }),
-          create('button', { style: { float: 'left' }, onClick: () => this.onCommit() },
-            'Commit'
+      return create("div", null,
+        this.state.active && create("div", null,
+          this.renderSlider("xSpeed", "X Speed", { min: -99, max: 99, step: 1 }),
+          this.renderSlider("ySpeed", "Y Speed", { min: -99, max: 99, step: 1 }),
+          this.renderSlider("rotation", "Rotation", { min: 0, max: 360, step: 1 }),
+          this.state.riderCount > 1 && this.renderSlider("selectedRider", "Rider", { min: 1, max: this.state.riderCount, step: 1 }),
+          create("button", { style: { float: "left" }, onClick: () => this.onCommit() },
+            "Commit"
           )
         ),
 
-        create('button',
+        create("button",
           {
             style: {
-              backgroundColor: this.state.active ? 'lightblue' : null
+              backgroundColor: this.state.active ? "lightblue" : null
             },
             onClick: this.onActivate.bind(this)
           },
-          'TenPC Mod'
+          "TenPC Mod"
         )
-      )
+      );
     }
   }
 
-  window.registerCustomSetting(TenPCModComponent)
+  window.registerCustomSetting(TenPCModComponent);
 }
 
 if (window.registerCustomSetting) {
-  main()
+  main();
 } else {
-  const prevCb = window.onCustomToolsApiReady
+  const prevCb = window.onCustomToolsApiReady;
   window.onCustomToolsApiReady = () => {
-    if (prevCb) prevCb()
-    main()
-  }
+    if (prevCb) prevCb();
+    main();
+  };
 }
 
 // Based on LRA's implementation
@@ -362,7 +362,7 @@ function drawRider(targetRider) {
     genMillionsLine(targetRider[4], targetRider[5], color, 0.1, 1.05),
     genMillionsLine(targetRider[5], targetRider[6], color, 0.1, 1.06),
     genMillionsLine(targetRider[4], targetRider[8], color, 0.1, 1.08),
-  ]
+  ];
 }
 
 function genMillionsLine(p1, p2, color, thickness, zIndex) {

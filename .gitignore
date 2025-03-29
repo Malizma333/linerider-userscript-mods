@@ -1,5 +1,5 @@
 .vscode
-update_changelog.sh
+node_modules
 
 # Docs
 _site

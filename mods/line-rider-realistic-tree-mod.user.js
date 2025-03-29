@@ -78,17 +78,17 @@ class TreeMod {
         let lines = [];
 
         switch (this.state.genType) {
-          case 0:
-            lines = genTreeTypeA(this.state);
-            break;
-          case 1:
-            lines = genTreeTypeB(this.state);
-            break;
-          case 2:
-            lines = genTreeTypeC(this.state);
-            break;
-          default:
-            break;
+        case 0:
+          lines = genTreeTypeA(this.state);
+          break;
+        case 1:
+          lines = genTreeTypeB(this.state);
+          break;
+        case 2:
+          lines = genTreeTypeC(this.state);
+          break;
+        default:
+          break;
         }
 
         if (lines.length > 0) {
@@ -180,13 +180,13 @@ function main () {
     }
 
     renderSection (key, title) {
-      return e('div', null,
-        e('button',
-          { id: key, style: { background: 'none', border: 'none' }, onClick: () => this.setState({ [key]: !this.state[key] }) },
-          this.state[key] ? '▲' : '▼'
+      return e("div", null,
+        e("button",
+          { id: key, style: { background: "none", border: "none" }, onClick: () => this.setState({ [key]: !this.state[key] }) },
+          this.state[key] ? "▲" : "▼"
         ),
-        e('label', { for: key }, title)
-      )
+        e("label", { for: key }, title)
+      );
     }
 
     onActivate () {
@@ -208,11 +208,11 @@ function main () {
       if (t < 1 || t > 4) return;
 
       this.setState({ template: t });
-      const keys = ['clumpMax', 'clumpMin', 'levels', 'initalBranchLength',
-        'lengthFalloffFactor', 'lengthFalloffPower', 'growAmount', 'branchFactor',
-        'taperRate', 'dropAmount', 'sweepAmount', 'maxRadius', 'radiusFalloffRate',
-        'treeSteps', 'trunkLength', 'climbRate', 'trunkKink', 'twistRate'
-      ]
+      const keys = ["clumpMax", "clumpMin", "levels", "initalBranchLength",
+        "lengthFalloffFactor", "lengthFalloffPower", "growAmount", "branchFactor",
+        "taperRate", "dropAmount", "sweepAmount", "maxRadius", "radiusFalloffRate",
+        "treeSteps", "trunkLength", "climbRate", "trunkKink", "twistRate"
+      ];
 
       const templates = [
         [0.665, 0.565, 5, 1.23, 0.65, 0.65, 0.2, 10, 1.025, 0.02, 0, 0.145, 0.705, 11.55, 2.15, 0.37, -0.035, 2.9],
@@ -230,18 +230,18 @@ function main () {
       const epsilon = 1/32;
       return e("div", null,
         this.state.active && e("div", null,
-          e('select', { value: this.state.genType, onChange: (e) => this.setState({ genType: parseInt(e.target.value) }) },
-            e('option', { value: 0 }, 'Trapezoidal Skeleton'),
-            e('option', { value: 1 }, 'Stick Branches'),
-            e('option', { value: 2 }, 'Realistic Mesh')
+          e("select", { value: this.state.genType, onChange: (e) => this.setState({ genType: parseInt(e.target.value) }) },
+            e("option", { value: 0 }, "Trapezoidal Skeleton"),
+            e("option", { value: 1 }, "Stick Branches"),
+            e("option", { value: 2 }, "Realistic Mesh")
           ),
           this.state.genType === 0 && e("div", null,
-            this.renderSlider('baseWidth', 'Base Width', { min: 1, max: 100, step: epsilon }),
-            this.renderSlider('baseHeight', 'Base Height', { min: 1, max: 100, step: epsilon }),
-            this.renderSlider('maxDepthA', 'Max Depth', { min: 1, max: 10, step: 1 }),
-            this.renderSlider('heightScale', 'Height Scale', { min: epsilon, max: 1, step: epsilon }),
-            this.renderSlider('widthScale', 'Width Scale', { min: epsilon, max: 1, step: epsilon }),
-            this.renderSlider('angleScale', 'Angle Scale', { min: epsilon, max: 1, step: epsilon })
+            this.renderSlider("baseWidth", "Base Width", { min: 1, max: 100, step: epsilon }),
+            this.renderSlider("baseHeight", "Base Height", { min: 1, max: 100, step: epsilon }),
+            this.renderSlider("maxDepthA", "Max Depth", { min: 1, max: 10, step: 1 }),
+            this.renderSlider("heightScale", "Height Scale", { min: epsilon, max: 1, step: epsilon }),
+            this.renderSlider("widthScale", "Width Scale", { min: epsilon, max: 1, step: epsilon }),
+            this.renderSlider("angleScale", "Angle Scale", { min: epsilon, max: 1, step: epsilon })
           ),
           this.state.genType === 1 && e("div", null,
             this.renderSlider("minBranches", "Min Branches", { min: 0, max: 5, step: 1 }),
@@ -252,20 +252,20 @@ function main () {
             this.renderSlider("lineWidth", "Line Width", { min: epsilon, max: 3, step: epsilon }),
             this.renderSlider("orientation", "Orientation", { min: 0, max: 360, step: 1 }),
             this.renderSlider("seed", "Random Seed", { min: 0, max: 10000, step: 1 }),
-            e('select', { value: this.state.template, onChange: (e) => this.onLoadTemplate(parseInt(e.target.value)) },
-              e('option', { value: 0 }, ''),
-              e('option', { value: 1 }, 'Eucalyptus Tree'),
-              e('option', { value: 2 }, 'Oak Tree'),
-              e('option', { value: 3 }, 'Birch Tree'),
-              e('option', { value: 4 }, 'Citrus Tree'),
+            e("select", { value: this.state.template, onChange: (e) => this.onLoadTemplate(parseInt(e.target.value)) },
+              e("option", { value: 0 }, ""),
+              e("option", { value: 1 }, "Eucalyptus Tree"),
+              e("option", { value: 2 }, "Oak Tree"),
+              e("option", { value: 3 }, "Birch Tree"),
+              e("option", { value: 4 }, "Citrus Tree"),
             ),
-            this.renderSection('twigGrowth', 'Twig Growth'),
-            this.state.twigGrowth && e('div', null,
+            this.renderSection("twigGrowth", "Twig Growth"),
+            this.state.twigGrowth && e("div", null,
               this.renderSlider("clumpMin", "Minimum Twig Clumping", { min: 0, max: this.state.clumpMax, step: epsilon }),
               this.renderSlider("clumpMax", "Maximum Twig Clumping", { min: this.state.clumpMin, max: 1, step: epsilon }),
             ),
-            this.renderSection('branchGrowth', 'Branch Growth'),
-            this.state.branchGrowth && e('div', null,
+            this.renderSection("branchGrowth", "Branch Growth"),
+            this.state.branchGrowth && e("div", null,
               this.renderSlider("levels", "Branching Level", { min: 0, max: 7, step: 1 }),
               this.renderSlider("initalBranchLength", "First Branch Length", { min: epsilon, max: 2.5, step: epsilon }),
               this.renderSlider("lengthFalloffFactor", "Other Branch Lengths", { min: 0.5, max: 1, step: epsilon }),
@@ -276,8 +276,8 @@ function main () {
               this.renderSlider("dropAmount", "Gravity Effect", { min: -1, max: 1, step: epsilon }),
               this.renderSlider("sweepAmount", "Wind Effect", { min: -1, max: 1, step: epsilon }),
             ),
-            this.renderSection('trunkGrowth', 'Trunk Growth'),
-            this.state.trunkGrowth && e('div', null,
+            this.renderSection("trunkGrowth", "Trunk Growth"),
+            this.state.trunkGrowth && e("div", null,
               this.renderSlider("scale", "Core Height", { min: epsilon, max: 30, step: epsilon }),
               this.renderSlider("maxRadius", "Trunk Thickness", { min: epsilon, max: 1, step: epsilon }),
               this.renderSlider("radiusFalloffRate", "Branch Thickness", { min: 0.5, max: 1, step: epsilon }),
@@ -295,7 +295,7 @@ function main () {
             this.treeMod.onUpdate(this.state, true);
             this.setState({ seed: Math.floor(Math.random() * 1000) });
           }},
-            "Refresh"
+          "Refresh"
           )
         ),
         e("button",
@@ -381,7 +381,7 @@ function genTreeTypeA ({ baseWidth, baseHeight, maxDepthA, widthScale, heightSca
 
       if (shouldBranch) {
         const side1 = Math.random() > 0.5;
-        const sign = (side1 ? 1 : -1)
+        const sign = (side1 ? 1 : -1);
         const target = { p1: side1 ? p2 : p1, p2: side1 ? p3 : p4 };
         const percent = Math.random() * 0.25 + 0.5;
         const perp = Math.atan2(target.p2.y - target.p1.y, target.p2.x - target.p1.x);
@@ -417,12 +417,12 @@ function getSecondBase(origin, dir, dist, width) {
   const p1 = {
     x: origin.x + dist * Math.cos(dir) + width / 2 * Math.cos(dir - Math.PI / 2),
     y: origin.y + dist * Math.sin(dir) + width / 2 * Math.sin(dir - Math.PI / 2),
-  }
+  };
 
   const p2 = {
     x: origin.x + dist * Math.cos(dir) + width / 2 * Math.cos(dir + Math.PI / 2),
     y: origin.y + dist * Math.sin(dir) + width / 2 * Math.sin(dir + Math.PI / 2),
-  }
+  };
 
   return { p1, p2 };
 }
@@ -467,8 +467,8 @@ function genTreeTypeC (state) {
 
   if (lineWidth <= 0) return;
 
-  const projectedX = (x, z) => camPos.x + scale * (x * Math.cos(rotation) + z * Math.sin(rotation))
-  const projectedY = (y) => -camPos.y - 4 * scale + scale * y
+  const projectedX = (x, z) => camPos.x + scale * (x * Math.cos(rotation) + z * Math.sin(rotation));
+  const projectedY = (y) => -camPos.y - 4 * scale + scale * y;
 
   let tree;
   try {
@@ -490,7 +490,7 @@ function genTreeTypeC (state) {
       [projectedX(vertices[face[0]][0], vertices[face[0]][2]), -projectedY(vertices[face[0]][1])],
       [projectedX(vertices[face[1]][0], vertices[face[1]][2]), -projectedY(vertices[face[1]][1])],
       [projectedX(vertices[face[2]][0], vertices[face[2]][2]), -projectedY(vertices[face[2]][1])]
-    ]
+    ];
     for (let i = 0; i < 3; i++) {
       let j = (i + 1) % 3;
       if (!seenPairs.has(face[i] * vertices.length + face[j])) {

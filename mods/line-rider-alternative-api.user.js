@@ -23,178 +23,178 @@
 // jshint esversion: 6
 
 const setTool = (tool) => ({
-  type: 'SET_TOOL',
+  type: "SET_TOOL",
   payload: tool
-})
+});
 
-const getActiveTool = state => state.selectedTool
-const getWindowFocused = state => !!state.views.Main
-const getPlayerRunning = state => state.player.running
+const getActiveTool = state => state.selectedTool;
+const getWindowFocused = state => !!state.views.Main;
+const getPlayerRunning = state => state.player.running;
 
 function main () {
-  window.V2 = window.V2 || window.store.getState().simulator.engine.engine.state.startPoint.constructor
+  window.V2 = window.V2 || window.store.getState().simulator.engine.engine.state.startPoint.constructor;
 
   const {
     React,
     ReactDOM,
     store
-  } = window
+  } = window;
 
-  const e = React.createElement
-  let playerRunning = getPlayerRunning(store.getState())
-  let windowFocused = getWindowFocused(store.getState())
+  const e = React.createElement;
+  let playerRunning = getPlayerRunning(store.getState());
+  let windowFocused = getWindowFocused(store.getState());
 
   const settingsContainerStyle = {
-    position: 'fixed',
-    background: '#ffffffbb',
-    overflow: 'hidden',
+    position: "fixed",
+    background: "#ffffffbb",
+    overflow: "hidden",
     opacity: 0,
-    pointerEvents: 'none',
-    transition: 'opacity 225ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
-    bottom: '70px',
-    right: '8px',
-    height: '35vh',
-    borderRadius: '10px'
-  }
+    pointerEvents: "none",
+    transition: "opacity 225ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
+    bottom: "70px",
+    right: "8px",
+    height: "35vh",
+    borderRadius: "10px"
+  };
 
   const minifyButtonStyle = {
-    height: '100%',
-    aspectRatio: '1/1',
-    background: 'none',
-    borderRadius: '100%',
-    alignItems: 'center',
-    display: 'flex'
-  }
+    height: "100%",
+    aspectRatio: "1/1",
+    background: "none",
+    borderRadius: "100%",
+    alignItems: "center",
+    display: "flex"
+  };
 
   const expandButtonStyle = {
-    visibility: 'hidden',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'fixed',
-    bottom: '70px',
-    right: '8px',
-    fontSize: 'xx-large',
-    aspectRatio: '1/1',
-    borderRadius: '100%'
-  }
+    visibility: "hidden",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    position: "fixed",
+    bottom: "70px",
+    right: "8px",
+    fontSize: "xx-large",
+    aspectRatio: "1/1",
+    borderRadius: "100%"
+  };
 
   const rootStyle = {
-    height: '100%',
-    overflowY: 'scroll',
-    display: 'flex',
-    flexDirection: 'column-reverse',
-    textAlign: 'right',
-  }
+    height: "100%",
+    overflowY: "scroll",
+    display: "flex",
+    flexDirection: "column-reverse",
+    textAlign: "right",
+  };
 
   class CustomSettingsContainer extends React.Component {
     constructor () {
-      super()
+      super();
 
       this.state = {
         customSettings: [],
         customTools: {},
-        searchTerm: '',
+        searchTerm: "",
         activeTool: getActiveTool(store.getState())
-      }
+      };
 
       store.subscribe(() => {
-        const activeTool = getActiveTool(store.getState())
+        const activeTool = getActiveTool(store.getState());
         if (this.state.activeTool !== activeTool) {
-          let activeCustomTool = this.state.customTools[this.state.activeTool]
+          let activeCustomTool = this.state.customTools[this.state.activeTool];
           if (activeCustomTool && activeCustomTool.onDetach) {
-            activeCustomTool.onDetach()
+            activeCustomTool.onDetach();
           }
-          this.setState({ activeTool })
+          this.setState({ activeTool });
         }
-      })
+      });
     }
 
     componentDidMount () {
-      let containerAssigned = false
+      let containerAssigned = false;
 
       window.registerCustomSetting = (component) => {
-        console.info('Registering custom setting', component.name)
+        console.info("Registering custom setting", component.name);
         this.setState((prevState) => {
           const customSettings = [...prevState.customSettings, component];
           customSettings.sort(function (modA, modB) {
-            const modAName = modA.name.toUpperCase()
-            const modBName = modB.name.toUpperCase()
-            return -((modAName < modBName) ? -1 : (modAName > modBName) ? 1 : 0)
+            const modAName = modA.name.toUpperCase();
+            const modBName = modB.name.toUpperCase();
+            return -((modAName < modBName) ? -1 : (modAName > modBName) ? 1 : 0);
           });
-          return { customSettings }
-        })
+          return { customSettings };
+        });
 
         if (!containerAssigned) {
-          containerAssigned = true
-          Object.assign(settingsContainer.style, settingsContainerStyle)
-          Object.assign(expandButton.style, expandButtonStyle)
+          containerAssigned = true;
+          Object.assign(settingsContainer.style, settingsContainerStyle);
+          Object.assign(expandButton.style, expandButtonStyle);
         }
-      }
+      };
 
       window.registerCustomTool = (toolName, tool, component, onDetach) => {
-        console.info('Registering custom tool', toolName)
+        console.info("Registering custom tool", toolName);
 
-        window.Tools[toolName] = tool
+        window.Tools[toolName] = tool;
 
         this.setState((prevState) => ({
           customTools: {
             ...prevState.customTools,
             [toolName]: { component, onDetach }
           }
-        }))
+        }));
 
         if (onDetach) {
-          this.customToolsDestructors[toolName] = onDetach
+          this.customToolsDestructors[toolName] = onDetach;
         }
-      }
+      };
 
-      if (typeof window.onCustomToolsApiReady === 'function') {
-        window.onCustomToolsApiReady()
+      if (typeof window.onCustomToolsApiReady === "function") {
+        window.onCustomToolsApiReady();
       }
     }
 
     render () {
       return this.state.customSettings.length > 0 && e(
-        'div',
-        { style: { display: 'flex', height: '100%', flexDirection: 'column' } },
+        "div",
+        { style: { display: "flex", height: "100%", flexDirection: "column" } },
         e(
-          'div',
-          { style: { display: 'flex', flexDirection: 'row', alignItems: 'center' } },
+          "div",
+          { style: { display: "flex", flexDirection: "row", alignItems: "center" } },
           e(
-            'button',
+            "button",
             {
               style: minifyButtonStyle,
-              onClick: () => { settingsContainer.style.visibility = 'hidden'; expandButton.style.visibility = 'visible' }
+              onClick: () => { settingsContainer.style.visibility = "hidden"; expandButton.style.visibility = "visible"; }
             },
-            '-'
+            "-"
           ),
           e(
-            'input',
+            "input",
             {
-              style: { width: '100%', border: 'none', background: 'none', marginLeft: '1em' },
-              placeholder: 'Search...',
+              style: { width: "100%", border: "none", background: "none", marginLeft: "1em" },
+              placeholder: "Search...",
               value: this.state.searchTerm,
               onChange: (e) => this.setState({ searchTerm: e.target.value })
             }
           )
         ),
         e(
-          'div',
+          "div",
           { style: rootStyle },
           this.state.customSettings.filter(
             (mod) => mod.name.toUpperCase().includes(this.state.searchTerm.toUpperCase())
           ).map((mod) => e(mod)),
           ...Object.keys(this.state.customTools).filter(toolName => toolName.toUpperCase().includes(this.state.searchTerm.toUpperCase())).map(toolName => {
             return e(
-              'div',
+              "div",
               null,
               this.state.activeTool === toolName && e(this.state.customTools[this.state.activeTool].component),
-              e('button',
+              e("button",
                 {
                   key: toolName,
                   style: {
-                    backgroundColor: this.state.activeTool === toolName ? 'lightblue' : null
+                    backgroundColor: this.state.activeTool === toolName ? "lightblue" : null
                   },
                   onClick: () => store.dispatch(setTool(toolName))
                 },
@@ -203,42 +203,42 @@ function main () {
             );
           })
         )
-      )
+      );
     }
   }
 
-  const expandButton = document.createElement('button')
-  expandButton.innerHTML = '↖'
-  expandButton.title = 'Show ModAPI'
-  expandButton.onclick = () => { settingsContainer.style.visibility = 'visible'; expandButton.style.visibility = 'hidden' }
-  document.getElementById('content').appendChild(expandButton)
+  const expandButton = document.createElement("button");
+  expandButton.innerHTML = "↖";
+  expandButton.title = "Show ModAPI";
+  expandButton.onclick = () => { settingsContainer.style.visibility = "visible"; expandButton.style.visibility = "hidden"; };
+  document.getElementById("content").appendChild(expandButton);
 
-  const settingsContainer = document.createElement('div')
+  const settingsContainer = document.createElement("div");
 
-  document.getElementById('content').appendChild(settingsContainer)
+  document.getElementById("content").appendChild(settingsContainer);
 
   ReactDOM.render(
     e(CustomSettingsContainer),
     settingsContainer
-  )
+  );
 
   store.subscribe(() => {
-    playerRunning = getPlayerRunning(store.getState())
-    windowFocused = getWindowFocused(store.getState())
-    const active = !playerRunning && windowFocused
-    settingsContainer.style.opacity = active ? 1 : 0
-    settingsContainer.style.pointerEvents = active ? null : 'none'
-    expandButton.style.opacity = active ? 1 : 0
-    expandButton.style.pointerEvents = active ? null : 'none'
-  })
+    playerRunning = getPlayerRunning(store.getState());
+    windowFocused = getWindowFocused(store.getState());
+    const active = !playerRunning && windowFocused;
+    settingsContainer.style.opacity = active ? 1 : 0;
+    settingsContainer.style.pointerEvents = active ? null : "none";
+    expandButton.style.opacity = active ? 1 : 0;
+    expandButton.style.pointerEvents = active ? null : "none";
+  });
 }
 
 if (window.store) {
-  main()
+  main();
 } else {
-  const prevInit = window.onAppReady
+  const prevInit = window.onAppReady;
   window.onAppReady = () => {
-    if (prevInit) prevInit()
-    main()
-  }
+    if (prevInit) prevInit();
+    main();
+  };
 }

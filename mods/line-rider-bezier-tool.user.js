@@ -26,8 +26,8 @@
 // jshint esversion: 6
 
 function parseFloatOrDefault (string, defaultValue = 0) {
-  const x = parseFloat(string)
-  return isNaN(x) ? defaultValue : x
+  const x = parseFloat(string);
+  return isNaN(x) ? defaultValue : x;
 }
 
 const bezier = window.adaptiveBezierCurve;
@@ -184,43 +184,43 @@ class EditState extends State {
     let nextPos = new V2(this.startPoint).add(p);
 
     switch (this.activePoint) {
-      case "p1":
-      case "p2":
-        if (pointSnap) {
-          nextPos = getPointSnapPos(nextPos, s, pendingLines, null, true);
-        }
-        break;
-      case "c1":
-        if (angleLock && this.p1.vec) {
-          nextPos = getAngleLockPos(nextPos, this.p1, this.p1.vec);
-        }
-        break;
-      case "c2":
-        if (angleLock && this.p2.vec) {
-          nextPos = getAngleLockPos(nextPos, this.p2, this.p2.vec);
-        }
-        break;
+    case "p1":
+    case "p2":
+      if (pointSnap) {
+        nextPos = getPointSnapPos(nextPos, s, pendingLines, null, true);
+      }
+      break;
+    case "c1":
+      if (angleLock && this.p1.vec) {
+        nextPos = getAngleLockPos(nextPos, this.p1, this.p1.vec);
+      }
+      break;
+    case "c2":
+      if (angleLock && this.p2.vec) {
+        nextPos = getAngleLockPos(nextPos, this.p2, this.p2.vec);
+      }
+      break;
     }
 
     switch (this.activePoint) {
-      case "p1": {
-        const delta = new V2(nextPos).sub(nextState.p1);
-        nextState.p1 = nextPos;
-        nextState.c1 = delta.add(nextState.c1);
-        break;
-      }
-      case "p2": {
-        const delta = new V2(nextPos).sub(nextState.p2);
-        nextState.p2 = nextPos;
-        nextState.c2 = delta.add(nextState.c2);
-        break;
-      }
-      case "c1":
-        nextState.c1 = nextPos;
-        break;
-      case "c2":
-        nextState.c2 = nextPos;
-        break;
+    case "p1": {
+      const delta = new V2(nextPos).sub(nextState.p1);
+      nextState.p1 = nextPos;
+      nextState.c1 = delta.add(nextState.c1);
+      break;
+    }
+    case "p2": {
+      const delta = new V2(nextPos).sub(nextState.p2);
+      nextState.p2 = nextPos;
+      nextState.c2 = delta.add(nextState.c2);
+      break;
+    }
+    case "c1":
+      nextState.c1 = nextPos;
+      break;
+    case "c2":
+      nextState.c2 = nextPos;
+      break;
     }
     return nextState;
   }
@@ -467,12 +467,12 @@ function main() {
     constructor(store) {
       super(store);
 
-      this.flipped = window.bezierToolFlipped || false
-      Object.defineProperty(window, 'bezierToolFlipped', {
+      this.flipped = window.bezierToolFlipped || false;
+      Object.defineProperty(window, "bezierToolFlipped", {
         configurable: true,
         get: () => this.flipped,
         set: f => {
-          this.flipped = f
+          this.flipped = f;
 
           const state = getBezierToolState(this.getState());
 
@@ -481,14 +481,14 @@ function main() {
             this.addCurve(state);
           }
         }
-      })
+      });
 
-      this.radius = window.bezierToolRadius || 0
-      Object.defineProperty(window, 'bezierToolRadius', {
+      this.radius = window.bezierToolRadius || 0;
+      Object.defineProperty(window, "bezierToolRadius", {
         configurable: true,
         get: () => this.radius,
         set: r => {
-          this.radius = r
+          this.radius = r;
 
           const state = getBezierToolState(this.getState());
 
@@ -497,14 +497,14 @@ function main() {
             this.addCurve(state);
           }
         }
-      })
+      });
 
-      this.scnWidth = window.bezierToolWidth || 1
-      Object.defineProperty(window, 'bezierToolWidth', {
+      this.scnWidth = window.bezierToolWidth || 1;
+      Object.defineProperty(window, "bezierToolWidth", {
         configurable: true,
         get: () => this.scnWidth,
         set: r => {
-          this.scnWidth = r
+          this.scnWidth = r;
 
           const state = getBezierToolState(this.getState());
 
@@ -513,7 +513,7 @@ function main() {
             this.addCurve(state);
           }
         }
-      })
+      });
 
       this.dispatch(setBezierToolState(new InitState()));
     }
@@ -609,7 +609,7 @@ function main() {
 
       const lines = [];
       let prevPoint = points.shift();
-      let prevNorm = V2.from(s.c1.x - s.p1.x, s.c1.y - s.p1.y).rotCW().norm().mul(this.radius)
+      let prevNorm = V2.from(s.c1.x - s.p1.x, s.c1.y - s.p1.y).rotCW().norm().mul(this.radius);
       const type = getSelectedLineType(this.getState());
       for (let p of points) {
         if (this.radius === 0) {
@@ -623,7 +623,7 @@ function main() {
             type
           });
         } else {
-          const norm = V2.from(p[0] - prevPoint[0], p[1] - prevPoint[1]).rotCW().norm().mul(this.radius)
+          const norm = V2.from(p[0] - prevPoint[0], p[1] - prevPoint[1]).rotCW().norm().mul(this.radius);
 
           lines.push({
             flipped: this.flipped,
@@ -643,7 +643,7 @@ function main() {
             type
           });
 
-          prevNorm = norm
+          prevNorm = norm;
         }
         prevPoint = p;
       }
@@ -673,9 +673,9 @@ function main() {
         flipped: false
       };
 
-      window.bezierToolRadius = 0
-      window.bezierToolWidth = 1
-      window.bezierToolFlipped = false
+      window.bezierToolRadius = 0;
+      window.bezierToolWidth = 1;
+      window.bezierToolFlipped = false;
 
       store.subscribe(() => {
         if (!this._mounted) return;
@@ -687,7 +687,7 @@ function main() {
         }
       });
     }
-    
+
     componentDidMount() {
       this._mounted = true;
     }
@@ -710,35 +710,35 @@ function main() {
     render() {
       const onRadiusChange = e => {
         const radius = parseFloatOrDefault(e.target.value);
-        this.setState({ radius })
-        window.bezierToolRadius = radius
-      }
+        this.setState({ radius });
+        window.bezierToolRadius = radius;
+      };
       const onSceneryWidthChange = e => {
         const scnWidth = parseFloatOrDefault(e.target.value);
-        this.setState({ scnWidth })
-        window.bezierToolWidth = scnWidth 
-      }
+        this.setState({ scnWidth });
+        window.bezierToolWidth = scnWidth;
+      };
       const onFlippedChange = () => {
-        const flipped = !this.state.flipped
-        this.setState({flipped})
-        window.bezierToolFlipped = flipped
-      }
+        const flipped = !this.state.flipped;
+        this.setState({flipped});
+        window.bezierToolFlipped = flipped;
+      };
       return e("div", null, [
         "Bezier Tool",
         e("div", null, [
-          e('label', null,
-            'Flip',
-            e('input', { type: 'checkbox', checked: this.state.flipped, onClick: onFlippedChange })
+          e("label", null,
+            "Flip",
+            e("input", { type: "checkbox", checked: this.state.flipped, onClick: onFlippedChange })
           ),
-          e('div', null,
-            'Radius',
-            e('input', { style: { width: '3em' }, type: 'number', onChange: onRadiusChange, min: 0, value: this.state.radius }),
-            e('input', { type: 'range', onChange: onRadiusChange, onFocus: e => e.target.blur(), min: 0, max: 20, step: 0.1, value: this.state.radius })
+          e("div", null,
+            "Radius",
+            e("input", { style: { width: "3em" }, type: "number", onChange: onRadiusChange, min: 0, value: this.state.radius }),
+            e("input", { type: "range", onChange: onRadiusChange, onFocus: e => e.target.blur(), min: 0, max: 20, step: 0.1, value: this.state.radius })
           ),
-          e('div', null,
-            'Scenery Width',
-            e('input', { style: { width: '3em' }, type: 'number', onChange: onSceneryWidthChange, min: 0.01, value: this.state.scnWidth }),
-            e('input', { type: 'range', onChange: onSceneryWidthChange, onFocus: e => e.target.blur(), min: 0.01, max: 20, step: 0.1, value: this.state.scnWidth })
+          e("div", null,
+            "Scenery Width",
+            e("input", { style: { width: "3em" }, type: "number", onChange: onSceneryWidthChange, min: 0.01, value: this.state.scnWidth }),
+            e("input", { type: "range", onChange: onSceneryWidthChange, onFocus: e => e.target.blur(), min: 0.01, max: 20, step: 0.1, value: this.state.scnWidth })
           ),
           e(
             "button",

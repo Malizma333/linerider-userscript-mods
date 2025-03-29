@@ -103,7 +103,7 @@ function main () {
         roll: 0,
         scale: 1,
         file: null,
-        fileName: '',
+        fileName: "",
         enableFill: false,
       };
 
@@ -129,17 +129,17 @@ function main () {
     }
 
     renderCheckbox (key, title = null) {
-      if (!title) title = key
+      if (!title) title = key;
 
       const props = {
         id: key,
         checked: this.state[key],
         onChange: e => this.setState({ [key]: e.target.checked })
-      }
-      return e('div', null,
-        e('label', { style: { width: '4em' }, for: key }, title),
-        e('input', { style: { marginLeft: '.5em' }, type: 'checkbox', ...props })
-      )
+      };
+      return e("div", null,
+        e("label", { style: { width: "4em" }, for: key }, title),
+        e("input", { style: { marginLeft: ".5em" }, type: "checkbox", ...props })
+      );
     }
 
     onActivate () {
@@ -164,7 +164,7 @@ function main () {
         fileReader.fileName = event.target.files[0].name;
         fileReader.onloadend = (e) => {
           resolve([fileReader.fileName, fileReader.result]);
-        }
+        };
         fileReader.readAsArrayBuffer(file);
       });
     }
@@ -175,23 +175,23 @@ function main () {
         this.state.active && e(
           "div", null,
           "Only supports .stl",
-          e('input', {
-            type: 'file',
+          e("input", {
+            type: "file",
             onChange: e => this.onStlFileChange().then(result => {
-                let [fileName, file] = result;
-                this.setState({ file, fileName });
-                console.log(`Loaded ${fileName} successfully`);
+              let [fileName, file] = result;
+              this.setState({ file, fileName });
+              console.log(`Loaded ${fileName} successfully`);
             }).catch(err => {
-                console.log("Error when parsing: Invalid file");
-                console.log(err.message);
+              console.log("Error when parsing: Invalid file");
+              console.log(err.message);
             })
           }),
           `Currently loaded: ${this.state.fileName}`,
-          this.renderSlider('yaw', 'Yaw', {min: 0, max: 360, step: 1}),
-          this.renderSlider('pitch', 'Pitch', {min: 0, max: 360, step: 1}),
-          this.renderSlider('roll', 'Roll', {min: 0, max: 360, step: 1}),
-          this.renderSlider('scale', 'Scale Power', {min: 0, max: 3, step: 1}),
-          this.renderCheckbox('enableFill', 'Enable Fill'),
+          this.renderSlider("yaw", "Yaw", {min: 0, max: 360, step: 1}),
+          this.renderSlider("pitch", "Pitch", {min: 0, max: 360, step: 1}),
+          this.renderSlider("roll", "Roll", {min: 0, max: 360, step: 1}),
+          this.renderSlider("scale", "Scale Power", {min: 0, max: 3, step: 1}),
+          this.renderCheckbox("enableFill", "Enable Fill"),
           e("button", { style: { float: "left" }, onClick: () => this.onCommit() },
             "Commit"
           ),
@@ -236,7 +236,7 @@ function createStl (state) {
     Math.sin(state.pitch * Math.PI / 180),
     Math.cos(state.roll * Math.PI / 180),
     Math.sin(state.roll * Math.PI / 180)
-  ]
+  ];
   const rotMatrix = [
     trig[2] * trig[4],
     trig[1] * trig[3] * trig[4] - trig[0] * trig[5],
@@ -244,14 +244,14 @@ function createStl (state) {
     trig[2] * trig[5],
     trig[1] * trig[3] * trig[5] + trig[0] * trig[4],
     trig[0] * trig[3] * trig[5] - trig[1] * trig[4],
-  ]
+  ];
 
   const transformedPoint = (x, y, z) => {
     return {
       x: camPos.x + Math.pow(10, state.scale) * (x * rotMatrix[0] + y * rotMatrix[1] + z * rotMatrix[2]),
       y: camPos.y + Math.pow(10, state.scale) * (x * rotMatrix[3] + y * rotMatrix[4] + z * rotMatrix[5]),
-    }
-  }
+    };
+  };
 
   const dv = new DataView(state.file.slice(80));
   const numTriangles = dv.getUint32(0, true);
@@ -263,7 +263,7 @@ function createStl (state) {
       transformedPoint(dv.getFloat32(triangleOffset + 7 * 4, true), dv.getFloat32(triangleOffset + 8 * 4, true), dv.getFloat32(triangleOffset + 9 * 4, true)),
       transformedPoint(dv.getFloat32(triangleOffset + 10 * 4, true), dv.getFloat32(triangleOffset + 11 * 4, true), dv.getFloat32(triangleOffset + 12 * 4, true))
     ];
-    
+
     for (let j = 0; j < 3; j++) {
       lineArray.push({ x1: triangle[j].x, y1: triangle[j].y, x2: triangle[(j + 1) % 3].x, y2: triangle[(j + 1) % 3].y, type: 2 });
     }
