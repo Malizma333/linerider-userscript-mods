@@ -11,6 +11,10 @@ permalink: /changelog/
   }
 </style>
 
+### 2025-03-29
+#### More Controls Mod
+- Added next frame lifelock checkbox
+
 ### 2025-03-05
 #### Command Editor Mod
 - Updated user interface design
