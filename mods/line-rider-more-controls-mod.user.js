@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Provides a menu for viewing and editing specific track data
-// @version      1.3.0
+// @version      1.3.1
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -29,6 +29,7 @@ const getPlayerRunning = state => state.player.running
 const getEditorCamPos = state => state.camera.editorPosition
 const getEditorCamZoom = state => state.camera.editorZoom
 const getStopAtEnd = state => state.player.stopAtEnd
+const getNextFrameLifelock = state => state.nextFrameLifelock
 const getPlayerIndex = state => state.player.index
 const getPlayerMaxIndex = state => state.player.maxIndex
 const getRiders = state => state.simulator.engine.engine.state.riders
@@ -55,6 +56,7 @@ function main () {
         active: false,
         editorCam: [0, 0],
         stopEnd: false,
+        nextFrameLifelock: false,
         index: 0,
         maxIndex: 0,
         riderPos: [0, 0],
@@ -88,6 +90,7 @@ function main () {
 
       this.setState({ editorCam: [editorCamState.x, editorCamState.y] })
       this.setState({ stopAtEnd: getStopAtEnd(state) })
+      this.setState({ nextFrameLifelock: getNextFrameLifelock(state) })
       this.setState({ index: getPlayerIndex(state) })
       this.setState({ maxIndex: getPlayerMaxIndex(state) })
       this.setState({ selectedLines: getNumSelectedLines(state) })
@@ -130,6 +133,11 @@ function main () {
     onToggleStopEnd (parent, stopAtEnd) {
       store.dispatch({ type: 'SET_PLAYER_STOP_AT_END', payload: stopAtEnd })
       parent.setState({ stopAtEnd })
+    }
+
+    onToggleNextFrameLifelock (parent) {
+      store.dispatch({ type: "TOGGLE_NEXT_FRAME_LIFELOCK" })
+      parent.setState({ nextFrameLifelock: !parent.state.nextFrameLifelock })
     }
 
     onSetIndex (parent, index) {
@@ -343,6 +351,7 @@ function main () {
           this.renderSingle('index', 'Timeline Index', true, true, this.onSetIndex),
           this.renderSingle('maxIndex', 'Max Index', true, true, this.onSetMaxIndex),
           this.renderCheckbox('stopAtEnd', 'Stop at End', this.onToggleStopEnd),
+          this.renderCheckbox('nextFrameLifelock', 'Next Frame Lifelock', this.onToggleNextFrameLifelock),
           e('hr'),
           this.state.numRiders > 1 && this.renderSingle('selectedRider', 'Selected Rider', true, true, this.onSelectRider),
           this.state.numRiders > 0 && e(
