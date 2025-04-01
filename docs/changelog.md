@@ -11,6 +11,10 @@ permalink: /changelog/
   }
 </style>
 
+### 2025-03-31
+#### Command Editor Mod
+- Added command editor version pulling from staging branch
+
 ### 2025-03-29
 #### More Controls Mod
 - Added next frame lifelock checkbox
