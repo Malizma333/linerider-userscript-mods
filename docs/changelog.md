@@ -11,6 +11,10 @@ permalink: /changelog/
   }
 </style>
 
+### 2025-04-15
+#### Scenery Width Fix
+- Changed scenery width max
+
 ### 2025-03-31
 #### Command Editor Mod
 - Added command editor version pulling from staging branch
