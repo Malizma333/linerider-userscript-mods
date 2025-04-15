@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Malizma
 // @description  Scenery slider component
-// @version      0.2.0
+// @version      0.2.1
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -70,8 +70,8 @@ function main () {
       return e(
         "div",
         null,
-        e("input", { style: { width: "4em" }, type: "number", min: 0, max: 1000, step: 0.01, value: this.state.sceneryWidth, onChange: e => this.onChooseWidth(parseFloat(e.target.value)) }),
-        e("input", { style: { width: "7em" }, type: "range", min: -2, max: 3, step: 0.1, value: Math.log10(this.state.sceneryWidth), onChange: e => this.onChooseWidth(Math.pow(10, parseFloat(e.target.value))), onFocus: e => e.target.blur() })
+        e("input", { style: { width: "4em" }, type: "number", min: 0, max: 362, step: 0.01, value: this.state.sceneryWidth, onChange: e => this.onChooseWidth(parseFloat(e.target.value)) }),
+        e("input", { style: { width: "7em" }, type: "range", min: -2, max: 2.55870857, step: 0.1, value: Math.log10(this.state.sceneryWidth), onChange: e => this.onChooseWidth(Math.pow(10, parseFloat(e.target.value))), onFocus: e => e.target.blur() })
       );
     }
   }
