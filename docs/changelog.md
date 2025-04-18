@@ -11,6 +11,10 @@ permalink: /changelog/
   }
 </style>
 
+### 2025-04-18
+#### Transform Mod
+- Fixed animation without transform
+
 ### 2025-04-15
 #### Scenery Width Fix
 - Changed scenery width max
