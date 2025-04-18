@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       David Lu, Ethan Li & Malizma
 // @description  Adds ability to transform selections
-// @version      0.8.2
+// @version      0.8.3
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -62,7 +62,7 @@ const getSimulatorCommittedTrack = state => state.simulator.committedEngine;
 const getSimulatorLayers = state => state.simulator.engine.engine.state.layers.buffer;
 const getEditorZoom = state => state.camera.editorZoom;
 const getSixtyEnabled = state => state.player.settings.interpolate === 60;
-const getPlayerIndex = state => state.player.index;
+const getPlayerIndex = state => state.player.index
 
 class TransformMod {
   constructor(store, initState) {
@@ -171,7 +171,7 @@ class TransformMod {
 
     const pretransformedLines = [];
     const allLines = [];
-
+    
     for (const id of getLinesFromPoints(this.selectedPoints)) {
       const line = this.track.getLine(id);
       if (line) {
@@ -278,22 +278,22 @@ class TransformMod {
         }
 
         posttransformedLines.push({
-          id: line.id,
-          type: line.type,
-          p1,
-          p2,
-          width,
-          layer: line.layer
+            id: line.id,
+            type: line.type,
+            p1,
+            p2,
+            width,
+            layer: line.layer
         });
       }
 
       pretransformedLines.length = 0;
 
-      const offset = { x: 0, y: 0 };
+      const offset = { x: 0, y: 0 }
       if (this.state.camLock) {
-        const camera = getCameraPosAtFrame(this.playerIndex + i * (this.sixty ? 2/3 : 1), this.track);
-        offset.x = camera.x - initCamera.x;
-        offset.y = camera.y - initCamera.y;
+          const camera = getCameraPosAtFrame(this.playerIndex + i * (this.sixty ? 2/3 : 1), this.track);
+          offset.x = camera.x - initCamera.x;
+          offset.y = camera.y - initCamera.y;
       }
 
       for (const line of posttransformedLines) {
@@ -313,7 +313,7 @@ class TransformMod {
           width: line.width,
           type: line.type,
           layer: line.layer
-        });
+        })
       }
 
       let endTime = performance.now();
@@ -364,46 +364,47 @@ class TransformMod {
       this.state.rotate !== 0 ||
       this.state.perspX || this.state.perspY ||
       this.state.nudgeXSmall !== 0 || this.state.nudgeXBig !== 0 ||
-      this.state.nudgeYSmall !== 0 || this.state.nudgeYBig !== 0
+      this.state.nudgeYSmall !== 0 || this.state.nudgeYBig !== 0 ||
+      this.state.aLength !== 0
     );
   }
 
   drawBoundingBoxes(bb, anchor, transform, postTransform, alongPerspX, alongPerspY, preCenter) {
-    const zoom = getEditorZoom(this.store.getState());
+    const zoom = getEditorZoom(this.store.getState())
     const preBox = genBoundingBox(
       bb.x, bb.y, bb.x + bb.width, bb.y + bb.height,
       anchor.x, anchor.y, 20 / zoom,
       1 / zoom, new Millions.Color(0, 0, 0, 64), 0
-    );
+    )
     for (const line of preBox) {
       const p1 = restorePoint(
         new V2(line.p1).sub(anchor),
         anchor, postTransform, alongPerspX, alongPerspY, preCenter
-      );
+      )
       const p2 = restorePoint(
         new V2(line.p2).sub(anchor),
         anchor, postTransform, alongPerspX, alongPerspY, preCenter
-      );
-      line.p1.x = p1.x;
-      line.p1.y = p1.y;
-      line.p2.x = p2.x;
-      line.p2.y = p2.y;
+      )
+      line.p1.x = p1.x
+      line.p1.y = p1.y
+      line.p2.x = p2.x
+      line.p2.y = p2.y
     }
     const postBox = genBoundingBox(
       bb.x, bb.y, bb.x + bb.width, bb.y + bb.height,
       anchor.x, anchor.y, 20 / zoom,
       1 / zoom, new Millions.Color(0, 0, 0, 255), 1
-    );
-    let perspX = this.state.perspX;
-    let perspY = this.state.perspY;
+    )
+    let perspX = this.state.perspX
+    let perspY = this.state.perspY
     if (this.state.relativePersp) {
-      perspX = perspX / (bb.width * this.state.scale * this.state.scaleX);
-      perspY = perspY / (bb.height * this.state.scale * this.state.scaleY);
+      perspX = perspX / (bb.width * this.state.scale * this.state.scaleX)
+      perspY = perspY / (bb.height * this.state.scale * this.state.scaleY)
     } else {
-      perspX = 0.01 * perspX;
-      perspY = 0.01 * perspY;
+      perspX = 0.01 * perspX
+      perspY = 0.01 * perspY
     }
-    const perspSafety = Math.pow(10, this.state.perspClamping);
+    const perspSafety = Math.pow(10, this.state.perspClamping)
     for (const line of postBox) {
       const p1 = restorePoint(
         transformPersp(
@@ -411,21 +412,21 @@ class TransformMod {
           perspX, perspY, perspSafety
         ),
         anchor, postTransform, alongPerspX, alongPerspY, preCenter
-      );
+      )
       const p2 = restorePoint(
         transformPersp(
           new V2(line.p2).sub(anchor).transform(transform),
           perspX, perspY, perspSafety
         ),
         anchor, postTransform, alongPerspX, alongPerspY, preCenter
-      );
-      line.p1.x = p1.x;
-      line.p1.y = p1.y;
-      line.p2.x = p2.x;
-      line.p2.y = p2.y;
+      )
+      line.p1.x = p1.x
+      line.p1.y = p1.y
+      line.p2.x = p2.x
+      line.p2.y = p2.y
     }
-    const boxes = this.state.advancedTools ? [...preBox, ...postBox] : postBox;
-    this.store.dispatch(setEditScene(Millions.Scene.fromEntities(boxes)));
+    const boxes = this.state.advancedTools ? [...preBox, ...postBox] : postBox
+    this.store.dispatch(setEditScene(Millions.Scene.fromEntities(boxes)))
   }
 }
 
@@ -529,112 +530,112 @@ function main() {
     }
 
     renderSection(key, title) {
-      return e("div", null,
-        e("button",
-          { id: key, style: { background: "none", border: "none" }, onClick: () => this.setState({ [key]: !this.state[key] }) },
-          this.state[key] ? "▲" : "▼"
+      return e('div', null,
+        e('button',
+          { id: key, style: { background: 'none', border: 'none' }, onClick: () => this.setState({ [key]: !this.state[key] }) },
+          this.state[key] ? '▲' : '▼'
         ),
-        e("label", { for: key }, title)
-      );
+        e('label', { for: key }, title)
+      )
     }
 
     renderCheckbox(key, title = null) {
-      if (!title) title = key;
+      if (!title) title = key
 
       const props = {
         id: key,
         checked: this.state[key],
         onChange: e => this.setState({ [key]: e.target.checked })
-      };
-      return e("div", null,
-        e("label", { style: { width: "4em" }, for: key }, title),
-        e("input", { style: { marginLeft: ".5em" }, type: "checkbox", ...props })
-      );
+      }
+      return e('div', null,
+        e('label', { style: { width: '4em' }, for: key }, title),
+        e('input', { style: { marginLeft: '.5em' }, type: 'checkbox', ...props })
+      )
     }
 
     renderSlider(key, props, title = null) {
-      if (!title) title = key;
+      if (!title) title = key
 
       props = {
         ...props,
         id: key,
         value: this.state[key],
         onChange: e => props.min <= e.target.value && e.target.value <= props.max && this.setState({ [key]: parseFloatOrDefault(e.target.value) })
-      };
+      }
 
-      return e("div", null,
-        e("label", { for: key }, title),
-        e("div", null,
-          e("button", { style: { marginRight: ".5em" }, onClick: () => this.onReset(key) }, "⟳"),
-          e("input", { style: { width: "4em" }, type: "number", ...props }),
-          e("input", { style: { width: "6em" }, type: "range", ...props, onFocus: e => e.target.blur() })
+      return e('div', null,
+        e('label', { for: key }, title),
+        e('div', null,
+          e('button', { style: { marginRight: '.5em' }, onClick: () => this.onReset(key) }, '⟳'),
+          e('input', { style: { width: '4em' }, type: 'number', ...props }),
+          e('input', { style: { width: '6em' }, type: 'range', ...props, onFocus: e => e.target.blur() })
         )
-      );
+      )
     }
 
     render() {
       return e(
-        "div",
+        'div',
         null,
         this.state.active &&
         e(
-          "div",
+          'div',
           null,
-          this.renderSlider("scaleX", { min: 0, max: 10, step: 0.01 }, "Scale X"),
-          this.renderSlider("scaleY", { min: 0, max: 10, step: 0.01 }, "Scale Y"),
-          this.renderSlider("scale", { min: 0, max: 10, step: 0.01 }, "Scale"),
-          this.renderCheckbox("scaleWidth", "Scale Width"),
-          this.renderCheckbox("flipX", "Flip X"),
-          this.renderCheckbox("flipY", "Flip Y"),
-          this.renderSlider("rotate", { min: -180, max: 180, step: 1 }, "Rotation"),
-          this.renderSection("relativeTools", "Adjust Origin"),
+          this.renderSlider('scaleX', { min: 0, max: 10, step: 0.01 }, 'Scale X'),
+          this.renderSlider('scaleY', { min: 0, max: 10, step: 0.01 }, 'Scale Y'),
+          this.renderSlider('scale', { min: 0, max: 10, step: 0.01 }, 'Scale'),
+          this.renderCheckbox('scaleWidth', 'Scale Width'),
+          this.renderCheckbox('flipX', 'Flip X'),
+          this.renderCheckbox('flipY', 'Flip Y'),
+          this.renderSlider('rotate', { min: -180, max: 180, step: 1 }, 'Rotation'),
+          this.renderSection('relativeTools', 'Adjust Origin'),
           this.state.relativeTools &&
           e(
-            "div",
+            'div',
             null,
-            this.renderSlider("alongPerspX", { min: -0.5, max: 0.5, step: 0.001 }, "Along Perspective X"),
-            this.renderSlider("alongPerspY", { min: -0.5, max: 0.5, step: 0.001 }, "Along Perspective Y"),
-            this.renderSlider("alongRot", { min: -180, max: 180, step: 1 }, "Along Rotation"),
-            this.renderSlider("anchorX", { min: -0.5, max: 0.5, step: 0.01 }, "Anchor X"),
-            this.renderSlider("anchorY", { min: -0.5, max: 0.5, step: 0.01 }, "Anchor Y")
+            this.renderSlider('alongPerspX', { min: -0.5, max: 0.5, step: 0.001 }, 'Along Perspective X'),
+            this.renderSlider('alongPerspY', { min: -0.5, max: 0.5, step: 0.001 }, 'Along Perspective Y'),
+            this.renderSlider('alongRot', { min: -180, max: 180, step: 1 }, 'Along Rotation'),
+            this.renderSlider('anchorX', { min: -0.5, max: 0.5, step: 0.01 }, 'Anchor X'),
+            this.renderSlider('anchorY', { min: -0.5, max: 0.5, step: 0.01 }, 'Anchor Y')
           ),
-          this.renderSection("warpTools", "Warp Tools"),
+          this.renderSection('warpTools', 'Warp Tools'),
           this.state.warpTools &&
           e(
-            "div",
+            'div',
             null,
-            this.renderCheckbox("relativePersp", "Relative Perspective"),
-            this.renderSlider("perspClamping", { min: -5, max: 0, step: 0.01 }, "Perspective Clamping"),
-            this.renderSlider("perspX", { min: -1, max: 1, step: 0.01 }, "Perpective X"),
-            this.renderSlider("perspY", { min: -1, max: 1, step: 0.01 }, "Perpective Y"),
-            this.renderSlider("skewX", { min: -2, max: 2, step: 0.01 }, "Skew X"),
-            this.renderSlider("skewY", { min: -2, max: 2, step: 0.01 }, "Skew Y")
+            this.renderCheckbox('relativePersp', 'Relative Perspective'),
+            this.renderSlider('perspClamping', { min: -5, max: 0, step: 0.01 }, 'Perspective Clamping'),
+            this.renderSlider('perspX', { min: -1, max: 1, step: 0.01 }, 'Perpective X'),
+            this.renderSlider('perspY', { min: -1, max: 1, step: 0.01 }, 'Perpective Y'),
+            this.renderSlider('skewX', { min: -2, max: 2, step: 0.01 }, 'Skew X'),
+            this.renderSlider('skewY', { min: -2, max: 2, step: 0.01 }, 'Skew Y')
           ),
-          this.renderSection("translateTools", "Translate Tools"),
+          this.renderSection('translateTools', 'Translate Tools'),
           this.state.translateTools &&
           e(
-            "div",
+            'div',
             null,
-            this.renderSlider("nudgeXSmall", { min: -10, max: 10, step: 0.1 }, "Small Nudge X"),
-            this.renderSlider("nudgeXBig", { min: -100000, max: 100000, step: 10 }, "Large Nudge X"),
-            this.renderSlider("nudgeYSmall", { min: -10, max: 10, step: 0.1 }, "Small Nudge Y"),
-            this.renderSlider("nudgeYBig", { min: -100000, max: 100000, step: 10 }, "Large Nudge Y")
+            this.renderSlider('nudgeXSmall', { min: -10, max: 10, step: 0.1 }, 'Small Nudge X'),
+            this.renderSlider('nudgeXBig', { min: -100000, max: 100000, step: 10 }, 'Large Nudge X'),
+            this.renderSlider('nudgeYSmall', { min: -10, max: 10, step: 0.1 }, 'Small Nudge Y'),
+            this.renderSlider('nudgeYBig', { min: -100000, max: 100000, step: 10 }, 'Large Nudge Y')
           ),
-          this.renderSection("animTools", "Animation Tools"),
+          this.renderSection('animTools', 'Animation Tools'),
           this.state.animTools &&
           e(
-            "div",
+            'div',
             null,
             this.renderSlider("aLength", { min: 0, max: 100, step: 1 }, "Animation Length"),
             this.renderCheckbox("camLock", "Lock to Camera"),
           ),
-          e("button", { style: { float: "left" }, onClick: () => this.onCommit() }, "Commit"),
-          e("button", { style: { float: "left" }, onClick: () => this.onResetAll() }, "Reset")
+          e('button', { style: { float: 'left' }, onClick: () => this.onCommit() }, 'Commit'),
+          e('button', { style: { float: 'left' }, onClick: () => this.onResetAll() }, 'Reset')
         ),
         e(
-          "button",
-          { style: { backgroundColor: this.state.active ? "lightblue" : null }, onClick: this.onActivate.bind(this) },
-          "Transform Mod"
+          'button',
+          { style: { backgroundColor: this.state.active ? 'lightblue' : null }, onClick: this.onActivate.bind(this) },
+          'Transform Mod'
         )
       );
     }
@@ -763,15 +764,15 @@ function genLine(x1, y1, x2, y2, thickness, color, zIndex) {
     colorA: color,
     colorB: color,
     thickness
-  };
+  }
   const p2 = {
     x: x2,
     y: y2,
     colorA: color,
     colorB: color,
     thickness
-  };
-  return new Millions.Line(p1, p2, 3, zIndex);
+  }
+  return new Millions.Line(p1, p2, 3, zIndex)
 }
 
 function genBoundingBox(x1, y1, x2, y2, anchorX, anchorY, anchorSize, thickness, color, zIndex) {
@@ -784,12 +785,12 @@ function genBoundingBox(x1, y1, x2, y2, anchorX, anchorY, anchorSize, thickness,
     // Transformation anchor
     genLine(anchorX, anchorY, anchorX + anchorSize, anchorY, thickness * 2, color, zIndex + 0.4),
     genLine(anchorX, anchorY, anchorX, anchorY - anchorSize, thickness * 2, color, zIndex + 0.5)
-  ];
+  ]
 }
 
 function getCameraPosAtFrame(frame, track) {
   const viewport = store.getState().camera.playbackDimensions || { width: 1920, height: 1080 };
   const zoom = window.getAutoZoom ? window.getAutoZoom(frame) : store.getState().camera.playbackZoom;
   const initCamera = store.getState().camera.playbackFollower.getCamera(track, { zoom, width: viewport.width, height: viewport.height }, frame);
-  return { x: initCamera.x, y: initCamera.y };
+  return { x: initCamera.x, y: initCamera.y }
 }
