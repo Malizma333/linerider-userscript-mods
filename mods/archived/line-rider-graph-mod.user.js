@@ -9,7 +9,6 @@
 
 // @match        https://www.linerider.com/*
 // @match        https://*.official-linerider.com/*
-// @match        http://localhost:*/*
 // @match        https://*.surge.sh/*
 
 // @require      https://cdnjs.cloudflare.com/ajax/libs/mathjs/9.2.0/math.js

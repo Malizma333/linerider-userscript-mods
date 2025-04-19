@@ -8,7 +8,6 @@ window.CMD_EDITOR_DEBUG=false;
 // @icon         https://www.linerider.com/favicon.ico
 // @match        https://www.linerider.com/*
 // @match        https://*.official-linerider.com/*
-// @match        http://localhost:*/*
 // @match        https://*.surge.sh/*
 // @grant        none
 // @require      https://github.com/Malizma333/line-rider-command-editor-userscript/raw/master/command-editor.min.js

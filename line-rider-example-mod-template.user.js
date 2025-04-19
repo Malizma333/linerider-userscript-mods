@@ -29,7 +29,6 @@ An "!" means this trait of the userscript data should be replaced.
 
 // @match        https://www.linerider.com/*
 // @match        https://*.official-linerider.com/*
-// @match        http://localhost:*/*
 // @match        https://*.surge.sh/*
 
 // @downloadURL  https://github.com/Malizma333/linerider-userscript-mods/raw/master/line-rider-example-mod-template.user.js

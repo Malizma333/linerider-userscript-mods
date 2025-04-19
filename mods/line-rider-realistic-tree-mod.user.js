@@ -9,7 +9,6 @@
 
 // @match        https://www.linerider.com/*
 // @match        https://*.official-linerider.com/*
-// @match        http://localhost:*/*
 // @match        https://*.surge.sh/*
 
 // @require      https://raw.githubusercontent.com/supereggbert/proctree.js/refs/heads/master/proctree.js
