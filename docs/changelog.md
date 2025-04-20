@@ -14,6 +14,7 @@ permalink: /changelog/
 ### 2025-04-20
 #### Metadata Mod
 - Added layer option
+- Added overwrite controls
 
 ### 2025-04-18
 #### Transform Mod
