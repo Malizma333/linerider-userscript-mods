@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Ethan Li & Tobias Bessler
 // @description  Adds ability to edit selected line metadata
-// @version      0.2.0
+// @version      0.3.0
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -110,11 +110,6 @@ class MetadataMod {
       }
 
       if (!setsEqual(this.selectedPoints, selectedPoints)) {
-        /*if (this.selectedPoints.size == 0) {
-          this.loadOriginals()
-          this.reloadState()
-          this.resetUI()
-        }*/
         this.selectedPoints = selectedPoints;
         shouldUpdate = true;
       }
@@ -134,26 +129,32 @@ class MetadataMod {
       return;
     }
 
-    /*if (!this.state.originalsLoaded) {
-      this.loadOriginals()
-      this.reloadState()
-      this.resetUI()
-    }*/
     const lines = [...getLinesFromPoints(this.selectedPoints)]
       .map(id => this.track.getLine(id))
       .filter(l => l);
     const editedLines = [];
     const multiplierSign = this.state.negativeMultiplier ? -1 : 1;
     for (let line of lines) {
-      editedLines.push({
-        ...line.toJSON(),
-        flipped: this.state.flipped,
-        multiplier: multiplierSign * (
+      const newLine = line.toJSON();
+      if (this.state.overwriteFlipped) {
+        newLine.flipped = this.state.flipped;
+      }
+
+      if (this.state.overwriteMultiplier) {
+        newLine.multiplier = multiplierSign * (
           parseFloat(this.state.multiplierSmall) + parseFloat(this.state.multiplierLarge)
-        ),
-        width: this.state.sceneryWidth,
-        layer: this.state.layer,
-      });
+        )
+      }
+
+      if (this.state.overwriteSceneryWidth) {
+        newLine.width = this.state.sceneryWidth
+      }
+
+      if (this.state.overwriteLayer) {
+        newLine.layer = this.state.layer
+      }
+
+      editedLines.push(newLine);
     }
     this.store.dispatch(setLines(editedLines));
 
@@ -234,8 +235,13 @@ function main () {
         originalWidth: 1,
         originalLayer: 0,
       };
+      
       this.state = {
         ...this.defaults,
+        overwriteFlipped: true,
+        overwriteMultiplier: true,
+        overwriteSceneryWidth: true,
+        overwriteLayer: true,
         active: false,
       };
 
@@ -260,7 +266,7 @@ function main () {
       this._mounted = false;
     }
 
-    componentWillUpdate (nextProps, nextState) {
+    componentWillUpdate (_, nextState) {
       this.metadataMod.onUpdate(nextState);
     }
 
@@ -301,12 +307,15 @@ function main () {
     renderCheckbox (key, props) {
       props = {
         ...props,
+        type: "checkbox",
+        id: key,
         checked: this.state[key],
         onChange: e => this.setState({ [key]: e.target.checked })
       };
+
       return e("div", null,
-        key,
-        e("input", { type: "checkbox", ...props })
+        e("label", { htmlFor: key }, key),
+        e("input", props),
       );
     }
 
@@ -316,39 +325,33 @@ function main () {
         value: this.state[key],
         onChange: e => this.setState({ [key]: parseFloatOrDefault(e.target.value) })
       };
-      const rangeProps = {
-        ...props
-      };
-      const numberProps = {
-        ...props
-      };
+
       return e("div", null,
         key,
-        e("input", { style: { width: "4em" }, type: "number", ...numberProps }),
-        e("input", { type: "range", ...rangeProps, onFocus: e => e.target.blur() }),
+        e("input", { style: { width: "4em" }, type: "number", ...props }),
+        e("input", { type: "range", onFocus: e => e.target.blur(),  ...props }),
       );
     }
 
     render () {
-      let tools = [];
-      if (this.state.active) {
-        tools = [
-          this.renderCheckbox("flipped"),
-          this.renderCheckbox("negativeMultiplier"),
-          this.renderSlider("multiplierSmall", { min: 0, max: 1, step: 0.001 }),
-          this.renderSlider("multiplierLarge", { min: 0, max: 1000, step: 1 }),
-          this.renderSlider("sceneryWidth", { min: 0.01, max: 1000, step: 0.1 }),
-          this.renderSlider("layer", { min: 0, max: 1000, step: 1 }),
-        ];
-        tools = [
-          ...tools,
-          e("button", { style: { float: "left" }, onClick: () => this.onResetAll() }, "Load"),
-          e("button", { style: { float: "left" }, onClick: () => this.onCommit() }, "Commit"),
-        ];
-      }
       return e("div",
         null,
-        this.state.active && e("div", null, tools),
+        this.state.active && e("div", null,
+          this.renderCheckbox("overwriteFlipped"),
+          this.renderCheckbox("overwriteMultiplier"),
+          this.renderCheckbox("overwriteSceneryWidth"),
+          this.renderCheckbox("overwriteLayer"),
+          e("hr"),
+          this.renderCheckbox("flipped", { disabled: !this.state.overwriteFlipped }),
+          this.renderCheckbox("negativeMultiplier", { disabled: !this.state.overwriteMultiplier }),
+          this.renderSlider("multiplierSmall", { min: 0, max: 1, step: 0.001, disabled: !this.state.overwriteMultiplier }),
+          this.renderSlider("multiplierLarge", { min: 0, max: 1000, step: 1, disabled: !this.state.overwriteMultiplier }),
+          this.renderSlider("sceneryWidth", { min: 0.01, max: 1000, step: 0.1, disabled: !this.state.overwriteSceneryWidth }),
+          this.renderSlider("layer", { min: 0, max: 1000, step: 1, disabled: !this.state.overwriteLayer }),
+          e("hr"),
+          e("button", { style: { float: "left", disabled: false }, onClick: () => this.onResetAll() }, "Load"),
+          e("button", { style: { float: "left" }, onClick: () => this.onCommit() }, "Commit"),
+        ),
         e("button",
           {
             style: {
@@ -362,11 +365,9 @@ function main () {
     }
   }
 
-  // this is a setting and not a standalone tool because it extends the select tool
   window.registerCustomSetting(MetadataModComponent);
 }
 
-/* init */
 if (window.registerCustomSetting) {
   main();
 } else {
@@ -377,7 +378,6 @@ if (window.registerCustomSetting) {
   };
 }
 
-/* utils */
 function setsEqual (a, b) {
   if (a.size !== b.size) {
     return false;
