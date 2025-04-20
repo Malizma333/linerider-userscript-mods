@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Ethan Li & Malizma
 // @description  Adds ability to edit selected line metadata
-// @version      0.1.2
+// @version      0.2.0
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -151,7 +151,8 @@ class MetadataMod {
         multiplier: multiplierSign * (
           parseFloat(this.state.multiplierSmall) + parseFloat(this.state.multiplierLarge)
         ),
-        width: this.state.sceneryWidth
+        width: this.state.sceneryWidth,
+        layer: this.state.layer,
       });
     }
     this.store.dispatch(setLines(editedLines));
@@ -168,6 +169,7 @@ class MetadataMod {
     this.state.originalFlipped = false;
     this.state.originalMultiplier = 1.0;
     this.state.originalWidth = 1.0;
+    this.state.originalLayer = 0;
   }
 
   loadOriginals () {
@@ -190,6 +192,10 @@ class MetadataMod {
     if (this.state.originalWidth === undefined) {
       this.state.originalWidth = 1.0;
     }
+    this.state.originalLayer = line.layer;
+    if (this.state.originalLayer === undefined) {
+      this.state.originalLayer = 0;
+    }
   }
 
   reloadState() {
@@ -199,6 +205,7 @@ class MetadataMod {
     this.state.multiplierSmall = multipliers.small;
     this.state.multiplierLarge = multipliers.large;
     this.state.sceneryWidth = this.state.originalWidth;
+    this.state.layer = this.state.originalLayer;
   }
 }
 
@@ -220,10 +227,12 @@ function main () {
         multiplierSmall: 1.0,
         multiplierLarge: 0,
         sceneryWidth: 1,
+        layer: 0,
         originalsLoaded: false,
         originalFlipped: false,
         originalMultiplier: 1,
         originalWidth: 1,
+        originalLayer: 0,
       };
       this.state = {
         ...this.defaults,
@@ -268,6 +277,7 @@ function main () {
         multiplierSmall: multipliers.small,
         multiplierLarge: multipliers.large,
         sceneryWidth: this.state.originalWidth,
+        layer: this.state.originalLayer,
       });
     }
 
@@ -328,6 +338,7 @@ function main () {
           this.renderSlider("multiplierSmall", { min: 0, max: 1, step: 0.001 }),
           this.renderSlider("multiplierLarge", { min: 0, max: 1000, step: 1 }),
           this.renderSlider("sceneryWidth", { min: 0.01, max: 1000, step: 0.1 }),
+          this.renderSlider("layer", { min: 0, max: 1000, step: 1 }),
         ];
         tools = [
           ...tools,
