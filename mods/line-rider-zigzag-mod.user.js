@@ -2,7 +2,7 @@
 
 // @name         Zigzag Generator
 // @namespace    https://www.linerider.com/
-// @author       Malizma
+// @author       Tobias Bessler
 // @description  Generates zig-zags
 // @version      1.3.1
 // @icon         https://www.linerider.com/favicon.ico

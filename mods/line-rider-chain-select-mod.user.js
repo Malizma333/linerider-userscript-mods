@@ -2,7 +2,7 @@
 
 // @name         Chain Select
 // @namespace    https://www.linerider.com/
-// @author       Malizma
+// @author       Tobias Bessler
 // @description  Adds lines to selection that are connected in a chain
 // @version      1.0.0
 // @icon         https://www.linerider.com/favicon.ico

@@ -2,7 +2,7 @@
 
 // @name         Selection Slice Mod
 // @namespace    https://www.linerider.com/
-// @author       David Lu & Malizma
+// @author       David Lu & Tobias Bessler
 // @description  Adds ability to slice lines with a selection
 // @version      0.5.3
 // @icon         https://www.linerider.com/favicon.ico

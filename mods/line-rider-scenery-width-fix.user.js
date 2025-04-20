@@ -2,7 +2,7 @@
 
 // @name         Scenery Width Number Picker
 // @namespace    https://www.linerider.com/
-// @author       Malizma
+// @author       Tobias Bessler
 // @description  Scenery slider component
 // @version      0.2.1
 // @icon         https://www.linerider.com/favicon.ico

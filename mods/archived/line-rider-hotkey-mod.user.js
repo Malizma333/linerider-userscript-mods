@@ -2,7 +2,7 @@
 
 // @name         Hotkey Mod
 // @namespace    https://www.linerider.com/
-// @author       Malizma
+// @author       Tobias Bessler
 // @description  Allows changing the default hotkeys
 // @version      1.1.0
 // @icon         https://www.linerider.com/favicon.ico

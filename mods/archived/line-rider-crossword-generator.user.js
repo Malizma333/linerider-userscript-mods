@@ -2,7 +2,7 @@
 
 // @name         Crossword Generator
 // @namespace    https://www.linerider.com/
-// @author       Malizma
+// @author       Tobias Bessler
 // @description  A mod that lets you generate crosswords in line rider
 // @version      1.0.0
 // @icon         https://www.linerider.com/favicon.ico

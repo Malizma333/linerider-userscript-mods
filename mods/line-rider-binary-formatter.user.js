@@ -2,7 +2,7 @@
 
 // @name         Binary Formatter
 // @namespace    https://www.linerider.com/
-// @author       Malizma
+// @author       Tobias Bessler
 // @description  Adds support for loading and saving track data to the LRB data format
 // @version      0.2.0
 // @icon         https://www.linerider.com/favicon.ico

@@ -2,7 +2,7 @@
 
 // @name         Minimal Collision Generator
 // @namespace    https://www.linerider.com/
-// @author       Malizma
+// @author       Tobias Bessler
 // @description  Generates minimal lines needed to reproduce collisions
 // @version      1.0.0
 // @icon         https://www.linerider.com/favicon.ico

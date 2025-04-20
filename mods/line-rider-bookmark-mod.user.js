@@ -2,7 +2,7 @@
 
 // @name         Bookmark Mod
 // @namespace    https://www.linerider.com/
-// @author       Malizma
+// @author       Tobias Bessler
 // @description  Allows you to make bookmarks that act similar to flags but there's multiple
 // @version      1.3.2
 // @icon         https://www.linerider.com/favicon.ico

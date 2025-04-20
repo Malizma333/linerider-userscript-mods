@@ -2,7 +2,7 @@
 
 // @name         SVG Mod
 // @namespace    https://www.linerider.com/
-// @author       Conqu3red & Malizma
+// @author       Conqu3red & Tobias Bessler
 // @description  Linerider.com userscript for converting svgs to lines
 // @version      1.1.1
 // @icon         https://www.linerider.com/favicon.ico

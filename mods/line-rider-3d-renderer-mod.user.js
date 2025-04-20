@@ -2,7 +2,7 @@
 
 // @name         3D Renderer
 // @namespace    https://www.linerider.com/
-// @author       Malizma
+// @author       Tobias Bessler
 // @description  Supports rendering of 3D object files
 // @version      1.0.0
 // @icon         https://www.linerider.com/favicon.ico

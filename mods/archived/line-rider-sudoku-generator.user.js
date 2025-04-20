@@ -2,7 +2,7 @@
 
 // @name         Sudoku Generator
 // @namespace    https://www.linerider.com/
-// @author       Malizma
+// @author       Tobias Bessler
 // @description  Generates a sudoku puzzle
 // @version      1.0.0
 // @icon         https://www.linerider.com/favicon.ico

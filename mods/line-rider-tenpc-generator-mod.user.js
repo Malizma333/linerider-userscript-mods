@@ -2,7 +2,7 @@
 
 // @name         Ten Point Cannon Generator
 // @namespace    https://www.linerider.com/
-// @author       Malizma
+// @author       Tobias Bessler
 // @description  Generates ten point cannons
 // @version      1.4.0
 // @icon         https://www.linerider.com/favicon.ico

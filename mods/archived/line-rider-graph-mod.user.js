@@ -2,7 +2,7 @@
 
 // @name         Graph Generator
 // @namespace    https://www.linerider.com/
-// @author       Malizma
+// @author       Tobias Bessler
 // @description  Generates graphs from equations
 // @version      1.2.0
 // @icon         https://www.linerider.com/favicon.ico

@@ -2,7 +2,7 @@
 
 // @name         Animation Helper for Xavi
 // @namespace    https://www.linerider.com/
-// @author       Malizma
+// @author       Tobias Bessler
 // @description  Generates repeated transforms for animation + layer stuff
 // @version      1.0.0
 // @icon         https://www.linerider.com/favicon.ico

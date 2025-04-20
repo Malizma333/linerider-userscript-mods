@@ -2,7 +2,7 @@
 
 // @name         Animation Helper
 // @namespace    https://www.linerider.com/
-// @author       Malizma
+// @author       Tobias Bessler
 // @description  Generates repeated transforms for animation
 // @version      1.3.1
 // @icon         https://www.linerider.com/favicon.ico

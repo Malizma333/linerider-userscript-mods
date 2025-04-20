@@ -2,7 +2,7 @@
 
 // @name         Selection Shader Mod
 // @namespace    https://www.linerider.com/
-// @author       David Lu & Malizma
+// @author       David Lu & Tobias Bessler
 // @description  Adds ability to shade in selections
 // @version      0.5.4
 // @icon         https://www.linerider.com/favicon.ico

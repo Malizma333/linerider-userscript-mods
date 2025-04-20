@@ -2,7 +2,7 @@
 
 // @name         More Controls
 // @namespace    https://www.linerider.com/
-// @author       Malizma
+// @author       Tobias Bessler
 // @description  Provides a menu for viewing and editing specific track data
 // @version      1.3.1
 // @icon         https://www.linerider.com/favicon.ico

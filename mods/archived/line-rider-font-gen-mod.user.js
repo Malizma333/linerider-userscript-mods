@@ -1,7 +1,7 @@
 // ==UserScript==
 
 // @name         Line Rider Font Generator Mod
-// @author       Malizma
+// @author       Tobias Bessler
 // @description  Adds the ability to create font files
 // @version      1.0
 

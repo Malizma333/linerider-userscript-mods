@@ -22,7 +22,7 @@ An "!" means this trait of the userscript data should be replaced.
 
 // @name         Line Rider Example Mod
 // @namespace    https://www.linerider.com/
-// @author       Malizma
+// @author       Tobias Bessler
 // @description  Linerider.com example mod
 // @version      1.0.0
 // @icon         https://www.linerider.com/favicon.ico

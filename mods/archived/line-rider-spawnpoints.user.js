@@ -2,7 +2,7 @@
 
 // @name         Spawn Points
 // @namespace    https://www.linerider.com/
-// @author       Malizma
+// @author       Tobias Bessler
 // @description  Creates teleportation points at target keyframes
 // @version      1.0.0
 // @icon         https://www.linerider.com/favicon.ico

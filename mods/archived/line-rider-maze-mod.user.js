@@ -2,7 +2,7 @@
 
 // @name         Maze Generator
 // @namespace    https://www.linerider.com/
-// @author       Malizma
+// @author       Tobias Bessler
 // @description  Generates basic rectangle-based mazes
 // @version      1.1.0
 // @icon         https://www.linerider.com/favicon.ico

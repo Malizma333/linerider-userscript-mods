@@ -2,7 +2,7 @@
 
 // @name         Noise Mod
 // @namespace    https://www.linerider.com/
-// @author       Malizma
+// @author       Tobias Bessler
 // @description  Generates a captured shape over an area with random transforms
 // @version      1.2.2
 // @icon         https://www.linerider.com/favicon.ico

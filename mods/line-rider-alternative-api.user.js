@@ -2,7 +2,7 @@
 
 // @name         Alternative Mod API
 // @namespace    https://www.linerider.com/
-// @author       Malizma
+// @author       Tobias Bessler
 // @description  Container for linerider.com mods
 // @version      2.0.1
 // @icon         https://www.linerider.com/favicon.ico

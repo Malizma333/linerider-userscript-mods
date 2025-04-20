@@ -1,7 +1,7 @@
 // ==UserScript==
 
 // @name         Line Rider Text Mod
-// @author       Malizma
+// @author       Tobias Bessler
 // @description  Adds the ability to generate text
 // @version      1.0
 

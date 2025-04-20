@@ -2,7 +2,7 @@
 
 // @name         Recursive Tree Generator
 // @namespace    https://www.linerider.com/
-// @author       Malizma
+// @author       Tobias Bessler
 // @description  Generates tree-like line structures recrusively
 // @version      1.1.0
 // @icon         https://www.linerider.com/favicon.ico

@@ -2,7 +2,7 @@
 
 // @name         Image Generator
 // @namespace    https://www.linerider.com/
-// @author       Malizma
+// @author       Tobias Bessler
 // @description  Generates colored line arrays from image data
 // @version      1.7.1
 // @icon         https://www.linerider.com/favicon.ico

@@ -2,7 +2,7 @@
 
 // @name         LRPK Support
 // @namespace    https://www.linerider.com/
-// @author       Malizma
+// @author       Tobias Bessler
 // @description  Adds support for loading and saving track data to the LRPK compressed data format
 // @version      0.0.0
 // @icon         https://www.linerider.com/favicon.ico

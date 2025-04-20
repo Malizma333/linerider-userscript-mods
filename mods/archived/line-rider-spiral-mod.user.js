@@ -1,7 +1,7 @@
 // ==UserScript==
 
 // @name         Spiral Mod
-// @author       Malizma
+// @author       Tobias Bessler
 // @description  Generates a spiral
 // @version      1.0
 

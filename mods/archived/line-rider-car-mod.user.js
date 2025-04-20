@@ -2,7 +2,7 @@
 
 // @name         Car Mode
 // @namespace    https://www.linerider.com/
-// @author       Malizma
+// @author       Tobias Bessler
 // @description  Mod to add UI to car mode and edit settings
 // @version      1.0.0
 // @icon         https://www.linerider.com/favicon.ico

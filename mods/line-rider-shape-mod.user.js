@@ -2,7 +2,7 @@
 
 // @name         Shape Generator
 // @namespace    https://www.linerider.com/
-// @author       Malizma
+// @author       Tobias Bessler
 // @description  Generates regular polygons
 // @version      1.1.1
 // @icon         https://www.linerider.com/favicon.ico

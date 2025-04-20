@@ -2,7 +2,7 @@
 
 // @name         Selection Metadata Mod
 // @namespace    https://www.linerider.com/
-// @author       Ethan Li & Malizma
+// @author       Ethan Li & Tobias Bessler
 // @description  Adds ability to edit selected line metadata
 // @version      0.2.0
 // @icon         https://www.linerider.com/favicon.ico

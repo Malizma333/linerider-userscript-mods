@@ -2,7 +2,7 @@
 
 // @name         SVG Exporter
 // @namespace    https://www.linerider.com/
-// @author       Malizma
+// @author       Tobias Bessler
 // @description  Generates an svg file from a selection of lines
 // @version      1.1.3
 // @icon         https://www.linerider.com/favicon.ico

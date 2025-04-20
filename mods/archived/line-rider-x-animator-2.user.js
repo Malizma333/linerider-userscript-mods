@@ -2,7 +2,7 @@
 
 // @name         XAnimator2
 // @namespace    https://www.linerider.com/
-// @author       Malizma
+// @author       Tobias Bessler
 // @description  The advanced, layer automated animation tool
 // @version      0.2.5
 // @icon         https://www.linerider.com/favicon.ico

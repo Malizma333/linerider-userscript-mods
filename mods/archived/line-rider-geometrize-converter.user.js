@@ -2,7 +2,7 @@
 
 // @name         Geometrize Converter
 // @namespace    https://www.linerider.com/
-// @author       Malizma
+// @author       Tobias Bessler
 // @description  Converts geometrize line maps into line rider lines
 // @version      1.1.0
 // @icon         https://www.linerider.com/favicon.ico

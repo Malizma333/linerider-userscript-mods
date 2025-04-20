@@ -2,7 +2,7 @@
 
 // @name         Tree Generator
 // @namespace    https://www.linerider.com/
-// @author       Malizma
+// @author       Tobias Bessler
 // @description  Generates various types of trees
 // @version      1.1.0
 // @icon         https://www.linerider.com/favicon.ico

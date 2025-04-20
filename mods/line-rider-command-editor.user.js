@@ -1,7 +1,7 @@
 window.CMD_EDITOR_DEBUG=false;
 // ==UserScript==
 // @name         Command Editor
-// @author       Malizma
+// @author       Tobias Bessler
 // @description  Adds UI to API commands in linerider.com
 // @namespace    https://www.linerider.com/
 // @version      476.0

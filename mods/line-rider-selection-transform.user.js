@@ -2,7 +2,7 @@
 
 // @name         Selection Transform Mod
 // @namespace    https://www.linerider.com/
-// @author       David Lu, Ethan Li & Malizma
+// @author       David Lu, Ethan Li & Tobias Bessler
 // @description  Adds ability to transform selections
 // @version      0.8.3
 // @icon         https://www.linerider.com/favicon.ico

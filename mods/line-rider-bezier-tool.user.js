@@ -2,7 +2,7 @@
 
 // @name         Bezier Tool
 // @namespace    https://www.linerider.com/
-// @author       David Lu & Malizma
+// @author       David Lu & Tobias Bessler
 // @description  Adds tool to create bezier curves
 // @version      0.4.2
 // @icon         https://www.linerider.com/favicon.ico

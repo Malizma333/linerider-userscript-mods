@@ -2,7 +2,7 @@
 
 // @name         Duplicate Line Remover
 // @namespace    https://www.linerider.com/
-// @author       Malizma
+// @author       Tobias Bessler
 // @description  Removes duplicate lines from a selection
 // @version      1.1.0
 // @icon         https://www.linerider.com/favicon.ico
