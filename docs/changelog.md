@@ -11,6 +11,10 @@ permalink: /changelog/
   }
 </style>
 
+### 2025-04-20
+#### Metadata Mod
+- Added layer option
+
 ### 2025-04-18
 #### Transform Mod
 - Fixed animation without transform
