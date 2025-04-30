@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Tobias Bessler
 // @description  Removes duplicate lines from a selection
-// @version      1.1.0
+// @version      1.1.1
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -86,12 +86,12 @@ function main () {
         let inPreserve = false;
 
         for (const order of preserve) {
-          if (order[0] === orderA[0] && order[1] === orderA[1] && order[2] === orderA[2] && order[3] === orderA[3]) {
+          if (Math.abs(order[0] - orderA[0]) <= 0.001 && Math.abs(order[1] - orderA[1]) <= 0.001 && Math.abs(order[2] - orderA[2]) <= 0.001 && Math.abs(order[3] - orderA[3]) <= 0.001) {
             inPreserve = true;
             break;
           }
 
-          if (order[0] === orderB[0] && order[1] === orderB[1] && order[2] === orderB[2] && order[3] === orderB[3]) {
+          if (Math.abs(order[0] - orderB[0]) <= 0.001 && Math.abs(order[1] - orderB[1]) <= 0.001 && Math.abs(order[2] - orderB[2]) <= 0.001 && Math.abs(order[3] - orderB[3]) <= 0.001) {
             inPreserve = true;
             break;
           }
