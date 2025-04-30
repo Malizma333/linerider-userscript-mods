@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Tobias Bessler
 // @description  Generates zig-zags
-// @version      1.3.1
+// @version      1.3.2
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -55,6 +55,7 @@ const getActiveTool = state => state.selectedTool;
 const getToolState = (state, toolId) => state.toolState[toolId];
 const getSelectToolState = state => getToolState(state, SELECT_TOOL);
 const getSimulatorCommittedTrack = state => state.simulator.committedEngine;
+const getSceneryWidth = state => state.selectedSceneryWidth;
 
 class ZigZagMod {
   constructor (store, initState) {
@@ -138,7 +139,8 @@ class ZigZagMod {
         y1: p1.y,
         x2: p2.x,
         y2: p2.y,
-        type: 2
+        type: 2,
+        width: this.state.sceneryWidth
       });
     }
 
@@ -168,7 +170,8 @@ function main () {
         width: 5,
         height: 5,
         noise: 0,
-        offsetMode: false
+        offsetMode: false,
+        sceneryWidth: 1
       };
 
       this.mod = new ZigZagMod(store, this.state);
@@ -181,6 +184,8 @@ function main () {
         if (this.state.active && !selectToolActive) {
           this.setState({ active: false });
         }
+        
+        this.setState({ sceneryWidth: getSceneryWidth(store.getState()) });
       });
     }
 
