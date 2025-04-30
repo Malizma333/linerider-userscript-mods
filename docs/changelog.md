@@ -14,7 +14,9 @@ permalink: /changelog/
 ### 2025-04-30
 #### Remove Duplicates Mod
 - Made lines with approximately similar points removed
-  
+
+#### Zigzag Mod
+- Use active scenery width when creating zigzags
 
 ### 2025-04-20
 #### Metadata Mod
@@ -140,7 +142,7 @@ permalink: /changelog/
 - Created mod for generating realistic tree outlines
 
 ### 2025-01-04
-#### ZigZag Mod
+#### Zigzag Mod
 - Added height noise slider
 
 ### 2024-12-23
