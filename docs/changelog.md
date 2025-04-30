@@ -11,6 +11,11 @@ permalink: /changelog/
   }
 </style>
 
+### 2025-04-30
+#### Remove Duplicates Mod
+- Made lines with approximately similar points removed
+  
+
 ### 2025-04-20
 #### Metadata Mod
 - Added layer option
