@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       David Lu & Tobias Bessler
 // @description  Adds tool to create bezier curves
-// @version      0.4.2
+// @version      0.5.0
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -514,6 +514,22 @@ function main() {
         }
       });
 
+      this.multiplier = window.bezierToolMultiplier || 1;
+      Object.defineProperty(window, "bezierToolMultiplier", {
+        configurable: true,
+        get: () => this.multiplier,
+        set: r => {
+          this.multiplier = r;
+
+          const state = getBezierToolState(this.getState());
+
+          if (state instanceof EditState) {
+            this.dispatch(revertTrackChanges());
+            this.addCurve(state);
+          }
+        }
+      });
+
       this.dispatch(setBezierToolState(new InitState()));
     }
 
@@ -619,6 +635,7 @@ function main() {
             x2: p[0],
             y2: p[1],
             width: window.bezierToolWidth || 1,
+            multiplier: window.bezierToolMultiplier || 1,
             type
           });
         } else {
@@ -631,6 +648,7 @@ function main() {
             x2: p[0] - norm.x,
             y2: p[1] - norm.y,
             width: window.bezierToolWidth || 1,
+            multiplier: window.bezierToolMultiplier || 1,
             type
           }, {
             flipped: !this.flipped,
@@ -639,6 +657,7 @@ function main() {
             x2: p[0] + norm.x,
             y2: p[1] + norm.y,
             width: window.bezierToolWidth || 1,
+            multiplier: window.bezierToolMultiplier || 1,
             type
           });
 
@@ -669,11 +688,13 @@ function main() {
         status: "Not Connected",
         radius: 0,
         scnWidth: 1,
+        multiplier: 1,
         flipped: false
       };
 
       window.bezierToolRadius = 0;
       window.bezierToolWidth = 1;
+      window.bezierToolMultiplier = 1;
       window.bezierToolFlipped = false;
 
       store.subscribe(() => {
@@ -717,6 +738,11 @@ function main() {
         this.setState({ scnWidth });
         window.bezierToolWidth = scnWidth;
       };
+      const onMultiplierChange = e => {
+        const multiplier = parseFloatOrDefault(e.target.value);
+        this.setState({ multiplier });
+        window.bezierToolMultiplier = multiplier;
+      };
       const onFlippedChange = () => {
         const flipped = !this.state.flipped;
         this.setState({flipped});
@@ -738,6 +764,11 @@ function main() {
             "Scenery Width",
             e("input", { style: { width: "3em" }, type: "number", onChange: onSceneryWidthChange, min: 0.01, value: this.state.scnWidth }),
             e("input", { type: "range", onChange: onSceneryWidthChange, onFocus: e => e.target.blur(), min: 0.01, max: 20, step: 0.1, value: this.state.scnWidth })
+          ),
+          e("div", null,
+            "Multiplier",
+            e("input", { style: { width: "3em" }, type: "number", onChange: onMultiplierChange, value: this.state.multiplier }),
+            e("input", { type: "range", onChange: onMultiplierChange, onFocus: e => e.target.blur(), min: -255, max: 255, step: 0.1, value: this.state.multiplier })
           ),
           e(
             "button",
