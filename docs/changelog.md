@@ -11,6 +11,11 @@ permalink: /changelog/
   }
 </style>
 
+### 2025-06-26
+#### Command Editor
+- Added exact camera bounds offset suppport
+- Archived staging script
+
 ### 2025-06-16
 #### Bezier Tool
 - Added multiplier slider
