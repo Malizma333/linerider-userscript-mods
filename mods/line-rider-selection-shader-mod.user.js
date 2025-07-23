@@ -36,13 +36,13 @@ const EMPTY_SET = new Set();
 /* actions */
 const setTool = (tool) => ({
   type: "SET_TOOL",
-  payload: tool
+  payload: tool,
 });
 
 const setToolState = (toolId, state) => ({
   type: "SET_TOOL_STATE",
   payload: state,
-  meta: { id: toolId }
+  meta: { id: toolId },
 });
 
 const setSelectToolState = toolState => setToolState(SELECT_TOOL, toolState);
@@ -50,17 +50,17 @@ const setSelectToolState = toolState => setToolState(SELECT_TOOL, toolState);
 const updateLines = (linesToRemove, linesToAdd, name) => ({
   type: "UPDATE_LINES",
   payload: { linesToRemove, linesToAdd },
-  meta: { name }
+  meta: { name },
 });
 
 const addLines = (line) => updateLines(null, line, "ADD_LINES");
 
 const commitTrackChanges = () => ({
-  type: "COMMIT_TRACK_CHANGES"
+  type: "COMMIT_TRACK_CHANGES",
 });
 
 const revertTrackChanges = () => ({
-  type: "REVERT_TRACK_CHANGES"
+  type: "REVERT_TRACK_CHANGES",
 });
 
 /* selectors */
@@ -72,7 +72,7 @@ const getTrackLinesLocked = state => state.trackLinesLocked;
 const getSceneryWidth = state => state.selectedSceneryWidth;
 
 class ShadeMod {
-  constructor (store, initState) {
+  constructor(store, initState) {
     this.store = store;
 
     this.changed = false;
@@ -93,7 +93,7 @@ class ShadeMod {
     });
   }
 
-  commitShade () {
+  commitShade() {
     if (this.changed) {
       this.store.dispatch(commitTrackChanges());
       this.store.dispatch(revertTrackChanges());
@@ -102,7 +102,7 @@ class ShadeMod {
     }
   }
 
-  onUpdate (nextState = this.state) {
+  onUpdate(nextState = this.state) {
     let shouldUpdate = false;
 
     if (!this.state.active && nextState.active) {
@@ -157,7 +157,7 @@ class ShadeMod {
             x2: p2.x,
             y2: p2.y,
             type: 2,
-            width: this.state.sceneryWidth
+            width: this.state.sceneryWidth,
           });
         }
 
@@ -170,16 +170,16 @@ class ShadeMod {
   }
 }
 
-function main () {
+function main() {
   const {
     React,
-    store
+    store,
   } = window;
 
   const e = React.createElement;
 
   class ShadeModComponent extends React.Component {
-    constructor (props) {
+    constructor(props) {
       super(props);
 
       this.state = {
@@ -187,7 +187,7 @@ function main () {
         angle: 0,
         spacing: 0,
         offset: 0,
-        sceneryWidth: 1
+        sceneryWidth: 1,
       };
 
       this.shadeMod = new ShadeMod(store, this.state);
@@ -213,11 +213,11 @@ function main () {
       this._mounted = false;
     }
 
-    componentWillUpdate (nextProps, nextState) {
+    componentWillUpdate(nextProps, nextState) {
       this.shadeMod.onUpdate(nextState);
     }
 
-    onActivate () {
+    onActivate() {
       if (this.state.active) {
         this.setState({ active: false });
       } else {
@@ -226,46 +226,47 @@ function main () {
       }
     }
 
-    onCommit () {
+    onCommit() {
       const committed = this.shadeMod.commitShade();
       if (committed) {
         this.setState({ active: false });
       }
     }
 
-    renderSlider (key, props) {
+    renderSlider(key, props) {
       props = {
         ...props,
         value: this.state[key],
-        onChange: e => this.setState({ [key]: parseFloat(e.target.value) })
+        onChange: e => this.setState({ [key]: parseFloat(e.target.value) }),
       };
-      return e("div", null,
+      return e(
+        "div",
+        null,
         key,
         e("input", { style: { width: "3em" }, type: "number", ...props }),
-        e("input", { type: "range", ...props, onFocus: e => e.target.blur() })
+        e("input", { type: "range", ...props, onFocus: e => e.target.blur() }),
       );
     }
 
-    render () {
-      return e("div",
+    render() {
+      return e(
+        "div",
         null,
-        this.state.active && e("div", null,
-          this.renderSlider("angle", { min: 0, max: 360, step: 1 }),
-          this.renderSlider("spacing", { min: 0, max: 10, step: 0.01 }),
-          this.renderSlider("offset", { min: 0, max: 1, step: 0.01 }),
-          e("button", { style: { float: "left" }, onClick: () => this.onCommit() },
-            "Commit"
-          )
-        ),
-        e("button",
-          {
-            style: {
-              backgroundColor: this.state.active ? "lightblue" : null
-            },
-            onClick: this.onActivate.bind(this)
+        this.state.active
+          && e(
+            "div",
+            null,
+            this.renderSlider("angle", { min: 0, max: 360, step: 1 }),
+            this.renderSlider("spacing", { min: 0, max: 10, step: 0.01 }),
+            this.renderSlider("offset", { min: 0, max: 1, step: 0.01 }),
+            e("button", { style: { float: "left" }, onClick: () => this.onCommit() }, "Commit"),
+          ),
+        e("button", {
+          style: {
+            backgroundColor: this.state.active ? "lightblue" : null,
           },
-          "Shade Mod"
-        )
+          onClick: this.onActivate.bind(this),
+        }, "Shade Mod"),
       );
     }
   }
@@ -286,7 +287,7 @@ if (window.registerCustomSetting) {
 }
 
 /* utils */
-function setsEqual (a, b) {
+function setsEqual(a, b) {
   if (a === b) {
     return true;
   }
@@ -301,12 +302,12 @@ function setsEqual (a, b) {
   return true;
 }
 
-function getLinesFromPoints (points) {
+function getLinesFromPoints(points) {
   return new Set([...points].map(point => point >> 1));
 }
 
 // takes an iterable of lines and properties and returns an iterable of lines of alternating fill
-function * genFill (lines, { angle = 0, spacing = 0, offset = 0, sceneryWidth = 1 } = {}) {
+function* genFill(lines, { angle = 0, spacing = 0, offset = 0, sceneryWidth = 1 } = {}) {
   const { V2 } = window;
   /* prep */
 
@@ -389,7 +390,7 @@ function * genFill (lines, { angle = 0, spacing = 0, offset = 0, sceneryWidth = 
           // yield the reverse transformed segment between currentY and y
           yield {
             p1: V2.from(currentX, currentY).transform(fromAngle),
-            p2: V2.from(currentX, y).transform(fromAngle)
+            p2: V2.from(currentX, y).transform(fromAngle),
           };
           // exit fill
           currentY = null;
@@ -409,7 +410,7 @@ function * genFill (lines, { angle = 0, spacing = 0, offset = 0, sceneryWidth = 
   }
 }
 
-function rotateTransform (rads) {
+function rotateTransform(rads) {
   const { V2 } = window;
 
   const u = V2.from(1, 0).rot(rads);

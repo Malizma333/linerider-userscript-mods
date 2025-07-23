@@ -30,27 +30,27 @@ const LINE_WIDTH = 2;
 /* actions */
 const setTool = (tool) => ({
   type: "SET_TOOL",
-  payload: tool
+  payload: tool,
 });
 
 const updateLines = (linesToRemove, linesToAdd) => ({
   type: "UPDATE_LINES",
-  payload: { linesToRemove, linesToAdd }
+  payload: { linesToRemove, linesToAdd },
 });
 
 const setLines = (line) => updateLines(null, line);
 
 const commitTrackChanges = () => ({
-  type: "COMMIT_TRACK_CHANGES"
+  type: "COMMIT_TRACK_CHANGES",
 });
 
 const revertTrackChanges = () => ({
-  type: "REVERT_TRACK_CHANGES"
+  type: "REVERT_TRACK_CHANGES",
 });
 
 const setEditScene = (scene) => ({
   type: "SET_RENDERER_SCENE",
-  payload: { key: "edit", scene }
+  payload: { key: "edit", scene },
 });
 
 /* selectors */
@@ -61,7 +61,7 @@ const getSimulatorCommittedTrack = state => state.simulator.committedEngine;
 const getEditorZoom = state => state.camera.editorZoom;
 
 class MetadataMod {
-  constructor (store, initState, resetUI) {
+  constructor(store, initState, resetUI) {
     this.store = store;
 
     this.changed = false;
@@ -76,7 +76,7 @@ class MetadataMod {
     });
   }
 
-  commit () {
+  commit() {
     if (this.changed) {
       this.store.dispatch(commitTrackChanges());
       this.store.dispatch(revertTrackChanges());
@@ -86,7 +86,7 @@ class MetadataMod {
     }
   }
 
-  onUpdate (nextState = this.state) {
+  onUpdate(nextState = this.state) {
     let shouldUpdate = false;
 
     if (this.state !== nextState) {
@@ -143,15 +143,15 @@ class MetadataMod {
       if (this.state.overwriteMultiplier) {
         newLine.multiplier = multiplierSign * (
           parseFloat(this.state.multiplierSmall) + parseFloat(this.state.multiplierLarge)
-        )
+        );
       }
 
       if (this.state.overwriteSceneryWidth) {
-        newLine.width = this.state.sceneryWidth
+        newLine.width = this.state.sceneryWidth;
       }
 
       if (this.state.overwriteLayer) {
-        newLine.layer = this.state.layer
+        newLine.layer = this.state.layer;
       }
 
       editedLines.push(newLine);
@@ -165,7 +165,7 @@ class MetadataMod {
     return this.state.active && this.selectedPoints.size > 0;
   }
 
-  resetOriginals () {
+  resetOriginals() {
     this.state.originalsLoaded = false;
     this.state.originalFlipped = false;
     this.state.originalMultiplier = 1.0;
@@ -173,7 +173,7 @@ class MetadataMod {
     this.state.originalLayer = 0;
   }
 
-  loadOriginals () {
+  loadOriginals() {
     const lines = [...getLinesFromPoints(this.selectedPoints)]
       .map(id => this.track.getLine(id))
       .filter(l => l);
@@ -210,16 +210,16 @@ class MetadataMod {
   }
 }
 
-function main () {
+function main() {
   const {
     React,
-    store
+    store,
   } = window;
 
   const e = React.createElement;
 
   class MetadataModComponent extends React.Component {
-    constructor (props) {
+    constructor(props) {
       super(props);
 
       this.defaults = {
@@ -235,7 +235,7 @@ function main () {
         originalWidth: 1,
         originalLayer: 0,
       };
-      
+
       this.state = {
         ...this.defaults,
         overwriteFlipped: true,
@@ -266,16 +266,16 @@ function main () {
       this._mounted = false;
     }
 
-    componentWillUpdate (_, nextState) {
+    componentWillUpdate(_, nextState) {
       this.metadataMod.onUpdate(nextState);
     }
 
-    onResetAll () {
+    onResetAll() {
       this.metadataMod.loadOriginals();
       this.reloadFromOriginals();
     }
 
-    reloadFromOriginals () {
+    reloadFromOriginals() {
       const multipliers = splitMultiplier(this.state.originalMultiplier);
       this.setState({
         flipped: this.state.originalFlipped,
@@ -287,7 +287,7 @@ function main () {
       });
     }
 
-    onCommit () {
+    onCommit() {
       this.metadataMod.commit();
       this.setState({
         ...this.defaults,
@@ -295,7 +295,7 @@ function main () {
       });
     }
 
-    onActivate () {
+    onActivate() {
       if (this.state.active) {
         this.setState({ active: false });
       } else {
@@ -304,63 +304,78 @@ function main () {
       }
     }
 
-    renderCheckbox (key, props) {
+    renderCheckbox(key, props) {
       props = {
         ...props,
         type: "checkbox",
         id: key,
         checked: this.state[key],
-        onChange: e => this.setState({ [key]: e.target.checked })
+        onChange: e => this.setState({ [key]: e.target.checked }),
       };
 
-      return e("div", null,
-        e("label", { htmlFor: key }, key),
-        e("input", props),
-      );
+      return e("div", null, e("label", { htmlFor: key }, key), e("input", props));
     }
 
-    renderSlider (key, props) {
+    renderSlider(key, props) {
       props = {
         ...props,
         value: this.state[key],
-        onChange: e => this.setState({ [key]: parseFloatOrDefault(e.target.value) })
+        onChange: e => this.setState({ [key]: parseFloatOrDefault(e.target.value) }),
       };
 
-      return e("div", null,
+      return e(
+        "div",
+        null,
         key,
         e("input", { style: { width: "4em" }, type: "number", ...props }),
-        e("input", { type: "range", onFocus: e => e.target.blur(),  ...props }),
+        e("input", { type: "range", onFocus: e => e.target.blur(), ...props }),
       );
     }
 
-    render () {
-      return e("div",
+    render() {
+      return e(
+        "div",
         null,
-        this.state.active && e("div", null,
-          this.renderCheckbox("overwriteFlipped"),
-          this.renderCheckbox("overwriteMultiplier"),
-          this.renderCheckbox("overwriteSceneryWidth"),
-          this.renderCheckbox("overwriteLayer"),
-          e("hr"),
-          this.renderCheckbox("flipped", { disabled: !this.state.overwriteFlipped }),
-          this.renderCheckbox("negativeMultiplier", { disabled: !this.state.overwriteMultiplier }),
-          this.renderSlider("multiplierSmall", { min: 0, max: 1, step: 0.001, disabled: !this.state.overwriteMultiplier }),
-          this.renderSlider("multiplierLarge", { min: 0, max: 1000, step: 1, disabled: !this.state.overwriteMultiplier }),
-          this.renderSlider("sceneryWidth", { min: 0.01, max: 1000, step: 0.1, disabled: !this.state.overwriteSceneryWidth }),
-          this.renderSlider("layer", { min: 0, max: 1000, step: 1, disabled: !this.state.overwriteLayer }),
-          e("hr"),
-          e("button", { style: { float: "left", disabled: false }, onClick: () => this.onResetAll() }, "Load"),
-          e("button", { style: { float: "left" }, onClick: () => this.onCommit() }, "Commit"),
-        ),
-        e("button",
-          {
-            style: {
-              backgroundColor: this.state.active ? "lightblue" : null
-            },
-            onClick: this.onActivate.bind(this)
+        this.state.active
+          && e(
+            "div",
+            null,
+            this.renderCheckbox("overwriteFlipped"),
+            this.renderCheckbox("overwriteMultiplier"),
+            this.renderCheckbox("overwriteSceneryWidth"),
+            this.renderCheckbox("overwriteLayer"),
+            e("hr"),
+            this.renderCheckbox("flipped", { disabled: !this.state.overwriteFlipped }),
+            this.renderCheckbox("negativeMultiplier", { disabled: !this.state.overwriteMultiplier }),
+            this.renderSlider("multiplierSmall", {
+              min: 0,
+              max: 1,
+              step: 0.001,
+              disabled: !this.state.overwriteMultiplier,
+            }),
+            this.renderSlider("multiplierLarge", {
+              min: 0,
+              max: 1000,
+              step: 1,
+              disabled: !this.state.overwriteMultiplier,
+            }),
+            this.renderSlider("sceneryWidth", {
+              min: 0.01,
+              max: 1000,
+              step: 0.1,
+              disabled: !this.state.overwriteSceneryWidth,
+            }),
+            this.renderSlider("layer", { min: 0, max: 1000, step: 1, disabled: !this.state.overwriteLayer }),
+            e("hr"),
+            e("button", { style: { float: "left", disabled: false }, onClick: () => this.onResetAll() }, "Load"),
+            e("button", { style: { float: "left" }, onClick: () => this.onCommit() }, "Commit"),
+          ),
+        e("button", {
+          style: {
+            backgroundColor: this.state.active ? "lightblue" : null,
           },
-          "Metadata Mod"
-        )
+          onClick: this.onActivate.bind(this),
+        }, "Metadata Mod"),
       );
     }
   }
@@ -378,7 +393,7 @@ if (window.registerCustomSetting) {
   };
 }
 
-function setsEqual (a, b) {
+function setsEqual(a, b) {
   if (a.size !== b.size) {
     return false;
   }
@@ -390,16 +405,16 @@ function setsEqual (a, b) {
   return true;
 }
 
-function getLinesFromPoints (points) {
+function getLinesFromPoints(points) {
   return new Set([...points].map(point => point >> 1));
 }
 
-function parseFloatOrDefault (string, defaultValue = 0) {
+function parseFloatOrDefault(string, defaultValue = 0) {
   const x = parseFloat(string);
   return isNaN(x) ? defaultValue : x;
 }
 
-function splitMultiplier (multiplier) {
+function splitMultiplier(multiplier) {
   const smallPrecision = 2;
   const negative = multiplier < 0;
   if (multiplier < 0) {
@@ -407,5 +422,5 @@ function splitMultiplier (multiplier) {
   }
   const large = parseFloat(multiplier).toFixed(0);
   const small = parseFloat(multiplier - large).toFixed(smallPrecision);
-  return {negative, small, large};
+  return { negative, small, large };
 }

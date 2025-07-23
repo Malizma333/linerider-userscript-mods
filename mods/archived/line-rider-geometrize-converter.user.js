@@ -21,7 +21,7 @@
 
 const updateLines = (linesToRemove, linesToAdd) => ({
   type: "UPDATE_LINES",
-  payload: { linesToRemove, linesToAdd }
+  payload: { linesToRemove, linesToAdd },
 });
 
 const addLines = (line) => updateLines(null, line, "ADD_LINES");
@@ -30,22 +30,22 @@ const addLayer = () => ({ type: "ADD_LAYER" });
 
 const renameLayer = (id, name) => ({
   type: "RENAME_LAYER",
-  payload: { id, name }
+  payload: { id, name },
 });
 
 const commitTrackChanges = () => ({
-  type: "COMMIT_TRACK_CHANGES"
+  type: "COMMIT_TRACK_CHANGES",
 });
 
 const revertTrackChanges = () => ({
-  type: "REVERT_TRACK_CHANGES"
+  type: "REVERT_TRACK_CHANGES",
 });
 
 const getSimulatorCommittedTrack = state => state.simulator.committedEngine;
 const getSimulatorLayers = track => track.engine.state.layers.buffer;
 
 class GeoConvertMod {
-  constructor (store, initState) {
+  constructor(store, initState) {
     this.store = store;
     this.state = initState;
 
@@ -58,7 +58,7 @@ class GeoConvertMod {
     });
   }
 
-  commit () {
+  commit() {
     if (this.changed) {
       this.store.dispatch(commitTrackChanges());
       this.store.dispatch(revertTrackChanges());
@@ -67,7 +67,7 @@ class GeoConvertMod {
     }
   }
 
-  onUpdate (nextState = this.state) {
+  onUpdate(nextState = this.state) {
     let shouldUpdate = false;
 
     if (!this.state.active && nextState.active) {
@@ -92,7 +92,6 @@ class GeoConvertMod {
     }
 
     if (shouldUpdate) {
-
       if (this.changed) {
         this.store.dispatch(revertTrackChanges());
         this.changed = false;
@@ -112,7 +111,7 @@ class GeoConvertMod {
             layerArr.push({
               name: color,
               editable: true,
-              visible: true
+              visible: true,
             });
           } else {
             lineArr.push({
@@ -121,7 +120,7 @@ class GeoConvertMod {
               y1: y1,
               x2: x2,
               y2: y2,
-              type: 2
+              type: 2,
             });
           }
         }
@@ -144,22 +143,22 @@ class GeoConvertMod {
   }
 }
 
-function main () {
+function main() {
   const {
     React,
-    store
+    store,
   } = window;
 
   const create = React.createElement;
 
   class GeoConvertModComponent extends React.Component {
-    constructor (props) {
+    constructor(props) {
       super(props);
 
       this.state = {
         active: false,
         fileData: null,
-        clamping: 4
+        clamping: 4,
       };
 
       this.message = "";
@@ -167,11 +166,11 @@ function main () {
       this.geoConvert = new GeoConvertMod(store, this.state);
     }
 
-    componentWillUpdate (nextProps, nextState) {
+    componentWillUpdate(nextProps, nextState) {
       this.geoConvert.onUpdate(nextState);
     }
 
-    onFileChange () {
+    onFileChange() {
       return new Promise((resolve) => {
         const file = event.target.files[0];
         const fileReader = new FileReader();
@@ -185,21 +184,23 @@ function main () {
       });
     }
 
-    renderSlider (key, title, props) {
+    renderSlider(key, title, props) {
       props = {
         ...props,
         value: this.state[key],
-        onChange: create => this.setState({ [key]: parseFloat(create.target.value) })
+        onChange: create => this.setState({ [key]: parseFloat(create.target.value) }),
       };
 
-      return create("div", null,
+      return create(
+        "div",
+        null,
         title,
         create("input", { style: { width: "3em" }, type: "number", ...props }),
-        create("input", { type: "range", ...props, onFocus: create => create.target.blur() })
+        create("input", { type: "range", ...props, onFocus: create => create.target.blur() }),
       );
     }
 
-    onActivate () {
+    onActivate() {
       if (this.state.active) {
         this.setState({ active: false });
       } else {
@@ -207,43 +208,47 @@ function main () {
       }
     }
 
-    onCommit () {
+    onCommit() {
       const committed = this.geoConvert.commit();
       if (committed) {
         this.setState({ active: false });
       }
     }
 
-    render () {
-      return create("div", null,
-        this.state.active && create("div", null,
-          create("div", null,
-            "JSON: ",
-            create("input", { type: "file",
-              onChange: () => this.onFileChange().then(result => {
-                this.setState({ fileData : result });
-                this.message = "JSON Loaded";
-              }).catch(err => {
-                this.message = "Invalid JSON File";
-                console.log(err);
-              })
-            })
+    render() {
+      return create(
+        "div",
+        null,
+        this.state.active
+          && create(
+            "div",
+            null,
+            create(
+              "div",
+              null,
+              "JSON: ",
+              create("input", {
+                type: "file",
+                onChange: () =>
+                  this.onFileChange().then(result => {
+                    this.setState({ fileData: result });
+                    this.message = "JSON Loaded";
+                  }).catch(err => {
+                    this.message = "Invalid JSON File";
+                    console.log(err);
+                  }),
+              }),
+            ),
+            this.renderSlider("clamping", "Color Clamp", { min: 1, max: 4, step: 1 }),
+            create("div", null, this.message),
+            create("button", { style: { float: "left" }, onClick: () => this.onCommit() }, "Commit"),
           ),
-          this.renderSlider("clamping", "Color Clamp", { min: 1, max: 4, step: 1 }),
-          create("div", null, this.message),
-          create("button", { style: { float: "left" }, onClick: () => this.onCommit() },
-            "Commit"
-          )
-        ),
-        create("button",
-          {
-            style: {
-              backgroundColor: this.state.active ? "lightblue" : null
-            },
-            onClick: this.onActivate.bind(this)
+        create("button", {
+          style: {
+            backgroundColor: this.state.active ? "lightblue" : null,
           },
-          "Geo-Convert Mod"
-        )
+          onClick: this.onActivate.bind(this),
+        }, "Geo-Convert Mod"),
       );
     }
   }
@@ -261,7 +266,7 @@ if (window.registerCustomSetting) {
   };
 }
 
-function* genLines ({ fileData = null, clamping = 4 } = {}) {
+function* genLines({ fileData = null, clamping = 4 } = {}) {
   if (!fileData || !fileData.shapes || !fileData.shapes[0].data) return;
 
   const camPos = window.store.getState().camera.editorPosition;
@@ -282,7 +287,7 @@ function* genLines ({ fileData = null, clamping = 4 } = {}) {
         y1: null,
         x2: null,
         y2: null,
-        layer: null
+        layer: null,
       };
     }
 
@@ -295,13 +300,13 @@ function* genLines ({ fileData = null, clamping = 4 } = {}) {
       y1: coords[1] + camPos.y,
       x2: coords[2] + camPos.x,
       y2: coords[3] + camPos.y,
-      layer: index
+      layer: index,
     };
   }
 }
 
-function rgbToHex (color, clamp) {
-  let powerClamp = Math.pow(2, clamp+3);
+function rgbToHex(color, clamp) {
+  let powerClamp = Math.pow(2, clamp + 3);
   let rHex = (powerClamp * Math.floor(color[0] / powerClamp)).toString(16);
   let gHex = (powerClamp * Math.floor(color[1] / powerClamp)).toString(16);
   let bHex = (powerClamp * Math.floor(color[2] / powerClamp)).toString(16);

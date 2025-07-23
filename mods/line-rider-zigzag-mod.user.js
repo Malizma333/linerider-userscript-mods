@@ -24,13 +24,13 @@ const EMPTY_SET = new Set();
 
 const setTool = (tool) => ({
   type: "SET_TOOL",
-  payload: tool
+  payload: tool,
 });
 
 const setToolState = (toolId, state) => ({
   type: "SET_TOOL_STATE",
   payload: state,
-  meta: { id: toolId }
+  meta: { id: toolId },
 });
 
 const setSelectToolState = toolState => setToolState(SELECT_TOOL, toolState);
@@ -38,17 +38,17 @@ const setSelectToolState = toolState => setToolState(SELECT_TOOL, toolState);
 const updateLines = (linesToRemove, linesToAdd, name) => ({
   type: "UPDATE_LINES",
   payload: { linesToRemove, linesToAdd },
-  meta: { name }
+  meta: { name },
 });
 
 const addLines = (line) => updateLines(null, line, "ADD_LINES");
 
 const commitTrackChanges = () => ({
-  type: "COMMIT_TRACK_CHANGES"
+  type: "COMMIT_TRACK_CHANGES",
 });
 
 const revertTrackChanges = () => ({
-  type: "REVERT_TRACK_CHANGES"
+  type: "REVERT_TRACK_CHANGES",
 });
 
 const getActiveTool = state => state.selectedTool;
@@ -58,7 +58,7 @@ const getSimulatorCommittedTrack = state => state.simulator.committedEngine;
 const getSceneryWidth = state => state.selectedSceneryWidth;
 
 class ZigZagMod {
-  constructor (store, initState) {
+  constructor(store, initState) {
     this.store = store;
     this.changed = false;
     this.state = initState;
@@ -78,7 +78,7 @@ class ZigZagMod {
     });
   }
 
-  commit () {
+  commit() {
     if (this.changed) {
       this.store.dispatch(commitTrackChanges());
       this.store.dispatch(revertTrackChanges());
@@ -87,7 +87,7 @@ class ZigZagMod {
     }
   }
 
-  onUpdate (nextState = this.state) {
+  onUpdate(nextState = this.state) {
     let shouldUpdate = false;
 
     if (!this.state.active && nextState.active) {
@@ -140,7 +140,7 @@ class ZigZagMod {
         x2: p2.x,
         y2: p2.y,
         type: 2,
-        width: this.state.sceneryWidth
+        width: this.state.sceneryWidth,
       });
     }
 
@@ -153,16 +153,16 @@ class ZigZagMod {
 
 // Function to create UI component
 
-function main () {
+function main() {
   const {
     React,
-    store
+    store,
   } = window;
 
   const e = React.createElement;
 
   class ZigZagModComponent extends React.Component {
-    constructor (props) {
+    constructor(props) {
       super(props);
 
       this.state = {
@@ -171,7 +171,7 @@ function main () {
         height: 5,
         noise: 0,
         offsetMode: false,
-        sceneryWidth: 1
+        sceneryWidth: 1,
       };
 
       this.mod = new ZigZagMod(store, this.state);
@@ -184,7 +184,7 @@ function main () {
         if (this.state.active && !selectToolActive) {
           this.setState({ active: false });
         }
-        
+
         this.setState({ sceneryWidth: getSceneryWidth(store.getState()) });
       });
     }
@@ -197,11 +197,11 @@ function main () {
       this._mounted = false;
     }
 
-    componentWillUpdate (nextProps, nextState) {
+    componentWillUpdate(nextProps, nextState) {
       this.mod.onUpdate(nextState);
     }
 
-    onActivate () {
+    onActivate() {
       if (this.state.active) {
         this.setState({ active: false });
       } else {
@@ -210,59 +210,63 @@ function main () {
       }
     }
 
-    onCommit () {
+    onCommit() {
       const committed = this.mod.commit();
       if (committed) {
         this.setState({ active: false });
       }
     }
 
-    renderCheckbox (key, title = null) {
+    renderCheckbox(key, title = null) {
       if (!title) title = key;
 
       const props = {
         id: key,
         checked: this.state[key],
-        onChange: e => this.setState({ [key]: e.target.checked })
+        onChange: e => this.setState({ [key]: e.target.checked }),
       };
-      return e("div", null,
+      return e(
+        "div",
+        null,
         e("label", { style: { width: "4em" }, for: key }, title),
-        e("input", { style: { marginLeft: ".5em" }, type: "checkbox", ...props })
+        e("input", { style: { marginLeft: ".5em" }, type: "checkbox", ...props }),
       );
     }
 
-    renderSlider (key, title, props) {
+    renderSlider(key, title, props) {
       props = {
         ...props,
         value: this.state[key],
-        onChange: e => this.setState({ [key]: parseFloat(e.target.value) })
+        onChange: e => this.setState({ [key]: parseFloat(e.target.value) }),
       };
 
       return e(
-        "div", null,
+        "div",
+        null,
         title,
         e("input", { style: { width: "3em" }, type: "number", ...props }),
-        e("input", { type: "range", ...props, onFocus: e => e.target.blur() })
+        e("input", { type: "range", ...props, onFocus: e => e.target.blur() }),
       );
     }
 
-    render () {
-      return e("div", null,
-        this.state.active &&
-                     e("div", null,
-                       this.renderCheckbox("offsetMode", "Offset Mode"),
-                       this.renderSlider("width", "Width", { min: 1, max: 100, step: 0.1 }),
-                       this.renderSlider("height", "Height", { min: -100, max: 100, step: 0.1 }),
-                       this.renderSlider("noise", "Height Noise", { min: 0, max: 100, step: 0.1 }),
-                       e("button",
-                         { style: { float: "left" }, onClick: () => this.onCommit() },
-                         "Commit"
-                       )
-                     ),
-        e("button",
-          { style: { backgroundColor: this.state.active ? "lightblue" : null }, onClick: this.onActivate.bind(this) },
-          "Zig Zag Mod"
-        )
+    render() {
+      return e(
+        "div",
+        null,
+        this.state.active
+          && e(
+            "div",
+            null,
+            this.renderCheckbox("offsetMode", "Offset Mode"),
+            this.renderSlider("width", "Width", { min: 1, max: 100, step: 0.1 }),
+            this.renderSlider("height", "Height", { min: -100, max: 100, step: 0.1 }),
+            this.renderSlider("noise", "Height Noise", { min: 0, max: 100, step: 0.1 }),
+            e("button", { style: { float: "left" }, onClick: () => this.onCommit() }, "Commit"),
+          ),
+        e("button", {
+          style: { backgroundColor: this.state.active ? "lightblue" : null },
+          onClick: this.onActivate.bind(this),
+        }, "Zig Zag Mod"),
       );
     }
   }
@@ -280,7 +284,7 @@ if (window.registerCustomSetting) {
   };
 }
 
-function setsEqual (a, b) {
+function setsEqual(a, b) {
   if (a === b) {
     return true;
   }
@@ -295,20 +299,23 @@ function setsEqual (a, b) {
   return true;
 }
 
-function getLinesFromPoints (points) {
+function getLinesFromPoints(points) {
   return new Set([...points].map(point => point >> 1));
 }
 
-function linesShareOnePoint (lineA, lineB) {
+function linesShareOnePoint(lineA, lineB) {
   return (
-    lineA.p1.x === lineB.p1.x && lineA.p1.y === lineB.p1.y && !(lineA.p2.x === lineB.p2.x && lineA.p2.y === lineB.p2.y) ||
-    lineA.p1.x === lineB.p2.x && lineA.p1.y === lineB.p2.y && !(lineA.p2.x === lineB.p1.x && lineA.p2.y === lineB.p1.y) ||
-    lineA.p2.x === lineB.p1.x && lineA.p2.y === lineB.p1.y && !(lineA.p1.x === lineB.p2.x && lineA.p1.y === lineB.p2.y) ||
-    lineA.p2.x === lineB.p2.x && lineA.p2.y === lineB.p2.y && !(lineA.p1.x === lineB.p1.x && lineA.p1.y === lineB.p1.y)
+    lineA.p1.x === lineB.p1.x && lineA.p1.y === lineB.p1.y && !(lineA.p2.x === lineB.p2.x && lineA.p2.y === lineB.p2.y)
+    || lineA.p1.x === lineB.p2.x && lineA.p1.y === lineB.p2.y
+      && !(lineA.p2.x === lineB.p1.x && lineA.p2.y === lineB.p1.y)
+    || lineA.p2.x === lineB.p1.x && lineA.p2.y === lineB.p1.y
+      && !(lineA.p1.x === lineB.p2.x && lineA.p1.y === lineB.p2.y)
+    || lineA.p2.x === lineB.p2.x && lineA.p2.y === lineB.p2.y
+      && !(lineA.p1.x === lineB.p1.x && lineA.p1.y === lineB.p1.y)
   );
 }
 
-function findShapes (lines) {
+function findShapes(lines) {
   const shapes = [];
 
   while (lines.length > 0) {
@@ -324,14 +331,14 @@ function findShapes (lines) {
         id: currentLine.id,
         endpoints: {
           p1: currentLine.p1,
-          p2: currentLine.p2
+          p2: currentLine.p2,
         },
         neighbors: {
           p1ToP1: [],
           p1ToP2: [],
           p2ToP1: [],
-          p2ToP2: []
-        }
+          p2ToP2: [],
+        },
       });
 
       for (let j = 0; j < lines.length; j++) {
@@ -374,7 +381,7 @@ function findShapes (lines) {
   return shapes;
 }
 
-function interpolateLine (line, width, offset, startFromP1) {
+function interpolateLine(line, width, offset, startFromP1) {
   const startPoint = startFromP1 ? line.p1 : line.p2;
   const inv = startFromP1 ? 1 : -1;
   const vector = { x: inv * (line.p2.x - line.p1.x), y: inv * (line.p2.y - line.p1.y) };
@@ -388,14 +395,14 @@ function interpolateLine (line, width, offset, startFromP1) {
     points.push({
       x: startPoint.x + i * normVector.x,
       y: startPoint.y + i * normVector.y,
-      a: theta
+      a: theta,
     });
   }
 
   return { points, remaining };
 }
 
-function * genZigZag (selectedLines, { width = 5, height = 5, noise = 0, offsetMode = false } = {}) {
+function* genZigZag(selectedLines, { width = 5, height = 5, noise = 0, offsetMode = false } = {}) {
   const { V2 } = window;
 
   const shapesArray = findShapes(selectedLines);
@@ -409,10 +416,15 @@ function * genZigZag (selectedLines, { width = 5, height = 5, noise = 0, offsetM
     visited.length = 0;
     dataStack.length = 0;
 
-    const initDirection = Math.atan2(shape[0].endpoints.p2.y - shape[0].endpoints.p1.y, shape[0].endpoints.p2.x - shape[0].endpoints.p1.x) - Math.PI / 2;
+    const initDirection =
+      Math.atan2(shape[0].endpoints.p2.y - shape[0].endpoints.p1.y, shape[0].endpoints.p2.x - shape[0].endpoints.p1.x)
+      - Math.PI / 2;
     const randomHeight = height + noise * Math.random() - noise / 2;
     const initHeightVector = { x: randomHeight * Math.cos(initDirection), y: randomHeight * Math.sin(initDirection) };
-    const initLastPoint = V2.from(shape[0].endpoints.p1.x + initHeightVector.x, shape[0].endpoints.p1.y + initHeightVector.y);
+    const initLastPoint = V2.from(
+      shape[0].endpoints.p1.x + initHeightVector.x,
+      shape[0].endpoints.p1.y + initHeightVector.y,
+    );
 
     dataStack.push({ currentLine: shape[0], offset: 0, startFromP1: true, lastPoint: initLastPoint, flipped: -1 });
 
@@ -438,11 +450,14 @@ function * genZigZag (selectedLines, { width = 5, height = 5, noise = 0, offsetM
 
         const currentDirection = currentPoint.a + flipTracker * Math.PI / 2;
         const randomHeight = height + noise * Math.random() - noise / 2;
-        const heightVector = { x: randomHeight * Math.cos(currentDirection), y: randomHeight * Math.sin(currentDirection) };
+        const heightVector = {
+          x: randomHeight * Math.cos(currentDirection),
+          y: randomHeight * Math.sin(currentDirection),
+        };
 
         yield {
           p1: V2.from(currentPoint.x + heightVector.x, currentPoint.y + heightVector.y),
-          p2: V2.from(lastPoint.x, lastPoint.y)
+          p2: V2.from(lastPoint.x, lastPoint.y),
         };
 
         lastPoint.x = currentPoint.x + heightVector.x;
@@ -451,33 +466,81 @@ function * genZigZag (selectedLines, { width = 5, height = 5, noise = 0, offsetM
 
       for (const neighbor of currentLine.neighbors.p1ToP1) {
         if (startFromP1) {
-          dataStack.push({ currentLine: neighbor, offset, startFromP1: true, lastPoint: startPoint, flipped: initFlipped });
+          dataStack.push({
+            currentLine: neighbor,
+            offset,
+            startFromP1: true,
+            lastPoint: startPoint,
+            flipped: initFlipped,
+          });
         } else {
-          dataStack.push({ currentLine: neighbor, offset: nextOffset, startFromP1: true, lastPoint, flipped: flipTracker });
+          dataStack.push({
+            currentLine: neighbor,
+            offset: nextOffset,
+            startFromP1: true,
+            lastPoint,
+            flipped: flipTracker,
+          });
         }
       }
 
       for (const neighbor of currentLine.neighbors.p1ToP2) {
         if (startFromP1) {
-          dataStack.push({ currentLine: neighbor, offset, startFromP1: false, lastPoint: startPoint, flipped: initFlipped });
+          dataStack.push({
+            currentLine: neighbor,
+            offset,
+            startFromP1: false,
+            lastPoint: startPoint,
+            flipped: initFlipped,
+          });
         } else {
-          dataStack.push({ currentLine: neighbor, offset: nextOffset, startFromP1: false, lastPoint, flipped: flipTracker });
+          dataStack.push({
+            currentLine: neighbor,
+            offset: nextOffset,
+            startFromP1: false,
+            lastPoint,
+            flipped: flipTracker,
+          });
         }
       }
 
       for (const neighbor of currentLine.neighbors.p2ToP1) {
         if (startFromP1) {
-          dataStack.push({ currentLine: neighbor, offset: nextOffset, startFromP1: true, lastPoint, flipped: flipTracker });
+          dataStack.push({
+            currentLine: neighbor,
+            offset: nextOffset,
+            startFromP1: true,
+            lastPoint,
+            flipped: flipTracker,
+          });
         } else {
-          dataStack.push({ currentLine: neighbor, offset, startFromP1: true, lastPoint: startPoint, flipped: initFlipped });
+          dataStack.push({
+            currentLine: neighbor,
+            offset,
+            startFromP1: true,
+            lastPoint: startPoint,
+            flipped: initFlipped,
+          });
         }
       }
 
       for (const neighbor of currentLine.neighbors.p2ToP2) {
         if (startFromP1) {
-          dataStack.push({ currentLine: neighbor, offset: nextOffset, startFromP1: false, lastPoint, flipped: flipTracker });
+          dataStack.push({
+            currentLine: neighbor,
+            offset: nextOffset,
+            startFromP1: false,
+            lastPoint,
+            flipped: flipTracker,
+          });
         } else {
-          dataStack.push({ currentLine: neighbor, offset, startFromP1: false, lastPoint: startPoint, flipped: initFlipped });
+          dataStack.push({
+            currentLine: neighbor,
+            offset,
+            startFromP1: false,
+            lastPoint: startPoint,
+            flipped: initFlipped,
+          });
         }
       }
     }

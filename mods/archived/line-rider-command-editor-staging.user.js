@@ -1,4 +1,4 @@
-window.CMD_EDITOR_DEBUG=false;
+window.CMD_EDITOR_DEBUG = false;
 // ==UserScript==
 // @name         Command Editor Staging
 // @author       Tobias Bessler

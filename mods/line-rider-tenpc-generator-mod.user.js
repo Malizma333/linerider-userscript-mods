@@ -22,22 +22,22 @@
 const updateLines = (linesToRemove, linesToAdd, name) => ({
   type: "UPDATE_LINES",
   payload: { linesToRemove, linesToAdd },
-  meta: { name }
+  meta: { name },
 });
 
 const addLines = (line) => updateLines(null, line, "ADD_LINES");
 
 const commitTrackChanges = () => ({
-  type: "COMMIT_TRACK_CHANGES"
+  type: "COMMIT_TRACK_CHANGES",
 });
 
 const revertTrackChanges = () => ({
-  type: "REVERT_TRACK_CHANGES"
+  type: "REVERT_TRACK_CHANGES",
 });
 
 const setEditScene = (scene) => ({
   type: "SET_RENDERER_SCENE",
-  payload: { key: "edit", scene }
+  payload: { key: "edit", scene },
 });
 
 const getSimulatorCommittedTrack = state => state.simulator.committedEngine;
@@ -154,7 +154,7 @@ class TenPCMod {
           flipped: f,
           leftExtended: false,
           rightExtended: false,
-          multiplier: m
+          multiplier: m,
         });
       }
 
@@ -162,7 +162,8 @@ class TenPCMod {
       this.changed = true;
 
       const engine = window.store.getState().simulator.engine.engine;
-      const newNextRider = engine.getFrame(currentFrame + 1).snapshot.entities[0].entities[this.state.selectedRider - 1];
+      const newNextRider =
+        engine.getFrame(currentFrame + 1).snapshot.entities[0].entities[this.state.selectedRider - 1];
       mounted = newNextRider.riderMounted;
       i += 1;
     }
@@ -172,7 +173,7 @@ class TenPCMod {
 function main() {
   const {
     React,
-    store
+    store,
   } = window;
 
   const create = React.createElement;
@@ -187,7 +188,7 @@ function main() {
         ySpeed: 0,
         rotation: 0,
         selectedRider: 1,
-        riderCount: 1
+        riderCount: 1,
       };
 
       this.mod = new TenPCMod(store, this.state);
@@ -239,50 +240,49 @@ function main() {
       props = {
         ...props,
         checked: this.state[key],
-        onChange: e => this.setState({ [key]: e.target.checked })
+        onChange: e => this.setState({ [key]: e.target.checked }),
       };
 
-      return create("div", null,
-        title,
-        create("input", { type: "checkbox", ...props })
-      );
+      return create("div", null, title, create("input", { type: "checkbox", ...props }));
     }
 
     renderSlider(key, title, props) {
       props = {
         ...props,
         value: this.state[key],
-        onChange: create => this.setState({ [key]: parseFloat(create.target.value) })
+        onChange: create => this.setState({ [key]: parseFloat(create.target.value) }),
       };
 
-      return create("div", null,
+      return create(
+        "div",
+        null,
         title,
         create("input", { style: { width: "4em" }, type: "number", ...props }),
-        create("input", { type: "range", ...props, onFocus: create => create.target.blur() })
+        create("input", { type: "range", ...props, onFocus: create => create.target.blur() }),
       );
     }
 
     render() {
-      return create("div", null,
-        this.state.active && create("div", null,
-          this.renderSlider("xSpeed", "X Speed", { min: -99, max: 99, step: 1 }),
-          this.renderSlider("ySpeed", "Y Speed", { min: -99, max: 99, step: 1 }),
-          this.renderSlider("rotation", "Rotation", { min: 0, max: 360, step: 1 }),
-          this.state.riderCount > 1 && this.renderSlider("selectedRider", "Rider", { min: 1, max: this.state.riderCount, step: 1 }),
-          create("button", { style: { float: "left" }, onClick: () => this.onCommit() },
-            "Commit"
-          )
-        ),
-
-        create("button",
-          {
-            style: {
-              backgroundColor: this.state.active ? "lightblue" : null
-            },
-            onClick: this.onActivate.bind(this)
+      return create(
+        "div",
+        null,
+        this.state.active
+          && create(
+            "div",
+            null,
+            this.renderSlider("xSpeed", "X Speed", { min: -99, max: 99, step: 1 }),
+            this.renderSlider("ySpeed", "Y Speed", { min: -99, max: 99, step: 1 }),
+            this.renderSlider("rotation", "Rotation", { min: 0, max: 360, step: 1 }),
+            this.state.riderCount > 1
+              && this.renderSlider("selectedRider", "Rider", { min: 1, max: this.state.riderCount, step: 1 }),
+            create("button", { style: { float: "left" }, onClick: () => this.onCommit() }, "Commit"),
+          ),
+        create("button", {
+          style: {
+            backgroundColor: this.state.active ? "lightblue" : null,
           },
-          "TenPC Mod"
-        )
+          onClick: this.onActivate.bind(this),
+        }, "TenPC Mod"),
       );
     }
   }
@@ -304,7 +304,18 @@ if (window.registerCustomSetting) {
 
 function calcTransformedRider({ xSpeed = 0, ySpeed = 0, rotation = 0 } = {}, origin) {
   const { V2 } = window;
-  const cpArray = [V2.from(0, 0), V2.from(0, 5), V2.from(15, 5), V2.from(17.5, 0), V2.from(5, 0), V2.from(5, -5.5), V2.from(11.5, -5), V2.from(11.5, -5), V2.from(10, 5), V2.from(10, 5)];
+  const cpArray = [
+    V2.from(0, 0),
+    V2.from(0, 5),
+    V2.from(15, 5),
+    V2.from(17.5, 0),
+    V2.from(5, 0),
+    V2.from(5, -5.5),
+    V2.from(11.5, -5),
+    V2.from(11.5, -5),
+    V2.from(10, 5),
+    V2.from(10, 5),
+  ];
   const theta = Math.PI * rotation / 180;
   const rotationMatrix = [[Math.cos(theta), -Math.sin(theta)], [Math.sin(theta), Math.cos(theta)]];
   const transformedRider = [];
@@ -312,7 +323,7 @@ function calcTransformedRider({ xSpeed = 0, ySpeed = 0, rotation = 0 } = {}, ori
   for (let i = 0; i < cpArray.length; i++) {
     transformedRider.push(V2.from(
       rotationMatrix[0][0] * cpArray[i].x + rotationMatrix[1][0] * cpArray[i].y + origin.pos.x + xSpeed,
-      rotationMatrix[0][1] * cpArray[i].x + rotationMatrix[1][1] * cpArray[i].y + origin.pos.y + ySpeed
+      rotationMatrix[0][1] * cpArray[i].x + rotationMatrix[1][1] * cpArray[i].y + origin.pos.y + ySpeed,
     ));
   }
 
@@ -346,7 +357,7 @@ function* GenerateCannon(curRider, nextRider, targetRider) {
       p1: lineCenter.copy().sub(targetDir.copy().mul(0.5 * 1.0e-5)),
       p2: lineCenter.copy().add(targetDir.copy().mul(0.5 * 1.0e-5)),
       f: inverse,
-      m: speedReq * 10.0
+      m: speedReq * 10.0,
     };
   }
 }

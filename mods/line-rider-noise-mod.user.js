@@ -25,38 +25,38 @@ const EMPTY_SET = new Set();
 const updateLines = (linesToRemove, linesToAdd, name) => ({
   type: "UPDATE_LINES",
   payload: { linesToRemove, linesToAdd },
-  meta: { name: name }
+  meta: { name: name },
 });
 
 const addLines = (line) => updateLines(null, line, "ADD_LINES");
 
 const commitTrackChanges = () => ({
-  type: "COMMIT_TRACK_CHANGES"
+  type: "COMMIT_TRACK_CHANGES",
 });
 
 const revertTrackChanges = () => ({
-  type: "REVERT_TRACK_CHANGES"
+  type: "REVERT_TRACK_CHANGES",
 });
 
 const setEditScene = (scene) => ({
   type: "SET_RENDERER_SCENE",
-  payload: { key: "edit", scene }
+  payload: { key: "edit", scene },
 });
 
 const getToolState = (state, toolId) => state.toolState[toolId];
 const getSelectToolState = state => getToolState(state, SELECT_TOOL);
 const getSimulatorCommittedTrack = state => state.simulator.committedEngine;
 
-function main () {
+function main() {
   const {
     React,
-    store
+    store,
   } = window;
 
   const e = React.createElement;
 
   class NoiseModComponent extends React.Component {
-    constructor (props) {
+    constructor(props) {
       super(props);
 
       this.state = {
@@ -66,13 +66,13 @@ function main () {
         iterations: 100,
         rotStep: 1,
         minScale: 1,
-        maxScale: 1
+        maxScale: 1,
       };
 
       this.currentShape = [];
     }
 
-    componentDidUpdate (_, prevState) {
+    componentDidUpdate(_, prevState) {
       let diff = false;
 
       for (let key in this.state) {
@@ -86,7 +86,7 @@ function main () {
       }
     }
 
-    onActivate () {
+    onActivate() {
       if (this.state.active) {
         this.setState({ active: false });
       } else {
@@ -94,7 +94,7 @@ function main () {
       }
     }
 
-    onCapture () {
+    onCapture() {
       this.currentShape.length = 0;
       const selectedLineIds = new Set([...getSelectToolState(store.getState()).selectedPoints].map(i => i >> 1));
       const shape = [...selectedLineIds].map(id => store.getState().simulator.engine.getLine(id));
@@ -121,12 +121,12 @@ function main () {
           shape[i].y1 - midY,
           shape[i].x2 - midX,
           shape[i].y2 - midY,
-          shape[i].width
+          shape[i].width,
         ]);
       }
     }
 
-    onRefresh () {
+    onRefresh() {
       store.dispatch(revertTrackChanges());
 
       if (this.currentShape.length === 0 || !this.state.active) {
@@ -143,7 +143,7 @@ function main () {
         this.state.boundHeight,
         new Millions.Color(0, 0, 0, 255),
         1,
-        1
+        1,
       );
 
       store.dispatch(setEditScene(Millions.Scene.fromEntities(boundingBox)));
@@ -161,7 +161,7 @@ function main () {
             x2: (Math.cos(rot) * this.currentShape[i][2] - Math.sin(rot) * this.currentShape[i][3]) * scale + xPos,
             y2: (Math.sin(rot) * this.currentShape[i][2] + Math.cos(rot) * this.currentShape[i][3]) * scale + yPos,
             type: 2,
-            width: this.currentShape[i][4] * scale
+            width: this.currentShape[i][4] * scale,
           });
         }
       }
@@ -169,74 +169,76 @@ function main () {
       store.dispatch(addLines(lines));
     }
 
-    onCommit () {
+    onCommit() {
       store.dispatch(commitTrackChanges());
       store.dispatch(revertTrackChanges());
       store.dispatch(setEditScene(new Millions.Scene()));
       this.setState({ active: false });
     }
 
-    renderCheckbox (key, title = null) {
+    renderCheckbox(key, title = null) {
       if (!title) title = key;
 
       const props = {
         id: key,
         checked: this.state[key],
-        onChange: e => this.setState({ [key]: e.target.checked })
+        onChange: e => this.setState({ [key]: e.target.checked }),
       };
-      return e("div", null,
+      return e(
+        "div",
+        null,
         e("label", { style: { width: "4em" }, for: key }, title),
-        e("input", { style: { marginLeft: ".5em" }, type: "checkbox", ...props })
+        e("input", { style: { marginLeft: ".5em" }, type: "checkbox", ...props }),
       );
     }
 
-    renderSlider (key, title, props) {
+    renderSlider(key, title, props) {
       props = {
         ...props,
         value: this.state[key],
-        onChange: e => this.setState({ [key]: parseFloat(e.target.value) })
+        onChange: e => this.setState({ [key]: parseFloat(e.target.value) }),
       };
 
       return e(
-        "div", null,
+        "div",
+        null,
         title,
         e("input", { style: { width: "3em" }, type: "number", ...props }),
-        e("input", { type: "range", ...props, onFocus: e => e.target.blur() })
+        e("input", { type: "range", ...props, onFocus: e => e.target.blur() }),
       );
     }
 
-    render () {
-      return e("div", null,
-        this.state.active && e("div", null,
-          this.renderSlider("boundWidth", "Boundary Width", { min: 0, max: 10000, step: 1 }),
-          this.renderSlider("boundHeight", "Boundary Height", { min: 0, max: 10000, step: 1 }),
-          this.renderSlider("iterations", "Count", { min: 1, max: 10000, step: 1 }),
-          this.renderSlider("rotStep", "Rotation Variation", { min: 1, max: 360, step: 1 }),
-          this.renderSlider("maxScale", "Max Scale", { min: 0.01, max: 10, step: 0.01 }),
-          this.renderSlider("minScale", "Min Scale", { min: 0.01, max: 10, step: 0.01 }),
-          e("button", {
-            onClick: () => this.onCapture() },
-          "Capture Selected Shape"
+    render() {
+      return e(
+        "div",
+        null,
+        this.state.active
+          && e(
+            "div",
+            null,
+            this.renderSlider("boundWidth", "Boundary Width", { min: 0, max: 10000, step: 1 }),
+            this.renderSlider("boundHeight", "Boundary Height", { min: 0, max: 10000, step: 1 }),
+            this.renderSlider("iterations", "Count", { min: 1, max: 10000, step: 1 }),
+            this.renderSlider("rotStep", "Rotation Variation", { min: 1, max: 360, step: 1 }),
+            this.renderSlider("maxScale", "Max Scale", { min: 0.01, max: 10, step: 0.01 }),
+            this.renderSlider("minScale", "Min Scale", { min: 0.01, max: 10, step: 0.01 }),
+            e("button", {
+              onClick: () => this.onCapture(),
+            }, "Capture Selected Shape"),
+            e("button", {
+              onClick: () => this.onRefresh(),
+            }, "Refresh Visual"),
+            e("button", {
+              style: { float: "left" },
+              onClick: () => this.onCommit(),
+            }, "Commit"),
           ),
-          e("button", {
-            onClick: () => this.onRefresh() },
-          "Refresh Visual"
-          ),
-          e("button", {
-            style: { float: "left" },
-            onClick: () => this.onCommit() },
-          "Commit"
-          )
-        ),
-        e("button",
-          {
-            style: {
-              backgroundColor: this.state.active ? "lightblue" : null
-            },
-            onClick: this.onActivate.bind(this)
+        e("button", {
+          style: {
+            backgroundColor: this.state.active ? "lightblue" : null,
           },
-          "Noise Mod"
-        )
+          onClick: this.onActivate.bind(this),
+        }, "Noise Mod"),
       );
     }
   }

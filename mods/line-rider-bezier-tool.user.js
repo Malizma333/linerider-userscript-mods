@@ -24,7 +24,7 @@
 // jshint asi: true
 // jshint esversion: 6
 
-function parseFloatOrDefault (string, defaultValue = 0) {
+function parseFloatOrDefault(string, defaultValue = 0) {
   const x = parseFloat(string);
   return isNaN(x) ? defaultValue : x;
 }
@@ -37,38 +37,35 @@ const TOOL_LAYER = 0;
 const setToolState = (toolId, state) => ({
   type: "SET_TOOL_STATE",
   payload: state,
-  meta: { id: toolId }
+  meta: { id: toolId },
 });
 const revertTrackChanges = () => ({
   type: "REVERT_TRACK_CHANGES",
-  meta: { ignorable: true }
+  meta: { ignorable: true },
 });
 const updateLines = (name, linesToRemove, linesToAdd, initialLoad = false) => ({
   type: "UPDATE_LINES",
   payload: { linesToRemove, linesToAdd, initialLoad },
-  meta: { name }
+  meta: { name },
 });
 const addLines = lines => updateLines("ADD_LINES", null, lines);
 const commitTrackChanges = () => ({
-  type: "COMMIT_TRACK_CHANGES"
+  type: "COMMIT_TRACK_CHANGES",
 });
 
 const getToolState = (state, toolId) => state.toolState[toolId];
 const getEditorZoom = state => state.camera.editorZoom;
-const getModifier = (state, modifier) =>
-  state.command.activeModifiers.has(modifier);
+const getModifier = (state, modifier) => state.command.activeModifiers.has(modifier);
 const getPlayerRunning = state => state.player.running;
 const getSimulatorTrack = state => state.simulator.engine;
 const getSimulatorCommittedTrack = state => state.simulator.committedEngine;
 const getTrackLinesLocked = state => state.trackLinesLocked;
-const getSelectedLineType = state =>
-  (getTrackLinesLocked(state) ? 2 : state.selectedLineType);
+const getSelectedLineType = state => (getTrackLinesLocked(state) ? 2 : state.selectedLineType);
 
 class State {}
 class InitState extends State {}
 class ControlOneState extends State {
   /**
-   *
    * @param {ControlOneState} c
    * @param {V2} pos
    */
@@ -87,7 +84,6 @@ class ControlOneState extends State {
 }
 class ControlTwoState extends State {
   /**
-   *
    * @param {ControlTwoState} c
    * @param {V2} pos
    */
@@ -183,43 +179,43 @@ class EditState extends State {
     let nextPos = new V2(this.startPoint).add(p);
 
     switch (this.activePoint) {
-    case "p1":
-    case "p2":
-      if (pointSnap) {
-        nextPos = getPointSnapPos(nextPos, s, pendingLines, null, true);
-      }
-      break;
-    case "c1":
-      if (angleLock && this.p1.vec) {
-        nextPos = getAngleLockPos(nextPos, this.p1, this.p1.vec);
-      }
-      break;
-    case "c2":
-      if (angleLock && this.p2.vec) {
-        nextPos = getAngleLockPos(nextPos, this.p2, this.p2.vec);
-      }
-      break;
+      case "p1":
+      case "p2":
+        if (pointSnap) {
+          nextPos = getPointSnapPos(nextPos, s, pendingLines, null, true);
+        }
+        break;
+      case "c1":
+        if (angleLock && this.p1.vec) {
+          nextPos = getAngleLockPos(nextPos, this.p1, this.p1.vec);
+        }
+        break;
+      case "c2":
+        if (angleLock && this.p2.vec) {
+          nextPos = getAngleLockPos(nextPos, this.p2, this.p2.vec);
+        }
+        break;
     }
 
     switch (this.activePoint) {
-    case "p1": {
-      const delta = new V2(nextPos).sub(nextState.p1);
-      nextState.p1 = nextPos;
-      nextState.c1 = delta.add(nextState.c1);
-      break;
-    }
-    case "p2": {
-      const delta = new V2(nextPos).sub(nextState.p2);
-      nextState.p2 = nextPos;
-      nextState.c2 = delta.add(nextState.c2);
-      break;
-    }
-    case "c1":
-      nextState.c1 = nextPos;
-      break;
-    case "c2":
-      nextState.c2 = nextPos;
-      break;
+      case "p1": {
+        const delta = new V2(nextPos).sub(nextState.p1);
+        nextState.p1 = nextPos;
+        nextState.c1 = delta.add(nextState.c1);
+        break;
+      }
+      case "p2": {
+        const delta = new V2(nextPos).sub(nextState.p2);
+        nextState.p2 = nextPos;
+        nextState.c2 = delta.add(nextState.c2);
+        break;
+      }
+      case "c1":
+        nextState.c1 = nextPos;
+        break;
+      case "c2":
+        nextState.c2 = nextPos;
+        break;
     }
     return nextState;
   }
@@ -229,8 +225,7 @@ const THICKNESS = 1;
 const POINT_RADIUS = 10;
 
 /** @param {State} toolState */
-const setBezierToolState = toolState =>
-  setToolState(TOOL_ID, { state: toolState });
+const setBezierToolState = toolState => setToolState(TOOL_ID, { state: toolState });
 /** @return {State} */
 const getBezierToolState = state => getToolState(state, TOOL_ID).state;
 
@@ -240,14 +235,14 @@ function genLine(x1, y1, x2, y2, thickness, color, zIndex) {
     y: y1,
     colorA: color,
     colorB: color,
-    thickness
+    thickness,
   };
   let p2 = {
     x: x2,
     y: y2,
     colorA: color,
     colorB: color,
-    thickness
+    thickness,
   };
   return new Millions.Line(p1, p2, TOOL_LAYER, zIndex);
 }
@@ -257,7 +252,7 @@ function genBoxOutline(x1, y1, x2, y2, thickness, color, zIndex) {
     genLine(x1, y1, x1, y2, thickness, color, zIndex),
     genLine(x1, y2, x2, y2, thickness, color, zIndex + 0.1),
     genLine(x2, y2, x2, y1, thickness, color, zIndex + 0.2),
-    genLine(x2, y1, x1, y1, thickness, color, zIndex + 0.3)
+    genLine(x2, y1, x1, y1, thickness, color, zIndex + 0.3),
   ];
 }
 
@@ -269,14 +264,14 @@ function genPoint(x, y, r, borderThickness, fillColor, borderColor, zIndex) {
     y + r,
     borderThickness,
     borderColor,
-    zIndex + 0.5
+    zIndex + 0.5,
   );
 }
 
 const Zoom = {
   STRENGTH: Math.pow(2, 1 / 64),
   MIN: 1 / 16,
-  MAX: 32
+  MAX: 32,
 };
 const MAX_SNAP_DISTANCE = 6;
 function getPointSnapPos(pos, state, ignoreLineIds, ignorePoint, withLineVec) {
@@ -291,8 +286,9 @@ function getPointSnapPos(pos, state, ignoreLineIds, ignorePoint, withLineVec) {
   let lines = track.selectLinesInRadius(pos, closestDistance);
 
   function getCloserPoint(point, otherPoint) {
-    if (ignorePoint && point.x === ignorePoint.x && point.y === ignorePoint.y)
+    if (ignorePoint && point.x === ignorePoint.x && point.y === ignorePoint.y) {
       return;
+    }
 
     let distance = pos.dist(point);
     if (distance < closestDistance) {
@@ -312,7 +308,7 @@ function getPointSnapPos(pos, state, ignoreLineIds, ignorePoint, withLineVec) {
     snapPos = {
       x: snapPos.x,
       y: snapPos.y,
-      vec: new V2(snapPos).sub(otherPointOfSnappedLine).norm()
+      vec: new V2(snapPos).sub(otherPointOfSnappedLine).norm(),
     };
   }
 
@@ -330,13 +326,13 @@ function main() {
   const Colors = {
     One: new Millions.Color(255, 0, 0, 255),
     Two: new Millions.Color(255, 0, 0, 255),
-    PointBorder: new Millions.Color(0, 0, 0, 255)
+    PointBorder: new Millions.Color(0, 0, 0, 255),
   };
 
   // SceneLayer is not exported so here's a hack to retreive it
   const SceneLayer = window.Tools.SELECT_TOOL.getSceneLayer({
     ...store.getState(),
-    toolState: { SELECT_TOOL: { status: {}, selectedPoints: [] } }
+    toolState: { SELECT_TOOL: { status: {}, selectedPoints: [] } },
   }).constructor;
 
   class BezierTool extends DefaultTool {
@@ -354,7 +350,7 @@ function main() {
     shouldPointSnap() {
       const disableSnap = getModifier(
         this.getState(),
-        "modifiers.disablePointSnap"
+        "modifiers.disablePointSnap",
       );
       return !disableSnap;
     }
@@ -380,9 +376,9 @@ function main() {
       const entities = [];
 
       if (
-        s instanceof ControlOneState ||
-        s instanceof ControlTwoState ||
-        s instanceof EditState
+        s instanceof ControlOneState
+        || s instanceof ControlTwoState
+        || s instanceof EditState
       ) {
         entities.push(
           genLine(
@@ -392,8 +388,8 @@ function main() {
             s.c1.y,
             THICKNESS / zoom,
             Colors.One,
-            1
-          )
+            1,
+          ),
         );
       }
       if (s instanceof ControlTwoState || s instanceof EditState) {
@@ -405,8 +401,8 @@ function main() {
             s.c2.y,
             THICKNESS / zoom,
             Colors.Two,
-            2
-          )
+            2,
+          ),
         );
       }
 
@@ -419,8 +415,8 @@ function main() {
             1 / zoom,
             Colors.One,
             Colors.PointBorder,
-            3
-          )
+            3,
+          ),
         );
         entities.push(
           ...genPoint(
@@ -430,8 +426,8 @@ function main() {
             1 / zoom,
             Colors.One,
             Colors.PointBorder,
-            4
-          )
+            4,
+          ),
         );
         entities.push(
           ...genPoint(
@@ -441,8 +437,8 @@ function main() {
             1 / zoom,
             Colors.Two,
             Colors.PointBorder,
-            5
-          )
+            5,
+          ),
         );
         entities.push(
           ...genPoint(
@@ -452,8 +448,8 @@ function main() {
             1 / zoom,
             Colors.Two,
             Colors.PointBorder,
-            6
-          )
+            6,
+          ),
         );
       }
       for (let e of entities) {
@@ -479,7 +475,7 @@ function main() {
             this.dispatch(revertTrackChanges());
             this.addCurve(state);
           }
-        }
+        },
       });
 
       this.radius = window.bezierToolRadius || 0;
@@ -495,7 +491,7 @@ function main() {
             this.dispatch(revertTrackChanges());
             this.addCurve(state);
           }
-        }
+        },
       });
 
       this.scnWidth = window.bezierToolWidth || 1;
@@ -511,7 +507,7 @@ function main() {
             this.dispatch(revertTrackChanges());
             this.addCurve(state);
           }
-        }
+        },
       });
 
       this.multiplier = window.bezierToolMultiplier || 1;
@@ -527,7 +523,7 @@ function main() {
             this.dispatch(revertTrackChanges());
             this.addCurve(state);
           }
-        }
+        },
       });
 
       this.dispatch(setBezierToolState(new InitState()));
@@ -586,7 +582,7 @@ function main() {
           this.getState(),
           new Set(),
           this.shouldPointSnap(),
-          this.shouldAngleLock()
+          this.shouldAngleLock(),
         );
         if (nextState) {
           this.dispatch(revertTrackChanges());
@@ -619,7 +615,7 @@ function main() {
         [s.c1.x, s.c1.y],
         [s.c2.x, s.c2.y],
         [s.p2.x, s.p2.y],
-        2
+        2,
       );
 
       const lines = [];
@@ -636,7 +632,7 @@ function main() {
             y2: p[1],
             width: window.bezierToolWidth || 1,
             multiplier: window.bezierToolMultiplier || 1,
-            type
+            type,
           });
         } else {
           const norm = V2.from(p[0] - prevPoint[0], p[1] - prevPoint[1]).rotCW().norm().mul(this.radius);
@@ -649,7 +645,7 @@ function main() {
             y2: p[1] - norm.y,
             width: window.bezierToolWidth || 1,
             multiplier: window.bezierToolMultiplier || 1,
-            type
+            type,
           }, {
             flipped: !this.flipped,
             x1: prevPoint[0] + prevNorm.x,
@@ -658,7 +654,7 @@ function main() {
             y2: p[1] + norm.y,
             width: window.bezierToolWidth || 1,
             multiplier: window.bezierToolMultiplier || 1,
-            type
+            type,
           });
 
           prevNorm = norm;
@@ -689,7 +685,7 @@ function main() {
         radius: 0,
         scnWidth: 1,
         multiplier: 1,
-        flipped: false
+        flipped: false,
       };
 
       window.bezierToolRadius = 0;
@@ -699,9 +695,8 @@ function main() {
 
       store.subscribe(() => {
         if (!this._mounted) return;
-        const changed =
-          getSimulatorTrack(store.getState()) !==
-          getSimulatorCommittedTrack(store.getState());
+        const changed = getSimulatorTrack(store.getState())
+          !== getSimulatorCommittedTrack(store.getState());
         if (changed !== this.state.changed) {
           this.setState({ changed });
         }
@@ -745,41 +740,90 @@ function main() {
       };
       const onFlippedChange = () => {
         const flipped = !this.state.flipped;
-        this.setState({flipped});
+        this.setState({ flipped });
         window.bezierToolFlipped = flipped;
       };
       return e("div", null, [
         "Bezier Tool",
         e("div", null, [
-          e("label", null,
+          e(
+            "label",
+            null,
             "Flip",
-            e("input", { type: "checkbox", checked: this.state.flipped, onClick: onFlippedChange })
+            e("input", { type: "checkbox", checked: this.state.flipped, onClick: onFlippedChange }),
           ),
-          e("div", null,
+          e(
+            "div",
+            null,
             "Radius",
-            e("input", { style: { width: "3em" }, type: "number", onChange: onRadiusChange, min: 0, value: this.state.radius }),
-            e("input", { type: "range", onChange: onRadiusChange, onFocus: e => e.target.blur(), min: 0, max: 20, step: 0.1, value: this.state.radius })
+            e("input", {
+              style: { width: "3em" },
+              type: "number",
+              onChange: onRadiusChange,
+              min: 0,
+              value: this.state.radius,
+            }),
+            e("input", {
+              type: "range",
+              onChange: onRadiusChange,
+              onFocus: e => e.target.blur(),
+              min: 0,
+              max: 20,
+              step: 0.1,
+              value: this.state.radius,
+            }),
           ),
-          e("div", null,
+          e(
+            "div",
+            null,
             "Scenery Width",
-            e("input", { style: { width: "3em" }, type: "number", onChange: onSceneryWidthChange, min: 0.01, value: this.state.scnWidth }),
-            e("input", { type: "range", onChange: onSceneryWidthChange, onFocus: e => e.target.blur(), min: 0.01, max: 20, step: 0.1, value: this.state.scnWidth })
+            e("input", {
+              style: { width: "3em" },
+              type: "number",
+              onChange: onSceneryWidthChange,
+              min: 0.01,
+              value: this.state.scnWidth,
+            }),
+            e("input", {
+              type: "range",
+              onChange: onSceneryWidthChange,
+              onFocus: e => e.target.blur(),
+              min: 0.01,
+              max: 20,
+              step: 0.1,
+              value: this.state.scnWidth,
+            }),
           ),
-          e("div", null,
+          e(
+            "div",
+            null,
             "Multiplier",
-            e("input", { style: { width: "3em" }, type: "number", onChange: onMultiplierChange, value: this.state.multiplier }),
-            e("input", { type: "range", onChange: onMultiplierChange, onFocus: e => e.target.blur(), min: -255, max: 255, step: 0.1, value: this.state.multiplier })
+            e("input", {
+              style: { width: "3em" },
+              type: "number",
+              onChange: onMultiplierChange,
+              value: this.state.multiplier,
+            }),
+            e("input", {
+              type: "range",
+              onChange: onMultiplierChange,
+              onFocus: e => e.target.blur(),
+              min: -255,
+              max: 255,
+              step: 0.1,
+              value: this.state.multiplier,
+            }),
           ),
           e(
             "button",
             {
               onClick: this.onCommit.bind(this),
-              disabled: !this.state.changed
+              disabled: !this.state.changed,
             },
-            "Commit"
+            "Commit",
           ),
-          e("button", { onClick: this.onReset.bind(this) }, "Reset")
-        ])
+          e("button", { onClick: this.onReset.bind(this) }, "Reset"),
+        ]),
       ]);
     }
   }

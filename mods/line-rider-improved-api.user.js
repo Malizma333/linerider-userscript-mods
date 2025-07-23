@@ -24,7 +24,7 @@
 
 const setTool = (tool) => ({
   type: "SET_TOOL",
-  payload: tool
+  payload: tool,
 });
 
 const getActiveTool = state => state.selectedTool;
@@ -35,11 +35,11 @@ const defaultPreferences = {
   settingsTop: "65vh",
   settingsLeft: "78vw",
   settingsWidth: "20vw",
-  settingsHeight: "25vh"
+  settingsHeight: "25vh",
 };
 const preferencesKey = "MOD_API_PREFERENCES";
 
-function loadPrefs () {
+function loadPrefs() {
   const storedPreferences = window.localStorage.getItem(preferencesKey);
   if (storedPreferences) {
     const nextPrefs = JSON.parse(storedPreferences);
@@ -55,20 +55,20 @@ function loadPrefs () {
   return defaultPreferences;
 }
 
-function savePrefs (newPrefs) {
+function savePrefs(newPrefs) {
   window.localStorage.setItem(
     preferencesKey,
-    JSON.stringify(newPrefs)
+    JSON.stringify(newPrefs),
   );
 }
 
-function main () {
+function main() {
   window.V2 = window.V2 || window.store.getState().simulator.engine.engine.state.startPoint.constructor;
 
   const {
     React,
     ReactDOM,
-    store
+    store,
   } = window;
 
   const e = React.createElement;
@@ -85,7 +85,7 @@ function main () {
     resize: "both",
     overflow: "hidden",
     opacity: 0,
-    pointerEvents: "none"
+    pointerEvents: "none",
   };
 
   const toolContainerStyle = {
@@ -99,7 +99,7 @@ function main () {
     border: "1px solid black",
     backgroundColor: "#ffffff",
     pointerEvents: "none",
-    opacity: 0
+    opacity: 0,
   };
 
   const headerStyle = {
@@ -107,14 +107,14 @@ function main () {
     minHeight: "3ch",
     backgroundColor: "#aaaaaa",
     zIndex: "10",
-    borderBottom: "3px solid black"
+    borderBottom: "3px solid black",
   };
 
   const minifyButtonStyle = {
     height: "100%",
     aspectRatio: "1/1",
     border: "none",
-    background: "none"
+    background: "none",
   };
 
   const expandButtonStyle = {
@@ -127,7 +127,7 @@ function main () {
     right: "1vw",
     fontSize: "xx-large",
     aspectRatio: "1/1",
-    borderRadius: "100%"
+    borderRadius: "100%",
   };
 
   settingsContainerStyle.top = preferences.settingsTop;
@@ -149,12 +149,12 @@ function main () {
   });
 
   class CustomToolsContainer extends React.Component {
-    constructor () {
+    constructor() {
       super();
 
       this.state = {
         activeTool: getActiveTool(store.getState()),
-        customTools: {}
+        customTools: {},
       };
 
       store.subscribe(() => {
@@ -169,7 +169,7 @@ function main () {
       });
     }
 
-    componentDidMount () {
+    componentDidMount() {
       let containerAssigned = false;
       window.registerCustomTool = (toolName, tool, component, onDetach) => {
         console.info("Registering custom tool", toolName);
@@ -179,8 +179,8 @@ function main () {
         this.setState((prevState) => ({
           customTools: {
             ...prevState.customTools,
-            [toolName]: { component, onDetach }
-          }
+            [toolName]: { component, onDetach },
+          },
         }));
 
         if (onDetach) {
@@ -194,7 +194,7 @@ function main () {
       };
     }
 
-    render () {
+    render() {
       const activeCustomTool = this.state.customTools[this.state.activeTool];
 
       const rootStyle = {
@@ -205,14 +205,14 @@ function main () {
         flex: 1,
         width: "100%",
         overflowY: "auto",
-        overflowX: "hidden"
+        overflowX: "hidden",
       };
 
       const boxStyle = {
         display: "flex",
         flexDirection: "column-reverse",
         padding: 8,
-        width: "100%"
+        width: "100%",
       };
 
       return e(
@@ -227,23 +227,24 @@ function main () {
               style: { textAlign: "center", width: "150px" },
               maxMenuHeight: 100,
               value: this.state.activeTool,
-              onChange: e => store.dispatch(setTool(e.target.value))
+              onChange: e => store.dispatch(setTool(e.target.value)),
             },
             e("option", { value: "PENCIL_TOOL" }, "- Select Tool -"),
             ...Object.keys(this.state.customTools).map(
-              toolName => e(
-                "option",
-                { value: toolName },
-                toolName
-              )
-            )
-          )
+              toolName =>
+                e(
+                  "option",
+                  { value: toolName },
+                  toolName,
+                ),
+            ),
+          ),
         ),
         activeCustomTool && activeCustomTool.component && e(
           "div",
           { style: boxStyle },
-          e(activeCustomTool.component)
-        )
+          e(activeCustomTool.component),
+        ),
       );
     }
   }
@@ -254,28 +255,28 @@ function main () {
 
   ReactDOM.render(
     e(CustomToolsContainer),
-    toolContainer
+    toolContainer,
   );
 
   const dragProps = { lastX: 0, lastY: 0 };
 
   class CustomSettingsContainer extends React.Component {
-    constructor () {
+    constructor() {
       super();
 
       this.state = {
         customSettings: [],
-        searchTerm: ""
+        searchTerm: "",
       };
     }
 
-    componentDidMount () {
+    componentDidMount() {
       let containerAssigned = false;
 
       window.registerCustomSetting = (component) => {
         console.info("Registering custom setting", component.name);
         this.setState((prevState) => ({
-          customSettings: [...prevState.customSettings, component]
+          customSettings: [...prevState.customSettings, component],
         }));
 
         if (!containerAssigned) {
@@ -292,14 +293,16 @@ function main () {
       window.addEventListener("resize", this.updateDimensions);
     }
 
-    updateDimensions () {
+    updateDimensions() {
       if (settingsContainer.offsetLeft < 0) {
         settingsContainer.style.left = `${0}vw`;
         preferences.settingsLeft = `${0}vw`;
       }
 
       if (settingsContainer.offsetLeft > window.innerWidth - settingsContainer.offsetWidth) {
-        settingsContainer.style.left = `${100 * (window.innerWidth - settingsContainer.offsetWidth) / window.innerWidth}vw`;
+        settingsContainer.style.left = `${
+          100 * (window.innerWidth - settingsContainer.offsetWidth) / window.innerWidth
+        }vw`;
         preferences.settingsLeft = `${100 * (window.innerWidth - settingsContainer.offsetWidth) / window.innerWidth}vw`;
       }
 
@@ -309,14 +312,18 @@ function main () {
       }
 
       if (settingsContainer.offsetTop > window.innerHeight - settingsContainer.offsetHeight) {
-        settingsContainer.style.top = `${100 * (window.innerHeight - settingsContainer.offsetHeight) / window.innerHeight}vh`;
-        preferences.settingsTop = `${100 * (window.innerHeight - settingsContainer.offsetHeight) / window.innerHeight}vh`;
+        settingsContainer.style.top = `${
+          100 * (window.innerHeight - settingsContainer.offsetHeight) / window.innerHeight
+        }vh`;
+        preferences.settingsTop = `${
+          100 * (window.innerHeight - settingsContainer.offsetHeight) / window.innerHeight
+        }vh`;
       }
 
       savePrefs(preferences);
     }
 
-    onStartDrag (e) {
+    onStartDrag(e) {
       e = e || window.event;
       e.preventDefault();
 
@@ -327,7 +334,7 @@ function main () {
       document.onmouseup = this.onCloseDrag;
     }
 
-    onDrag (e) {
+    onDrag(e) {
       e = e || window.event;
       e.preventDefault();
 
@@ -339,8 +346,10 @@ function main () {
       const nextOffsetX = settingsContainer.offsetLeft - newX;
       const nextOffsetY = settingsContainer.offsetTop - newY;
 
-      if (nextOffsetX >= 0 && nextOffsetX <= window.innerWidth - settingsContainer.offsetWidth &&
-             nextOffsetY >= 0 && nextOffsetY <= window.innerHeight - settingsContainer.offsetHeight) {
+      if (
+        nextOffsetX >= 0 && nextOffsetX <= window.innerWidth - settingsContainer.offsetWidth
+        && nextOffsetY >= 0 && nextOffsetY <= window.innerHeight - settingsContainer.offsetHeight
+      ) {
         settingsContainer.style.left = `${100 * (settingsContainer.offsetLeft - newX) / window.innerWidth}vw`;
         settingsContainer.style.top = `${100 * (settingsContainer.offsetTop - newY) / window.innerHeight}vh`;
         preferences.settingsLeft = `${100 * (settingsContainer.offsetLeft - newX) / window.innerWidth}vw`;
@@ -350,22 +359,22 @@ function main () {
       savePrefs(preferences);
     }
 
-    onCloseDrag (e) {
+    onCloseDrag(e) {
       document.onmouseup = null;
       document.onmousemove = null;
     }
 
-    render () {
+    render() {
       const rootStyle = {
         height: "100%",
         overflowY: "scroll",
         overflowX: "hidden",
         display: "flex",
         flexDirection: "column-reverse",
-        textAlign: "right"
+        textAlign: "right",
       };
 
-      this.state.customSettings.sort(function (modA, modB) {
+      this.state.customSettings.sort(function(modA, modB) {
         const modAName = modA.name.toUpperCase();
         const modBName = modB.name.toUpperCase();
         return -((modAName < modBName) ? -1 : (modAName > modBName) ? 1 : 0);
@@ -381,10 +390,13 @@ function main () {
             "button",
             {
               style: minifyButtonStyle,
-              onClick: () => { settingsContainer.style.visibility = "hidden"; expandButton.style.visibility = "visible"; }
+              onClick: () => {
+                settingsContainer.style.visibility = "hidden";
+                expandButton.style.visibility = "visible";
+              },
             },
-            "-"
-          )
+            "-",
+          ),
         ),
         e(
           "input",
@@ -392,22 +404,25 @@ function main () {
             style: { width: "100%" },
             placeholder: "Search...",
             value: this.state.searchTerm,
-            onChange: (e) => { this.setState({ searchTerm: e.target.value }); }
-          }
+            onChange: (e) => {
+              this.setState({ searchTerm: e.target.value });
+            },
+          },
         ),
         e(
           "div",
           { style: rootStyle },
           this.state.customSettings.filter(
-            (mod) => mod.name.toUpperCase().includes(this.state.searchTerm.toUpperCase())
+            (mod) => mod.name.toUpperCase().includes(this.state.searchTerm.toUpperCase()),
           ).map(
-            (mod) => e(
-              "div",
-              { style: { width: "100%", borderTop: "2px solid black" } },
-              e(mod)
-            )
-          )
-        )
+            (mod) =>
+              e(
+                "div",
+                { style: { width: "100%", borderTop: "2px solid black" } },
+                e(mod),
+              ),
+          ),
+        ),
       );
     }
   }
@@ -415,7 +430,10 @@ function main () {
   const expandButton = document.createElement("button");
   expandButton.innerHTML = "↖";
   expandButton.title = "Show ModAPI";
-  expandButton.onclick = () => { settingsContainer.style.visibility = "visible"; expandButton.style.visibility = "hidden"; };
+  expandButton.onclick = () => {
+    settingsContainer.style.visibility = "visible";
+    expandButton.style.visibility = "hidden";
+  };
   document.getElementById("content").appendChild(expandButton);
 
   const settingsContainer = document.createElement("div");
@@ -424,7 +442,7 @@ function main () {
 
   ReactDOM.render(
     e(CustomSettingsContainer),
-    settingsContainer
+    settingsContainer,
   );
 
   const resizeObserver = new window.ResizeObserver(() => {

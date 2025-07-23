@@ -22,17 +22,17 @@
 /* Actions */
 
 const commitTrackChanges = () => ({
-  type: "COMMIT_TRACK_CHANGES"
+  type: "COMMIT_TRACK_CHANGES",
 });
 
 const revertTrackChanges = () => ({
-  type: "REVERT_TRACK_CHANGES"
+  type: "REVERT_TRACK_CHANGES",
 });
 
 /* Selectors */
 
 class Mod {
-  constructor (store, initState) {
+  constructor(store, initState) {
     this.store = store;
     this.state = initState;
 
@@ -45,7 +45,7 @@ class Mod {
     });
   }
 
-  commit () {
+  commit() {
     if (!this.changed) return false;
 
     this.store.dispatch(commitTrackChanges());
@@ -54,7 +54,7 @@ class Mod {
     return true;
   }
 
-  onUpdate (nextState = this.state) {
+  onUpdate(nextState = this.state) {
     let shouldUpdate = false;
 
     if (this.state !== nextState) {
@@ -81,34 +81,33 @@ class Mod {
   }
 }
 
-function main () {
+function main() {
   const {
     React,
-    store
+    store,
   } = window;
   const c = React.createElement;
 
   class ModComponent extends React.Component {
-    constructor (props) {
+    constructor(props) {
       super(props);
 
       this.state = {
-        active: false
+        active: false,
         /* State Props */
       };
 
       this.modLogic = new Mod(store, this.state);
 
       store.subscribe(() => {
-
       });
     }
 
-    componentWillUpdate (nextProps, nextState) {
+    componentWillUpdate(nextProps, nextState) {
       this.modLogic.onUpdate(nextState);
     }
 
-    onActivate () {
+    onActivate() {
       if (this.state.active) {
         this.setState({ active: false });
       } else {
@@ -116,7 +115,7 @@ function main () {
       }
     }
 
-    onCommit () {
+    onCommit() {
       const committed = this.modLogic.commit();
 
       if (committed) {
@@ -124,25 +123,23 @@ function main () {
       }
     }
 
-    render () {
-      return c("div", null,
-        this.state.active && c("div", null,
+    render() {
+      return c(
+        "div",
+        null,
+        this.state.active && c(
+          "div",
+          null,
           /* Mod UI */
-          c("button",
-            {
-              style: { float: "left" },
-              onClick: this.onCommit.bind(this)
-            },
-            "Commit"
-          )
+          c("button", {
+            style: { float: "left" },
+            onClick: this.onCommit.bind(this),
+          }, "Commit"),
         ),
-        c("button",
-          {
-            style: { backgroundColor: this.state.active ? "lightblue" : null },
-            onClick: this.onActivate.bind(this)
-          },
-          "New Mod"
-        )
+        c("button", {
+          style: { backgroundColor: this.state.active ? "lightblue" : null },
+          onClick: this.onActivate.bind(this),
+        }, "New Mod"),
       );
     }
   }

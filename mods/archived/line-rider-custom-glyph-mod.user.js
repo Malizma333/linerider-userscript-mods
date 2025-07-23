@@ -17,23 +17,23 @@
 const updateLines = (linesToRemove, linesToAdd, name) => ({
   type: "UPDATE_LINES",
   payload: { linesToRemove, linesToAdd },
-  meta: { name: name }
+  meta: { name: name },
 });
 
 const addLines = (line) => updateLines(null, line, "ADD_LINES");
 
 const commitTrackChanges = () => ({
-  type: "COMMIT_TRACK_CHANGES"
+  type: "COMMIT_TRACK_CHANGES",
 });
 
 const revertTrackChanges = () => ({
-  type: "REVERT_TRACK_CHANGES"
+  type: "REVERT_TRACK_CHANGES",
 });
 
 const getSimulatorCommittedTrack = state => state.simulator.committedEngine;
 
 class TextMod {
-  constructor (store, initState) {
+  constructor(store, initState) {
     this.store = store;
     this.state = initState;
 
@@ -46,7 +46,7 @@ class TextMod {
     });
   }
 
-  commit () {
+  commit() {
     if (this.changed) {
       this.store.dispatch(commitTrackChanges());
       this.store.dispatch(revertTrackChanges());
@@ -55,7 +55,7 @@ class TextMod {
     }
   }
 
-  onUpdate (nextState = this.state) {
+  onUpdate(nextState = this.state) {
     let shouldUpdate = false;
 
     if (!this.state.active && nextState.active) {
@@ -80,7 +80,6 @@ class TextMod {
     }
 
     if (shouldUpdate) {
-
       if (this.changed) {
         this.store.dispatch(revertTrackChanges());
         this.changed = false;
@@ -95,7 +94,7 @@ class TextMod {
             y1: p1.y,
             x2: p2.x,
             y2: p2.y,
-            type: 2
+            type: 2,
           });
         }
 
@@ -108,33 +107,33 @@ class TextMod {
   }
 }
 
-function main () {
+function main() {
   const {
     React,
-    store
+    store,
   } = window;
 
   const create = React.createElement;
 
   class TextModComponent extends React.Component {
-    constructor (props) {
+    constructor(props) {
       super(props);
 
       this.state = {
         active: false,
         text: "",
         fontFile: null,
-        fontName: ""
+        fontName: "",
       };
 
       this.textMod = new TextMod(store, this.state);
     }
 
-    componentWillUpdate (nextProps, nextState) {
+    componentWillUpdate(nextProps, nextState) {
       this.textMod.onUpdate(nextState);
     }
 
-    onActivate () {
+    onActivate() {
       if (this.state.active) {
         this.setState({ active: false });
         this.setState({ text: "" });
@@ -143,7 +142,7 @@ function main () {
       }
     }
 
-    onFileChange () {
+    onFileChange() {
       return new Promise((resolve) => {
         const file = event.target.files[0];
         const fileReader = new FileReader();
@@ -163,7 +162,7 @@ function main () {
       });
     }
 
-    onCommit () {
+    onCommit() {
       const committed = this.textMod.commit();
       if (committed) {
         this.setState({ active: false });
@@ -171,41 +170,53 @@ function main () {
       }
     }
 
-    render () {
-      return create("div", null,
-        this.state.active && create("div", null,
-          create("div", null,
-            "Font: ",
-            create("input", { type: "file",
-              onChange: () => this.onFileChange().then(result => {
-                result = normalizeLines(result);
-                this.setState({ fontFile : result });
-                this.setState({ fontName : result.fileName });
-                console.log("Loaded " + result.fileName + " successfully");
-              }).catch(err => {console.log("Error when parsing: Invalid font file"); console.log(err);})
-            })
+    render() {
+      return create(
+        "div",
+        null,
+        this.state.active
+          && create(
+            "div",
+            null,
+            create(
+              "div",
+              null,
+              "Font: ",
+              create("input", {
+                type: "file",
+                onChange: () =>
+                  this.onFileChange().then(result => {
+                    result = normalizeLines(result);
+                    this.setState({ fontFile: result });
+                    this.setState({ fontName: result.fileName });
+                    console.log("Loaded " + result.fileName + " successfully");
+                  }).catch(err => {
+                    console.log("Error when parsing: Invalid font file");
+                    console.log(err);
+                  }),
+              }),
+            ),
+            this.state.fontFile != null && create("div", null, "Loaded: " + this.state.fontName),
+            this.state.fontFile != null
+              && create(
+                "div",
+                null,
+                "Text: ",
+                create("textArea", {
+                  style: { width: "88%" },
+                  type: "text",
+                  value: this.state.text,
+                  onChange: create => this.setState({ text: create.target.value }),
+                }),
+              ),
+            create("button", { style: { float: "left" }, onClick: () => this.onCommit() }, "Commit"),
           ),
-          this.state.fontFile != null && create("div", null, "Loaded: " + this.state.fontName),
-          this.state.fontFile != null && create("div", null,
-            "Text: ",
-            create("textArea", { style: { width: "88%" }, type: "text",
-              value: this.state.text,
-              onChange: create => this.setState({ text: create.target.value })
-            })
-          ),
-          create("button", { style: { float: "left" }, onClick: () => this.onCommit() },
-            "Commit"
-          )
-        ),
-        create("button",
-          {
-            style: {
-              backgroundColor: this.state.active ? "lightblue" : null
-            },
-            onClick: this.onActivate.bind(this)
+        create("button", {
+          style: {
+            backgroundColor: this.state.active ? "lightblue" : null,
           },
-          "Text Mod"
-        )
+          onClick: this.onActivate.bind(this),
+        }, "Text Mod"),
       );
     }
   }
@@ -224,7 +235,7 @@ if (window.registerCustomSetting) {
 }
 
 // function to generate text based on given font
-function* genLines ({ text = "", fontFile = null } = {}) {
+function* genLines({ text = "", fontFile = null } = {}) {
   // check if the font file is valid
   if (fontFile != null) {
     const { V2 } = window;
@@ -259,7 +270,7 @@ function* genLines ({ text = "", fontFile = null } = {}) {
       for (const line of fontFile[c]) {
         yield {
           p1: V2.from(line.x1 + offset.x, line.y1 + offset.y + charOffset.y),
-          p2: V2.from(line.x2 + offset.x, line.y2 + offset.y + charOffset.y)
+          p2: V2.from(line.x2 + offset.x, line.y2 + offset.y + charOffset.y),
         };
       }
     }
@@ -267,11 +278,11 @@ function* genLines ({ text = "", fontFile = null } = {}) {
 }
 
 // function to normalize each letter in a font
-function normalizeLines (fontFile) {
+function normalizeLines(fontFile) {
   const { V2 } = window;
 
   Object.entries(fontFile).forEach((entry) => {
-    const [ key, value ] = entry;
+    const [key, value] = entry;
 
     // continue on non-character keys
     if (key.length > 1) return;

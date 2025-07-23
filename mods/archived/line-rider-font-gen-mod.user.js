@@ -16,17 +16,17 @@
 
 const SELECT_TOOL = "SELECT_TOOL";
 const EMPTY_SET = new Set();
-const NEW_FONT = { "style": { "spacing": 5, "lineHeight" : 20, "yOffset": {} } };
+const NEW_FONT = { "style": { "spacing": 5, "lineHeight": 20, "yOffset": {} } };
 
 const setTool = (tool) => ({
   type: "SET_TOOL",
-  payload: tool
+  payload: tool,
 });
 
 const setToolState = (toolId, state) => ({
   type: "SET_TOOL_STATE",
   payload: state,
-  meta: { id: toolId }
+  meta: { id: toolId },
 });
 
 const setSelectToolState = toolState => setToolState(SELECT_TOOL, toolState);
@@ -34,17 +34,17 @@ const setSelectToolState = toolState => setToolState(SELECT_TOOL, toolState);
 const updateLines = (linesToRemove, linesToAdd, name) => ({
   type: "UPDATE_LINES",
   payload: { linesToRemove, linesToAdd },
-  meta: { name: name }
+  meta: { name: name },
 });
 
 const addLines = (line) => updateLines(null, line, "ADD_LINES");
 
 const commitTrackChanges = () => ({
-  type: "COMMIT_TRACK_CHANGES"
+  type: "COMMIT_TRACK_CHANGES",
 });
 
 const revertTrackChanges = () => ({
-  type: "REVERT_TRACK_CHANGES"
+  type: "REVERT_TRACK_CHANGES",
 });
 
 const getActiveTool = state => state.selectedTool;
@@ -55,7 +55,7 @@ const getTrackLinesLocked = state => state.trackLinesLocked;
 const getSelectedLineType = state => (getTrackLinesLocked(state) ? 2 : state.selectedLineType);
 
 class FontMod {
-  constructor (store, initState) {
+  constructor(store, initState) {
     this.store = store;
     this.state = initState;
 
@@ -77,7 +77,7 @@ class FontMod {
     });
   }
 
-  onUpdate (nextState = this.state) {
+  onUpdate(nextState = this.state) {
     let shouldUpdate = false;
 
     if (!this.state.active && nextState.active) {
@@ -122,7 +122,7 @@ class FontMod {
 
     if (shouldUpdate) {
       if (this.state.active) {
-        this.lines = [ ...getLinesFromPoints(this.selectedPoints) ]
+        this.lines = [...getLinesFromPoints(this.selectedPoints)]
           .map(id => this.track.getLine(id))
           .filter(l => l);
       }
@@ -130,16 +130,16 @@ class FontMod {
   }
 }
 
-function main () {
+function main() {
   const {
     React,
-    store
+    store,
   } = window;
 
   const create = React.createElement;
 
   class FontModComponent extends React.Component {
-    constructor (props) {
+    constructor(props) {
       super(props);
 
       this.changed = false;
@@ -150,7 +150,7 @@ function main () {
         charSpacing: 0,
         lineHeight: 0,
         char: "",
-        charYOffset: 0
+        charYOffset: 0,
       };
 
       this.fontMod = new FontMod(store, this.state);
@@ -164,11 +164,11 @@ function main () {
       });
     }
 
-    componentWillUpdate (nextProps, nextState) {
+    componentWillUpdate(nextProps, nextState) {
       this.fontMod.onUpdate(nextState);
     }
 
-    onActivate () {
+    onActivate() {
       if (this.state.active) {
         this.setState({ active: false });
         this.setState({ charSpacing: 0 });
@@ -187,14 +187,14 @@ function main () {
       }
     }
 
-    onFileDownload () {
+    onFileDownload() {
       const fileName = "My-Font";
       const json = JSON.stringify(this.state.fontFile);
-      const blob = new Blob([ json ], { type: "application/json" });
+      const blob = new Blob([json], { type: "application/json" });
       const href = URL.createObjectURL(blob);
     }
 
-    onLetterCapture () {
+    onLetterCapture() {
       if (this.state.char != "" && this.fontMod.lines.length > 0) {
         const nFontFile = this.state.fontFile;
 
@@ -210,7 +210,7 @@ function main () {
       }
     }
 
-    onPreviewFont () {
+    onPreviewFont() {
       if (this.changed) {
         store.dispatch(revertTrackChanges());
         this.changed = false;
@@ -219,7 +219,7 @@ function main () {
         let text = "";
 
         Object.entries(font).forEach((entry) => {
-          const [ key, value ] = entry;
+          const [key, value] = entry;
 
           if (key.length > 1) return;
 
@@ -235,7 +235,7 @@ function main () {
               y1: p1.y,
               x2: p2.x,
               y2: p2.y,
-              type: 2
+              type: 2,
             });
           }
 
@@ -244,84 +244,119 @@ function main () {
             this.changed = true;
           }
         }
-
       }
     }
 
-    render () {
-      return create("div", null,
-        this.state.active && create("div", null,
-          create("div", null, "Spacing: ", create("input",
-            {
-              type: "number", min: -1000, max: 1000, step: 0.01,
+    render() {
+      return create(
+        "div",
+        null,
+        this.state.active && create(
+          "div",
+          null,
+          create(
+            "div",
+            null,
+            "Spacing: ",
+            create("input", {
+              type: "number",
+              min: -1000,
+              max: 1000,
+              step: 0.01,
               style: { width: "6em", textAlign: "right" },
               value: this.state.charSpacing,
-              onChange: create => {-1000 <= create.target.value && create.target.value <= 1000 && this.setState({ charSpacing: create.target.valueAsNumber });}
-            }
-          )),
-          create("div", null, "Line Height: ", create("input",
-            {
-              type: "number", min: -1000, max: 1000, step: 0.01,
+              onChange: create => {
+                -1000 <= create.target.value && create.target.value <= 1000
+                  && this.setState({ charSpacing: create.target.valueAsNumber });
+              },
+            }),
+          ),
+          create(
+            "div",
+            null,
+            "Line Height: ",
+            create("input", {
+              type: "number",
+              min: -1000,
+              max: 1000,
+              step: 0.01,
               style: { width: "4.5em", textAlign: "right" },
               value: this.state.lineHeight,
-              onChange: create => {-1000 <= create.target.value && create.target.value <= 1000 && this.setState({ lineHeight: create.target.valueAsNumber });}
-            }
-          )),
-          this.fontMod.lines.length > 0 && create("div", null, "Character: ", create("input",
-            {
+              onChange: create => {
+                -1000 <= create.target.value && create.target.value <= 1000
+                  && this.setState({ lineHeight: create.target.valueAsNumber });
+              },
+            }),
+          ),
+          this.fontMod.lines.length > 0 && create(
+            "div",
+            null,
+            "Character: ",
+            create("input", {
               type: "text",
               style: { width: "1.5em", textAlign: "right" },
               maxLength: 1,
               value: this.state.char,
-              onChange: create => {this.setState({ char: create.target.value }); this.setState({ charYOffset: 0 });}
-            }
-          )),
-          this.fontMod.lines.length > 0 && this.state.char != "" && create("div", null, `Y Offset (${this.state.char}): `, create("input",
-            {
-              type: "number", min: -1000, max: 1000, step: 0.01,
-              style: { width: "4.5em", textAlign: "right" },
-              value: this.state.charYOffset,
-              onChange: create => {-1000 <= create.target.value && create.target.value <= 1000 && this.setState({ charYOffset: create.target.valueAsNumber });}
-            }
-          )),
-          create("div", null,
-            create("button", {
-              style: { float: "left" },
-              onClick: () => this.onLetterCapture() },
-            "Capture"
-            ),
-            create("button", {
-              style: { float: "left" },
-              onClick: () => this.setState({ fontFile: NEW_FONT }) },
-            "Clear Font"
-            )
+              onChange: create => {
+                this.setState({ char: create.target.value });
+                this.setState({ charYOffset: 0 });
+              },
+            }),
           ),
-          create("div", null,
+          this.fontMod.lines.length > 0 && this.state.char != ""
+            && create(
+              "div",
+              null,
+              `Y Offset (${this.state.char}): `,
+              create("input", {
+                type: "number",
+                min: -1000,
+                max: 1000,
+                step: 0.01,
+                style: { width: "4.5em", textAlign: "right" },
+                value: this.state.charYOffset,
+                onChange: create => {
+                  -1000 <= create.target.value && create.target.value <= 1000
+                    && this.setState({ charYOffset: create.target.valueAsNumber });
+                },
+              }),
+            ),
+          create(
+            "div",
+            null,
+            create("button", {
+              style: { float: "left" },
+              onClick: () => this.onLetterCapture(),
+            }, "Capture"),
+            create("button", {
+              style: { float: "left" },
+              onClick: () => this.setState({ fontFile: NEW_FONT }),
+            }, "Clear Font"),
+          ),
+          create(
+            "div",
+            null,
             create("a", {
               style: { float: "left" },
               href: `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(this.state.fontFile))}`,
-              download: "My-Font.json" },
-            "Download Font"
-            )
+              download: "My-Font.json",
+            }, "Download Font"),
           ),
-          create("div", null,
+          create(
+            "div",
+            null,
             create("button", {
               style: { float: "left", backgroundColor: this.changed ? "lightblue" : null },
-              onClick: this.onPreviewFont.bind(this) },
-            "Preview Font"
-            )
-          )
-
+              onClick: this.onPreviewFont.bind(this),
+            }, "Preview Font"),
+          ),
         ),
-        create("button",
-          {
-            style: {
-              backgroundColor: this.state.active ? "lightblue" : null
-            },
-            onClick: this.onActivate.bind(this)
+        create("button", {
+          style: {
+            backgroundColor: this.state.active ? "lightblue" : null,
           },
-          "Font Generator"
-        )
+          onClick: this.onActivate.bind(this),
+        }, "Font Generator"),
       );
     }
   }
@@ -339,7 +374,7 @@ if (window.registerCustomSetting) {
   };
 }
 
-function setsEqual (a, b) {
+function setsEqual(a, b) {
   if (a === b) {
     return true;
   }
@@ -354,11 +389,11 @@ function setsEqual (a, b) {
   return true;
 }
 
-function getLinesFromPoints (points) {
-  return new Set([ ...points ].map(point => point >> 1));
+function getLinesFromPoints(points) {
+  return new Set([...points].map(point => point >> 1));
 }
 
-function* genLines (fontFile, text) {
+function* genLines(fontFile, text) {
   const { V2 } = window;
   const camPos = window.store.getState().camera.editorPosition;
   const fontStyle = fontFile.style;
@@ -391,17 +426,17 @@ function* genLines (fontFile, text) {
     for (const line of fontFile[c]) {
       yield {
         p1: V2.from(line.x1 + offset.x, line.y1 + offset.y + charOffset.y),
-        p2: V2.from(line.x2 + offset.x, line.y2 + offset.y + charOffset.y)
+        p2: V2.from(line.x2 + offset.x, line.y2 + offset.y + charOffset.y),
       };
     }
   }
 }
 
-function normalize (fontFile) {
+function normalize(fontFile) {
   const { V2 } = window;
 
   Object.entries(fontFile).forEach((entry) => {
-    const [ key, value ] = entry;
+    const [key, value] = entry;
 
     // continue on non-character keys
     if (key.length > 1) return;

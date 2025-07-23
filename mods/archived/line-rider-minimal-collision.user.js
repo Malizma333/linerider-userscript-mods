@@ -24,13 +24,13 @@ const EMPTY_SET = new Set();
 
 const setTool = (tool) => ({
   type: "SET_TOOL",
-  payload: tool
+  payload: tool,
 });
 
 const setToolState = (toolId, state) => ({
   type: "SET_TOOL_STATE",
   payload: state,
-  meta: { id: toolId }
+  meta: { id: toolId },
 });
 
 const setSelectToolState = toolState => setToolState(SELECT_TOOL, toolState);
@@ -38,18 +38,18 @@ const setSelectToolState = toolState => setToolState(SELECT_TOOL, toolState);
 const updateLines = (linesToRemove, linesToAdd, name) => ({
   type: "UPDATE_LINES",
   payload: { linesToRemove, linesToAdd },
-  meta: { name: name }
+  meta: { name: name },
 });
 
 const addLines = (lines) => updateLines(null, lines, "ADD_LINES");
 const removeLines = (lines) => updateLines(lines, null, "REMOVE_LINES");
 
 const commitTrackChanges = () => ({
-  type: "COMMIT_TRACK_CHANGES"
+  type: "COMMIT_TRACK_CHANGES",
 });
 
 const revertTrackChanges = () => ({
-  type: "REVERT_TRACK_CHANGES"
+  type: "REVERT_TRACK_CHANGES",
 });
 
 const getActiveTool = state => state.selectedTool;
@@ -63,7 +63,7 @@ function getPlayerIndex(state) {
 }
 
 class CollisionsMod {
-  constructor (store, initState) {
+  constructor(store, initState) {
     this.store = store;
     this.changed = false;
     this.state = initState;
@@ -84,7 +84,7 @@ class CollisionsMod {
     });
   }
 
-  commit () {
+  commit() {
     if (this.changed) {
       this.store.dispatch(commitTrackChanges());
       this.store.dispatch(revertTrackChanges());
@@ -93,7 +93,7 @@ class CollisionsMod {
     }
   }
 
-  onUpdate (nextState = this.state) {
+  onUpdate(nextState = this.state) {
     let shouldUpdate = false;
 
     if (!this.state.active && nextState.active) {
@@ -140,7 +140,7 @@ class CollisionsMod {
 
     if (!this.state.active || this.selectedPoints.size === 0) return;
 
-    const selectedLines = [ ...getLinesFromPoints(this.selectedPoints) ]
+    const selectedLines = [...getLinesFromPoints(this.selectedPoints)]
       .map(id => this.track.getLine(id))
       .filter(l => l);
     let linesToAdd = [];
@@ -153,7 +153,7 @@ class CollisionsMod {
         y2: p2.y,
         flipped,
         type,
-        multiplier
+        multiplier,
       });
     }
 
@@ -162,11 +162,13 @@ class CollisionsMod {
     }
 
     this.store.dispatch(removeLines(
-        selectedLines.map(line => line.id)
+      selectedLines.map(line => line.id),
     ));
 
     this.store.dispatch(addLines(
-        selectedLines.map(line => {return {x1: line.x1, y1: line.y1, x2: line.x2, y2: line.y2, type: 2}})
+      selectedLines.map(line => {
+        return { x1: line.x1, y1: line.y1, x2: line.x2, y2: line.y2, type: 2 };
+      }),
     ));
 
     this.changed = true;
@@ -175,22 +177,22 @@ class CollisionsMod {
 
 // Function to create UI component
 
-function main () {
+function main() {
   const {
     React,
-    store
+    store,
   } = window;
 
   const e = React.createElement;
 
   class MinCollisionsModComponent extends React.Component {
-    constructor (props) {
+    constructor(props) {
       super(props);
 
       this.state = {
         active: false,
         width: 5,
-        height: 5
+        height: 5,
       };
 
       this.mod = new CollisionsMod(store, this.state);
@@ -204,11 +206,11 @@ function main () {
       });
     }
 
-    componentWillUpdate (nextProps, nextState) {
+    componentWillUpdate(nextProps, nextState) {
       this.mod.onUpdate(nextState);
     }
 
-    onActivate () {
+    onActivate() {
       if (this.state.active) {
         this.setState({ active: false });
       } else {
@@ -217,26 +219,23 @@ function main () {
       }
     }
 
-    onCommit () {
+    onCommit() {
       const committed = this.mod.commit();
       if (committed) {
         this.setState({ active: false });
       }
     }
 
-    render () {
-      return e("div", null,
-        this.state.active &&
-                     e("div", null,
-                       e("button",
-                         { style: { float: "left" }, onClick: () => this.onCommit() },
-                         "Commit"
-                       )
-                     ),
-        e("button",
-          { style: { backgroundColor: this.state.active ? "lightblue" : null }, onClick: this.onActivate.bind(this) },
-          "Minimal Collisions Mod"
-        )
+    render() {
+      return e(
+        "div",
+        null,
+        this.state.active
+          && e("div", null, e("button", { style: { float: "left" }, onClick: () => this.onCommit() }, "Commit")),
+        e("button", {
+          style: { backgroundColor: this.state.active ? "lightblue" : null },
+          onClick: this.onActivate.bind(this),
+        }, "Minimal Collisions Mod"),
       );
     }
   }
@@ -254,7 +253,7 @@ if (window.registerCustomSetting) {
   };
 }
 
-function setsEqual (a, b) {
+function setsEqual(a, b) {
   if (a === b) {
     return true;
   }
@@ -269,37 +268,37 @@ function setsEqual (a, b) {
   return true;
 }
 
-function getLinesFromPoints (points) {
-  return new Set([ ...points ].map(point => point >> 1));
+function getLinesFromPoints(points) {
+  return new Set([...points].map(point => point >> 1));
 }
 
-const dist = (a,b) => Math.sqrt((a.x-b.x)*(a.x-b.x) + (a.y-b.y)*(a.y-b.y))
+const dist = (a, b) => Math.sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
 
-const between = (a, b, c) => dist(a,b) + .00001 >= dist(a,c) + dist(b,c)
+const between = (a, b, c) => dist(a, b) + .00001 >= dist(a, c) + dist(b, c);
 
-function* genLines (selectedLines, playerIndex, track) {
-    const { V2 } = window;
-    const lineSize = 0.025;
+function* genLines(selectedLines, playerIndex, track) {
+  const { V2 } = window;
+  const lineSize = 0.025;
 
-    for(let i = 0; i < playerIndex; i++) {
-        const frameData = track.getFrame(i);
-        const collidingLines = selectedLines.filter(line => frameData.involvedLineIds.includes(line.id));
-        const points = frameData.snapshot.entities[0].entities[0].points;
+  for (let i = 0; i < playerIndex; i++) {
+    const frameData = track.getFrame(i);
+    const collidingLines = selectedLines.filter(line => frameData.involvedLineIds.includes(line.id));
+    const points = frameData.snapshot.entities[0].entities[0].points;
 
-        if(collidingLines.length === 0) continue;
+    if (collidingLines.length === 0) continue;
 
-        for(const p of points) {
-            for(const line of collidingLines) {
-                if(between(line.p1, line.p2, p.pos)) {
-                    yield {
-                        flipped: line.flipped,
-                        type: line.type,
-                        multiplier: line.multiplier || 0,
-                        p1: V2.from(p.pos.x - lineSize * line.norm.y, p.pos.y + lineSize * line.norm.x),
-                        p2: V2.from(p.pos.x + lineSize * line.norm.y, p.pos.y - lineSize * line.norm.x)
-                    };
-                }
-            }
+    for (const p of points) {
+      for (const line of collidingLines) {
+        if (between(line.p1, line.p2, p.pos)) {
+          yield {
+            flipped: line.flipped,
+            type: line.type,
+            multiplier: line.multiplier || 0,
+            p1: V2.from(p.pos.x - lineSize * line.norm.y, p.pos.y + lineSize * line.norm.x),
+            p2: V2.from(p.pos.x + lineSize * line.norm.y, p.pos.y - lineSize * line.norm.x),
+          };
         }
+      }
     }
+  }
 }

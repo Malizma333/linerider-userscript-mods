@@ -22,21 +22,21 @@
 const updateLines = (linesToRemove, linesToAdd, name) => ({
   type: "UPDATE_LINES",
   payload: { linesToRemove, linesToAdd },
-  meta: { name }
+  meta: { name },
 });
 
 const addLines = (line) => updateLines(null, line, "ADD_LINES");
 
 const commitTrackChanges = () => ({
-  type: "COMMIT_TRACK_CHANGES"
+  type: "COMMIT_TRACK_CHANGES",
 });
 
 const revertTrackChanges = () => ({
-  type: "REVERT_TRACK_CHANGES"
+  type: "REVERT_TRACK_CHANGES",
 });
 
 class _3DMod {
-  constructor (store, initState) {
+  constructor(store, initState) {
     this.store = store;
     this.state = initState;
 
@@ -50,7 +50,7 @@ class _3DMod {
     });
   }
 
-  commit () {
+  commit() {
     if (this.changed) {
       this.store.dispatch(commitTrackChanges());
       this.store.dispatch(revertTrackChanges());
@@ -59,7 +59,7 @@ class _3DMod {
     }
   }
 
-  onUpdate (nextState = this.state, shouldUpdate = false) {
+  onUpdate(nextState = this.state, shouldUpdate = false) {
     if (this.state !== nextState) {
       this.state = nextState;
       shouldUpdate = true;
@@ -83,16 +83,16 @@ class _3DMod {
   }
 }
 
-function main () {
+function main() {
   const {
     React,
-    store
+    store,
   } = window;
 
   const e = React.createElement;
 
   class _3DModComponent extends React.Component {
-    constructor (props) {
+    constructor(props) {
       super(props);
 
       this.state = {
@@ -109,39 +109,43 @@ function main () {
       this.mod = new _3DMod(store, this.state);
     }
 
-    componentWillUpdate (_, nextState) {
+    componentWillUpdate(_, nextState) {
       this.mod.onUpdate(nextState);
     }
 
-    renderSlider (key, title, props) {
+    renderSlider(key, title, props) {
       props = {
         ...props,
         value: this.state[key],
-        onChange: e => this.setState({ [key]: parseFloat(e.target.value) })
+        onChange: e => this.setState({ [key]: parseFloat(e.target.value) }),
       };
 
-      return e("div", null,
+      return e(
+        "div",
+        null,
         title,
         e("input", { style: { width: "3em" }, type: "number", ...props }),
-        e("input", { type: "range", ...props, onFocus: e => e.target.blur() })
+        e("input", { type: "range", ...props, onFocus: e => e.target.blur() }),
       );
     }
 
-    renderCheckbox (key, title = null) {
+    renderCheckbox(key, title = null) {
       if (!title) title = key;
 
       const props = {
         id: key,
         checked: this.state[key],
-        onChange: e => this.setState({ [key]: e.target.checked })
+        onChange: e => this.setState({ [key]: e.target.checked }),
       };
-      return e("div", null,
+      return e(
+        "div",
+        null,
         e("label", { style: { width: "4em" }, for: key }, title),
-        e("input", { style: { marginLeft: ".5em" }, type: "checkbox", ...props })
+        e("input", { style: { marginLeft: ".5em" }, type: "checkbox", ...props }),
       );
     }
 
-    onActivate () {
+    onActivate() {
       if (this.state.active) {
         this.setState({ active: false });
       } else {
@@ -149,14 +153,14 @@ function main () {
       }
     }
 
-    onCommit () {
+    onCommit() {
       const committed = this.mod.commit();
       if (committed) {
         this.setState({ active: false });
       }
     }
 
-    onStlFileChange () {
+    onStlFileChange() {
       return new Promise((resolve) => {
         const file = event.target.files[0];
         const fileReader = new FileReader();
@@ -168,42 +172,41 @@ function main () {
       });
     }
 
-    render () {
-      const epsilon = 1/32;
-      return e("div", null,
+    render() {
+      const epsilon = 1 / 32;
+      return e(
+        "div",
+        null,
         this.state.active && e(
-          "div", null,
+          "div",
+          null,
           "Only supports .stl",
           e("input", {
             type: "file",
-            onChange: e => this.onStlFileChange().then(result => {
-              let [fileName, file] = result;
-              this.setState({ file, fileName });
-              console.log(`Loaded ${fileName} successfully`);
-            }).catch(err => {
-              console.log("Error when parsing: Invalid file");
-              console.log(err.message);
-            })
+            onChange: e =>
+              this.onStlFileChange().then(result => {
+                let [fileName, file] = result;
+                this.setState({ file, fileName });
+                console.log(`Loaded ${fileName} successfully`);
+              }).catch(err => {
+                console.log("Error when parsing: Invalid file");
+                console.log(err.message);
+              }),
           }),
           `Currently loaded: ${this.state.fileName}`,
-          this.renderSlider("yaw", "Yaw", {min: 0, max: 360, step: 1}),
-          this.renderSlider("pitch", "Pitch", {min: 0, max: 360, step: 1}),
-          this.renderSlider("roll", "Roll", {min: 0, max: 360, step: 1}),
-          this.renderSlider("scale", "Scale Power", {min: 0, max: 3, step: 1}),
+          this.renderSlider("yaw", "Yaw", { min: 0, max: 360, step: 1 }),
+          this.renderSlider("pitch", "Pitch", { min: 0, max: 360, step: 1 }),
+          this.renderSlider("roll", "Roll", { min: 0, max: 360, step: 1 }),
+          this.renderSlider("scale", "Scale Power", { min: 0, max: 3, step: 1 }),
           this.renderCheckbox("enableFill", "Enable Fill"),
-          e("button", { style: { float: "left" }, onClick: () => this.onCommit() },
-            "Commit"
-          ),
+          e("button", { style: { float: "left" }, onClick: () => this.onCommit() }, "Commit"),
         ),
-        e("button",
-          {
-            style: {
-              backgroundColor: this.state.active ? "lightblue" : null
-            },
-            onClick: this.onActivate.bind(this)
+        e("button", {
+          style: {
+            backgroundColor: this.state.active ? "lightblue" : null,
           },
-          "3D Mod"
-        )
+          onClick: this.onActivate.bind(this),
+        }, "3D Mod"),
       );
     }
   }
@@ -221,7 +224,7 @@ if (window.registerCustomSetting) {
   };
 }
 
-function createStl (state) {
+function createStl(state) {
   if (!state.file) return [];
 
   const camPos = window.store.getState().camera.editorPosition;
@@ -234,7 +237,7 @@ function createStl (state) {
     Math.cos(state.pitch * Math.PI / 180),
     Math.sin(state.pitch * Math.PI / 180),
     Math.cos(state.roll * Math.PI / 180),
-    Math.sin(state.roll * Math.PI / 180)
+    Math.sin(state.roll * Math.PI / 180),
   ];
   const rotMatrix = [
     trig[2] * trig[4],
@@ -258,13 +261,31 @@ function createStl (state) {
   for (let i = 0; i < numTriangles; i++) {
     const triangleOffset = 50 * i;
     const triangle = [
-      transformedPoint(dv.getFloat32(triangleOffset + 4 * 4, true), dv.getFloat32(triangleOffset + 5 * 4, true), dv.getFloat32(triangleOffset + 6 * 4, true)),
-      transformedPoint(dv.getFloat32(triangleOffset + 7 * 4, true), dv.getFloat32(triangleOffset + 8 * 4, true), dv.getFloat32(triangleOffset + 9 * 4, true)),
-      transformedPoint(dv.getFloat32(triangleOffset + 10 * 4, true), dv.getFloat32(triangleOffset + 11 * 4, true), dv.getFloat32(triangleOffset + 12 * 4, true))
+      transformedPoint(
+        dv.getFloat32(triangleOffset + 4 * 4, true),
+        dv.getFloat32(triangleOffset + 5 * 4, true),
+        dv.getFloat32(triangleOffset + 6 * 4, true),
+      ),
+      transformedPoint(
+        dv.getFloat32(triangleOffset + 7 * 4, true),
+        dv.getFloat32(triangleOffset + 8 * 4, true),
+        dv.getFloat32(triangleOffset + 9 * 4, true),
+      ),
+      transformedPoint(
+        dv.getFloat32(triangleOffset + 10 * 4, true),
+        dv.getFloat32(triangleOffset + 11 * 4, true),
+        dv.getFloat32(triangleOffset + 12 * 4, true),
+      ),
     ];
 
     for (let j = 0; j < 3; j++) {
-      lineArray.push({ x1: triangle[j].x, y1: triangle[j].y, x2: triangle[(j + 1) % 3].x, y2: triangle[(j + 1) % 3].y, type: 2 });
+      lineArray.push({
+        x1: triangle[j].x,
+        y1: triangle[j].y,
+        x2: triangle[(j + 1) % 3].x,
+        y2: triangle[(j + 1) % 3].y,
+        type: 2,
+      });
     }
 
     if (!state.enableFill) continue;
@@ -284,4 +305,3 @@ function createStl (state) {
 
   return lineArray;
 }
-

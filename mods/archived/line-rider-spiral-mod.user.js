@@ -19,17 +19,17 @@
 const updateLines = (linesToRemove, linesToAdd, name) => ({
   type: "UPDATE_LINES",
   payload: { linesToRemove, linesToAdd },
-  meta: { name: name }
+  meta: { name: name },
 });
 
 const addLines = (line) => updateLines(null, line, "ADD_LINES");
 
 const commitTrackChanges = () => ({
-  type: "COMMIT_TRACK_CHANGES"
+  type: "COMMIT_TRACK_CHANGES",
 });
 
 const revertTrackChanges = () => ({
-  type: "REVERT_TRACK_CHANGES"
+  type: "REVERT_TRACK_CHANGES",
 });
 
 const getSimulatorCommittedTrack = state => state.simulator.committedEngine;
@@ -37,7 +37,7 @@ const getSimulatorCommittedTrack = state => state.simulator.committedEngine;
 // Class to hold back-end information
 
 class SpiralMod {
-  constructor (store, initState) {
+  constructor(store, initState) {
     this.store = store;
     this.state = initState;
 
@@ -52,7 +52,7 @@ class SpiralMod {
 
   // Committing changes
 
-  commit () {
+  commit() {
     if (this.changed) {
       this.store.dispatch(commitTrackChanges());
       this.store.dispatch(revertTrackChanges());
@@ -61,7 +61,7 @@ class SpiralMod {
     }
   }
 
-  onUpdate (nextState = this.state) {
+  onUpdate(nextState = this.state) {
     let shouldUpdate = false;
 
     if (!this.state.active && nextState.active) {
@@ -86,7 +86,6 @@ class SpiralMod {
     }
 
     if (shouldUpdate) {
-
       if (this.changed) {
         this.store.dispatch(revertTrackChanges());
         this.changed = false;
@@ -101,7 +100,7 @@ class SpiralMod {
             y1: p1.y,
             x2: p2.x,
             y2: p2.y,
-            type: 2
+            type: 2,
           });
         }
 
@@ -114,32 +113,32 @@ class SpiralMod {
   }
 }
 
-function main () {
+function main() {
   const {
     React,
-    store
+    store,
   } = window;
 
   const create = React.createElement;
 
   class SpiralModComponent extends React.Component {
-    constructor (props) {
+    constructor(props) {
       super(props);
 
       this.state = {
         active: false,
         length: 1,
-        angle: 90
+        angle: 90,
       };
 
       this.modClass = new SpiralMod(store, this.state);
     }
 
-    componentWillUpdate (nextProps, nextState) {
+    componentWillUpdate(nextProps, nextState) {
       this.modClass.onUpdate(nextState);
     }
 
-    onActivate () {
+    onActivate() {
       if (this.state.active) {
         this.setState({ active: false });
       } else {
@@ -147,46 +146,47 @@ function main () {
       }
     }
 
-    onCommit () {
+    onCommit() {
       const committed = this.modClass.commit();
       if (committed) {
         this.setState({ active: false });
       }
     }
 
-    renderSlider (key, title, props) {
+    renderSlider(key, title, props) {
       props = {
         ...props,
         value: this.state[key],
-        onChange: create => this.setState({ [key]: parseFloat(create.target.value) })
+        onChange: create => this.setState({ [key]: parseFloat(create.target.value) }),
       };
 
-      return create("div", null,
+      return create(
+        "div",
+        null,
         title,
         create("input", { style: { width: "3em" }, type: "number", ...props }),
-        create("input", { type: "range", ...props, onFocus: create => create.target.blur() })
+        create("input", { type: "range", ...props, onFocus: create => create.target.blur() }),
       );
     }
 
-    render () {
-      return create("div", null,
-        this.state.active && create("div", null,
-          this.renderSlider("length", "Length", { min: 3, max: 500, step: 1 }),
-          this.renderSlider("angle", "Angle", { min: 0, max: 360, step: 0.01 }),
-          create("button", { style: { float: "left" }, onClick: () => this.onCommit() },
-            "Commit"
-          )
-        ),
-
-        create("button",
-          {
-            style: {
-              backgroundColor: this.state.active ? "lightblue" : null
-            },
-            onClick: this.onActivate.bind(this)
+    render() {
+      return create(
+        "div",
+        null,
+        this.state.active
+          && create(
+            "div",
+            null,
+            this.renderSlider("length", "Length", { min: 3, max: 500, step: 1 }),
+            this.renderSlider("angle", "Angle", { min: 0, max: 360, step: 0.01 }),
+            create("button", { style: { float: "left" }, onClick: () => this.onCommit() }, "Commit"),
+          ),
+        create("button", {
+          style: {
+            backgroundColor: this.state.active ? "lightblue" : null,
           },
-          "Spiral Mod"
-        )
+          onClick: this.onActivate.bind(this),
+        }, "Spiral Mod"),
       );
     }
   }
@@ -204,7 +204,7 @@ if (window.registerCustomSetting) {
   };
 }
 
-function* genLines ({ length = 1, angle = 90 } = {}) {
+function* genLines({ length = 1, angle = 90 } = {}) {
   const { V2 } = window;
   const camPos = window.store.getState().camera.editorPosition;
 

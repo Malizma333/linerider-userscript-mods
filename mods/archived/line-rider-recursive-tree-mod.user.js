@@ -21,23 +21,23 @@
 
 const updateLines = (linesToRemove, linesToAdd) => ({
   type: "UPDATE_LINES",
-  payload: { linesToRemove, linesToAdd }
+  payload: { linesToRemove, linesToAdd },
 });
 
 const addLines = (line) => updateLines(null, line, "ADD_LINES");
 
 const commitTrackChanges = () => ({
-  type: "COMMIT_TRACK_CHANGES"
+  type: "COMMIT_TRACK_CHANGES",
 });
 
 const revertTrackChanges = () => ({
-  type: "REVERT_TRACK_CHANGES"
+  type: "REVERT_TRACK_CHANGES",
 });
 
 const getSimulatorCommittedTrack = state => state.simulator.committedEngine;
 
 class RTreeMod {
-  constructor (store, initState) {
+  constructor(store, initState) {
     this.store = store;
     this.state = initState;
 
@@ -51,7 +51,7 @@ class RTreeMod {
     });
   }
 
-  commit () {
+  commit() {
     if (this.changed) {
       this.store.dispatch(commitTrackChanges());
       this.store.dispatch(revertTrackChanges());
@@ -60,7 +60,7 @@ class RTreeMod {
     }
   }
 
-  onUpdate (nextState = this.state) {
+  onUpdate(nextState = this.state) {
     let shouldUpdate = false;
 
     if (this.state !== nextState) {
@@ -89,7 +89,7 @@ class RTreeMod {
             y1: p1.y,
             x2: p2.x,
             y2: p2.y,
-            type: 2
+            type: 2,
           });
         }
 
@@ -102,16 +102,16 @@ class RTreeMod {
   }
 }
 
-function main () {
+function main() {
   const {
     React,
-    store
+    store,
   } = window;
 
   const create = React.createElement;
 
   class RTreeModComponent extends React.Component {
-    constructor (props) {
+    constructor(props) {
       super(props);
 
       this.state = {
@@ -119,31 +119,33 @@ function main () {
         minB: 1,
         maxB: 3,
         iter: 5,
-        scale: 1
+        scale: 1,
       };
 
       this.treeMod = new RTreeMod(store, this.state);
     }
 
-    componentWillUpdate (nextProps, nextState) {
+    componentWillUpdate(nextProps, nextState) {
       this.treeMod.onUpdate(nextState);
     }
 
-    renderSlider (key, title, props) {
+    renderSlider(key, title, props) {
       props = {
         ...props,
         value: this.state[key],
-        onChange: create => this.setState({ [key]: parseFloat(create.target.value) })
+        onChange: create => this.setState({ [key]: parseFloat(create.target.value) }),
       };
 
-      return create("div", null,
+      return create(
+        "div",
+        null,
         title,
         create("input", { style: { width: "3em" }, type: "number", ...props }),
-        create("input", { type: "range", ...props, onFocus: create => create.target.blur() })
+        create("input", { type: "range", ...props, onFocus: create => create.target.blur() }),
       );
     }
 
-    onActivate () {
+    onActivate() {
       if (this.state.active) {
         this.setState({ active: false });
       } else {
@@ -151,33 +153,33 @@ function main () {
       }
     }
 
-    onCommit () {
+    onCommit() {
       const committed = this.treeMod.commit();
       if (committed) {
         this.setState({ active: false });
       }
     }
 
-    render () {
-      return create("div", null,
-        this.state.active && create("div", null,
-          this.renderSlider("minB", "Min Branches", { min: 0, max: 5, step: 1 }),
-          this.renderSlider("maxB", "Max Branches", { min: this.state.minB + 1, max: 10, step: 1 }),
-          this.renderSlider("iter", "Iterations", { min: 2, max: 5, step: 1 }),
-          this.renderSlider("scale", "Scale", { min: 1, max: 10, step: 1 }),
-          create("button", { style: { float: "left" }, onClick: () => this.onCommit() },
-            "Commit"
-          )
-        ),
-        create("button",
-          {
-            style: {
-              backgroundColor: this.state.active ? "lightblue" : null
-            },
-            onClick: this.onActivate.bind(this)
+    render() {
+      return create(
+        "div",
+        null,
+        this.state.active
+          && create(
+            "div",
+            null,
+            this.renderSlider("minB", "Min Branches", { min: 0, max: 5, step: 1 }),
+            this.renderSlider("maxB", "Max Branches", { min: this.state.minB + 1, max: 10, step: 1 }),
+            this.renderSlider("iter", "Iterations", { min: 2, max: 5, step: 1 }),
+            this.renderSlider("scale", "Scale", { min: 1, max: 10, step: 1 }),
+            create("button", { style: { float: "left" }, onClick: () => this.onCommit() }, "Commit"),
+          ),
+        create("button", {
+          style: {
+            backgroundColor: this.state.active ? "lightblue" : null,
           },
-          "Recursive Tree Mod"
-        )
+          onClick: this.onActivate.bind(this),
+        }, "Recursive Tree Mod"),
       );
     }
   }
@@ -195,12 +197,12 @@ if (window.registerCustomSetting) {
   };
 }
 
-function* genLines ({ minB = 1, maxB = 3, iter = 5, scale = 1 } = {}) {
+function* genLines({ minB = 1, maxB = 3, iter = 5, scale = 1 } = {}) {
   const camPos = window.store.getState().camera.editorPosition;
 
   let lineArray = [];
 
-  function branch (iB, min, max, x, y, a) {
+  function branch(iB, min, max, x, y, a) {
     let nX = x + iB * Math.cos(a);
     let nY = y + iB * Math.sin(a);
 
@@ -209,18 +211,18 @@ function* genLines ({ minB = 1, maxB = 3, iter = 5, scale = 1 } = {}) {
     if (iB == 1) return;
 
     for (let i = 0; i < min + (max - min) * Math.random(); i++) {
-      branch(iB-1, min, max, nX, nY, a + Math.PI/2 * (Math.random()-0.5));
+      branch(iB - 1, min, max, nX, nY, a + Math.PI / 2 * (Math.random() - 0.5));
     }
   }
 
-  function addLine (x1, y1, x2, y2) {
+  function addLine(x1, y1, x2, y2) {
     lineArray[lineArray.length] = {
-      p1: { x: camPos.x + scale * Math.round(x1*100)/100, y: camPos.y + scale * -Math.round(y1*100)/100 },
-      p2: { x: camPos.x + scale * Math.round(x2*100)/100, y: camPos.y + scale * -Math.round(y2*100)/100 }
+      p1: { x: camPos.x + scale * Math.round(x1 * 100) / 100, y: camPos.y + scale * -Math.round(y1 * 100) / 100 },
+      p2: { x: camPos.x + scale * Math.round(x2 * 100) / 100, y: camPos.y + scale * -Math.round(y2 * 100) / 100 },
     };
   }
 
-  branch(iter, minB, maxB, 0, 0, Math.PI/2);
+  branch(iter, minB, maxB, 0, 0, Math.PI / 2);
 
   for (let i = 0; i < lineArray.length; i++) {
     yield lineArray[i];

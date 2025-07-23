@@ -37,13 +37,13 @@ const LINE_WIDTH = 2;
 /* actions */
 const setTool = (tool) => ({
   type: "SET_TOOL",
-  payload: tool
+  payload: tool,
 });
 
 const setToolState = (toolId, state) => ({
   type: "SET_TOOL_STATE",
   payload: state,
-  meta: { id: toolId }
+  meta: { id: toolId },
 });
 
 const setSelectToolState = toolState => setToolState(SELECT_TOOL, toolState);
@@ -51,7 +51,7 @@ const setSelectToolState = toolState => setToolState(SELECT_TOOL, toolState);
 const updateLines = (linesToRemove, linesToAdd, name) => ({
   type: "UPDATE_LINES",
   payload: { linesToRemove, linesToAdd },
-  meta: { name }
+  meta: { name },
 });
 
 // add_line adds to active layer but we want to keep layers
@@ -62,11 +62,11 @@ const setLines = (lines) => updateLines(null, lines, "SET_LINES");
 const removeLines = (lineIds) => updateLines(lineIds, null, "REMOVE_LINES");
 
 const commitTrackChanges = () => ({
-  type: "COMMIT_TRACK_CHANGES"
+  type: "COMMIT_TRACK_CHANGES",
 });
 
 const revertTrackChanges = () => ({
-  type: "REVERT_TRACK_CHANGES"
+  type: "REVERT_TRACK_CHANGES",
 });
 
 /* selectors */
@@ -78,7 +78,7 @@ const getSimulatorTrack = state => state.simulator.engine;
 const getTrackLinesLocked = state => state.trackLinesLocked;
 
 class SliceMod {
-  constructor (store, initState) {
+  constructor(store, initState) {
     this.store = store;
 
     this.changed = false;
@@ -99,7 +99,7 @@ class SliceMod {
     });
   }
 
-  commitSlice () {
+  commitSlice() {
     if (this.changed) {
       this.store.dispatch(commitTrackChanges());
       this.store.dispatch(revertTrackChanges());
@@ -108,7 +108,7 @@ class SliceMod {
     }
   }
 
-  onUpdate (nextState = this.state) {
+  onUpdate(nextState = this.state) {
     let shouldUpdate = false;
 
     if (!this.state.active && nextState.active) {
@@ -147,9 +147,11 @@ class SliceMod {
       }
 
       if (this.state.active && this.selectedPoints.size > 0) {
-        const selectedLines = new Set([...getLinesFromPoints(this.selectedPoints)]
-          .map(id => this.track.getLine(id))
-          .filter(l => l));
+        const selectedLines = new Set(
+          [...getLinesFromPoints(this.selectedPoints)]
+            .map(id => this.track.getLine(id))
+            .filter(l => l),
+        );
 
         let track = this.track;
         const selectLinesInRect = rect => {
@@ -171,7 +173,7 @@ class SliceMod {
           line => {
             this.store.dispatch(newLines([line]));
             track = getSimulatorTrack(this.store.getState());
-          }
+          },
         );
 
         const linesToRemove = [...genRemove(selectedLines, selectLinesInRect, this.state)];
@@ -185,21 +187,21 @@ class SliceMod {
   }
 }
 
-function main () {
+function main() {
   const {
     React,
-    store
+    store,
   } = window;
 
   const e = React.createElement;
 
   class SliceModComponent extends React.Component {
-    constructor (props) {
+    constructor(props) {
       super(props);
 
       this.state = {
         active: false,
-        angle: 0
+        angle: 0,
       };
 
       this.sliceMod = new SliceMod(store, this.state);
@@ -223,11 +225,11 @@ function main () {
       this._mounted = false;
     }
 
-    componentWillUpdate (nextProps, nextState) {
+    componentWillUpdate(nextProps, nextState) {
       this.sliceMod.onUpdate(nextState);
     }
 
-    onActivate () {
+    onActivate() {
       if (this.state.active) {
         this.setState({ active: false });
       } else {
@@ -236,44 +238,45 @@ function main () {
       }
     }
 
-    onCommit () {
+    onCommit() {
       const committed = this.sliceMod.commitSlice();
       if (committed) {
         this.setState({ active: false });
       }
     }
 
-    renderSlider (key, props) {
+    renderSlider(key, props) {
       props = {
         ...props,
         value: this.state[key],
-        onChange: e => this.setState({ [key]: parseFloat(e.target.value) })
+        onChange: e => this.setState({ [key]: parseFloat(e.target.value) }),
       };
-      return e("div", null,
+      return e(
+        "div",
+        null,
         key,
         e("input", { style: { width: "3em" }, type: "number", ...props }),
-        e("input", { type: "range", ...props, onFocus: e => e.target.blur() })
+        e("input", { type: "range", ...props, onFocus: e => e.target.blur() }),
       );
     }
 
-    render () {
-      return e("div",
+    render() {
+      return e(
+        "div",
         null,
-        this.state.active && e("div", null,
-          this.renderSlider("angle", { min: 0, max: 360, step: 1 }),
-          e("button", { style: { float: "left" }, onClick: () => this.onCommit() },
-            "Commit"
-          )
-        ),
-        e("button",
-          {
-            style: {
-              backgroundColor: this.state.active ? "lightblue" : null
-            },
-            onClick: this.onActivate.bind(this)
+        this.state.active
+          && e(
+            "div",
+            null,
+            this.renderSlider("angle", { min: 0, max: 360, step: 1 }),
+            e("button", { style: { float: "left" }, onClick: () => this.onCommit() }, "Commit"),
+          ),
+        e("button", {
+          style: {
+            backgroundColor: this.state.active ? "lightblue" : null,
           },
-          "Slice Mod"
-        )
+          onClick: this.onActivate.bind(this),
+        }, "Slice Mod"),
       );
     }
   }
@@ -294,7 +297,7 @@ if (window.registerCustomSetting) {
 }
 
 /* utils */
-function setsEqual (a, b) {
+function setsEqual(a, b) {
   if (a === b) {
     return true;
   }
@@ -309,11 +312,11 @@ function setsEqual (a, b) {
   return true;
 }
 
-function getLinesFromPoints (points) {
+function getLinesFromPoints(points) {
   return new Set([...points].map(point => point >> 1));
 }
 
-function performSlice (selectedLines, selectLinesInRect, setLine, addLine) {
+function performSlice(selectedLines, selectLinesInRect, setLine, addLine) {
   let changed = false;
   for (const selectedLine of selectedLines) {
     const { p1, p2 } = selectedLine;
@@ -322,7 +325,7 @@ function performSlice (selectedLines, selectLinesInRect, setLine, addLine) {
       x: Math.min(p1.x, p2.x),
       y: Math.min(p1.y, p2.y),
       width: Math.abs(p1.x - p2.x),
-      height: Math.abs(p1.y - p2.y)
+      height: Math.abs(p1.y - p2.y),
     });
 
     for (const line of lines) {
@@ -339,13 +342,13 @@ function performSlice (selectedLines, selectLinesInRect, setLine, addLine) {
         setLine({
           ...json,
           x2: x,
-          y2: y
+          y2: y,
         });
         addLine({
           ...json,
           x1: x,
           y1: y,
-          id: null
+          id: null,
         });
         changed = true;
       }
@@ -355,7 +358,7 @@ function performSlice (selectedLines, selectLinesInRect, setLine, addLine) {
 }
 
 // takes an iterable of lines and returns an iterable of line IDs to remove
-function * genRemove (selectedLines, selectLinesInRect, { angle = 0 } = {}) {
+function* genRemove(selectedLines, selectLinesInRect, { angle = 0 } = {}) {
   const { V2 } = window;
   /* prep */
 
@@ -448,7 +451,7 @@ function * genRemove (selectedLines, selectLinesInRect, { angle = 0 } = {}) {
   }
 }
 
-function rotateTransform (rads) {
+function rotateTransform(rads) {
   const { V2 } = window;
 
   const u = V2.from(1, 0).rot(rads);
@@ -468,7 +471,7 @@ function rotateTransform (rads) {
  *   or true if lines are collinear and inclusive is true (undefined point of intersectoin)
  * else: null
  */
-function lineLineIntersection (x0, y0, x1, y1, x2, y2, x3, y3, inclusive) {
+function lineLineIntersection(x0, y0, x1, y1, x2, y2, x3, y3, inclusive) {
   const x01 = x1 - x0;
   const y01 = y1 - y0;
   const x23 = x3 - x2;
@@ -502,7 +505,7 @@ function lineLineIntersection (x0, y0, x1, y1, x2, y2, x3, y3, inclusive) {
   return _02cross23 / _01cross23;
 }
 
-function getBBoxFromLines (lines) {
+function getBBoxFromLines(lines) {
   let x1 = Infinity;
   let y1 = Infinity;
   let x2 = -Infinity;
@@ -519,6 +522,6 @@ function getBBoxFromLines (lines) {
     x: x1,
     y: y1,
     width: x2 - x1,
-    height: y2 - y1
+    height: y2 - y1,
   };
 }

@@ -1,0 +1,13 @@
+{
+  "typescript": {
+  },
+  "excludes": [
+    "**/node_modules",
+    ".github",
+    ".vscode",
+    "docs",
+  ],
+  "plugins": [
+    "https://plugins.dprint.dev/typescript-0.95.8.wasm"
+  ]
+}

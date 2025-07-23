@@ -19,18 +19,18 @@
 
 // ==/UserScript==
 
-const updateLines = (linesToRemove, linesToAdd) => ({ type: "UPDATE_LINES", payload: { linesToRemove, linesToAdd }});
+const updateLines = (linesToRemove, linesToAdd) => ({ type: "UPDATE_LINES", payload: { linesToRemove, linesToAdd } });
 const addLines = (line) => updateLines(null, line, "ADD_LINES");
 const addLayer = (name) => ({ type: "ADD_LAYER", payload: { name } });
-const moveLayer = (id, index) => ({ type: "MOVE_LAYER", payload: {id, index} });
-const addFolder = (name) => ({ type: "ADD_FOLDER", payload: {name} });
+const moveLayer = (id, index) => ({ type: "MOVE_LAYER", payload: { id, index } });
+const addFolder = (name) => ({ type: "ADD_FOLDER", payload: { name } });
 const commitTrackChanges = () => ({ type: "COMMIT_TRACK_CHANGES" });
 const revertTrackChanges = () => ({ type: "REVERT_TRACK_CHANGES" });
 
 const getLayers = (state) => state.simulator.engine.engine.state.layers;
 
 class ImageMod {
-  constructor (store) {
+  constructor(store) {
     this.store = store;
 
     this.changed = false;
@@ -39,7 +39,7 @@ class ImageMod {
     this.animEvent = 0;
   }
 
-  commit () {
+  commit() {
     if (this.changed && !this.drawTask) {
       this.store.dispatch(commitTrackChanges());
       this.store.dispatch(revertTrackChanges());
@@ -48,7 +48,7 @@ class ImageMod {
     }
   }
 
-  cancelDraw () {
+  cancelDraw() {
     if (this.animEvent) {
       cancelAnimationFrame(this.animEvent);
     }
@@ -61,7 +61,7 @@ class ImageMod {
     this.drawTask = false;
   }
 
-  async draw (state) {
+  async draw(state) {
     this.drawTask = true;
 
     if (this.changed) {
@@ -121,29 +121,29 @@ class ImageMod {
   }
 }
 
-function main () {
+function main() {
   const {
     React,
-    store
+    store,
   } = window;
 
   const e = React.createElement;
 
   class ImageModComponent extends React.Component {
-    constructor (props) {
+    constructor(props) {
       super(props);
 
       this.state = {
         active: false,
         imageData: null,
         clamping: 1,
-        message: ""
+        message: "",
       };
 
       this.imageMod = new ImageMod(store);
     }
 
-    onFileChange () {
+    onFileChange() {
       return new Promise((resolve) => {
         const file = event.target.files[0];
         const fileReader = new FileReader();
@@ -153,7 +153,7 @@ function main () {
         fileReader.onloadend = () => {
           const dataURL = fileReader.result;
           const image = document.getElementById("output");
-          image.onload = function () {
+          image.onload = function() {
             const canvas = document.createElement("canvas");
             const ctx = canvas.getContext("2d");
             canvas.width = image.width;
@@ -167,24 +167,25 @@ function main () {
       });
     }
 
-    renderSlider (key, title, props) {
+    renderSlider(key, title, props) {
       props = {
         ...props,
         value: this.state[key],
         onChange: create => {
           const v = parseFloat(create.target.value);
           props.min <= v && v <= props.max && this.setState({ [key]: v });
-        }
+        },
       };
 
       return e(
-        "div", null,
+        "div",
+        null,
         title,
-        e("input", { type: "range", ...props, onFocus: create => create.target.blur() })
+        e("input", { type: "range", ...props, onFocus: create => create.target.blur() }),
       );
     }
 
-    onActivate () {
+    onActivate() {
       if (this.state.active) {
         this.setState({ active: false });
         this.imageMod.cancelDraw();
@@ -193,33 +194,38 @@ function main () {
       }
     }
 
-    onCommit () {
+    onCommit() {
       const committed = this.imageMod.commit();
       if (committed) {
         this.setState({ active: false });
       }
     }
 
-    render () {
+    render() {
       return e(
-        "div", null,
+        "div",
+        null,
         this.state.active && e(
-          "div", null,
+          "div",
+          null,
           e(
-            "div", null,
+            "div",
+            null,
             "Image: ",
             e(
               "input",
               {
                 type: "file",
-                onChange: () => this.onFileChange().then(result => {
-                  this.setState({ imageData: result });
-                  this.setState({ message: "Image Loaded" });
-                }).catch(err => {
-                  this.setState({ message: "Invalid Image File" });
-                  console.error(err.message);
-                })
-              }),
+                onChange: () =>
+                  this.onFileChange().then(result => {
+                    this.setState({ imageData: result });
+                    this.setState({ message: "Image Loaded" });
+                  }).catch(err => {
+                    this.setState({ message: "Invalid Image File" });
+                    console.error(err.message);
+                  }),
+              },
+            ),
             e("br"),
             "Color Resolution",
             e(
@@ -227,35 +233,36 @@ function main () {
               { style: { display: "flex", flexDirection: "row" } },
               "High",
               this.renderSlider("clamping", "", { min: 0, max: 3, step: 1 }),
-              "Low"
+              "Low",
             ),
-            e("img", { id: "output", style: { display: "none" } })
+            e("img", { id: "output", style: { display: "none" } }),
           ),
           e(
-            "div", null,
-            this.state.message
+            "div",
+            null,
+            this.state.message,
           ),
           e(
             "button",
             { style: { float: "left" }, onClick: () => this.onCommit() },
-            "Commit"
+            "Commit",
           ),
           this.state.imageData && e(
             "button",
             { style: { float: "left" }, onClick: () => this.imageMod.draw(this.state) },
-            "Render"
-          )
+            "Render",
+          ),
         ),
         e(
           "button",
           {
             style: {
-              backgroundColor: this.state.active ? "lightblue" : null
+              backgroundColor: this.state.active ? "lightblue" : null,
             },
-            onClick: this.onActivate.bind(this)
+            onClick: this.onActivate.bind(this),
           },
-          "Image Mod"
-        )
+          "Image Mod",
+        ),
       );
     }
   }
@@ -273,7 +280,7 @@ if (window.registerCustomSetting) {
   };
 }
 
-function * genLines ({ imageData = null, clamping = 1 } = {}) {
+function* genLines({ imageData = null, clamping = 1 } = {}) {
   if (imageData == null) return;
 
   const camPos = window.store.getState().camera.editorPosition;
@@ -302,7 +309,7 @@ function * genLines ({ imageData = null, clamping = 1 } = {}) {
           y1: null,
           x2: null,
           y2: null,
-          layer: null
+          layer: null,
         };
       }
 
@@ -317,7 +324,7 @@ function * genLines ({ imageData = null, clamping = 1 } = {}) {
           y1: yOff * 2 + camPos.y,
           x2: xOff * 2 + camPos.x,
           y2: yOff * 2 + 0.01 + camPos.y,
-          layer: index
+          layer: index,
         };
       } else {
         currentLine.x2 = xOff * 2 + camPos.x;
@@ -330,7 +337,7 @@ function * genLines ({ imageData = null, clamping = 1 } = {}) {
   yield currentLine;
 }
 
-function rgbToHex (color, clamp) {
+function rgbToHex(color, clamp) {
   const p = color[3] / 256;
   let rHex = Math.floor(255 - p * (255 - (color[0] & (-16 << clamp)))).toString(16);
   let gHex = Math.floor(255 - p * (255 - (color[1] & (-16 << clamp)))).toString(16);

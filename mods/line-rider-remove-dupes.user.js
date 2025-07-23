@@ -27,17 +27,17 @@ const SELECT_TOOL = "SELECT_TOOL";
 const updateLines = (linesToRemove, linesToAdd, name) => ({
   type: "UPDATE_LINES",
   payload: { linesToRemove, linesToAdd },
-  meta: { name }
+  meta: { name },
 });
 
 const removeLines = (lineIds) => updateLines(lineIds, null, "REMOVE_LINES");
 
 const commitTrackChanges = () => ({
-  type: "COMMIT_TRACK_CHANGES"
+  type: "COMMIT_TRACK_CHANGES",
 });
 
 const revertTrackChanges = () => ({
-  type: "REVERT_TRACK_CHANGES"
+  type: "REVERT_TRACK_CHANGES",
 });
 
 const getActiveTool = state => state.selectedTool;
@@ -45,20 +45,20 @@ const getToolState = (state, toolId) => state.toolState[toolId];
 const getSelectToolState = state => getToolState(state, SELECT_TOOL);
 const getSimulatorCommittedTrack = state => state.simulator.committedEngine;
 
-function main () {
+function main() {
   const {
     React,
-    store
+    store,
   } = window;
 
   const e = React.createElement;
 
   class RemoveDuplicatesModComponent extends React.Component {
-    constructor (props) {
+    constructor(props) {
       super(props);
     }
 
-    onRemove () {
+    onRemove() {
       const selectToolActive = getActiveTool(store.getState()) === SELECT_TOOL;
 
       if (!selectToolActive) {
@@ -74,8 +74,10 @@ function main () {
       const t = performance.now();
 
       const linesToRemove = [];
-      const selectedLines = new Set([...new Set([...selectedPoints].map(point => point >> 1))]
-        .map(id => getSimulatorCommittedTrack(store.getState()).getLine(id)).filter(l => l));
+      const selectedLines = new Set(
+        [...new Set([...selectedPoints].map(point => point >> 1))]
+          .map(id => getSimulatorCommittedTrack(store.getState()).getLine(id)).filter(l => l),
+      );
       const preserve = new Set();
 
       for (const line of selectedLines) {
@@ -86,12 +88,18 @@ function main () {
         let inPreserve = false;
 
         for (const order of preserve) {
-          if (Math.abs(order[0] - orderA[0]) <= 0.001 && Math.abs(order[1] - orderA[1]) <= 0.001 && Math.abs(order[2] - orderA[2]) <= 0.001 && Math.abs(order[3] - orderA[3]) <= 0.001) {
+          if (
+            Math.abs(order[0] - orderA[0]) <= 0.001 && Math.abs(order[1] - orderA[1]) <= 0.001
+            && Math.abs(order[2] - orderA[2]) <= 0.001 && Math.abs(order[3] - orderA[3]) <= 0.001
+          ) {
             inPreserve = true;
             break;
           }
 
-          if (Math.abs(order[0] - orderB[0]) <= 0.001 && Math.abs(order[1] - orderB[1]) <= 0.001 && Math.abs(order[2] - orderB[2]) <= 0.001 && Math.abs(order[3] - orderB[3]) <= 0.001) {
+          if (
+            Math.abs(order[0] - orderB[0]) <= 0.001 && Math.abs(order[1] - orderB[1]) <= 0.001
+            && Math.abs(order[2] - orderB[2]) <= 0.001 && Math.abs(order[3] - orderB[3]) <= 0.001
+          ) {
             inPreserve = true;
             break;
           }
@@ -111,13 +119,8 @@ function main () {
       console.log("Took", Math.round(performance.now() - t), "ms");
     }
 
-    render () {
-      return e("div", null,
-        e("button",
-          { onClick: this.onRemove.bind(this) },
-          "Remove Duplicates Select Mod"
-        )
-      );
+    render() {
+      return e("div", null, e("button", { onClick: this.onRemove.bind(this) }, "Remove Duplicates Select Mod"));
     }
   }
 

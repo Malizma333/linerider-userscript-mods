@@ -24,13 +24,13 @@ const EMPTY_SET = new Set();
 
 const setTool = (tool) => ({
   type: "SET_TOOL",
-  payload: tool
+  payload: tool,
 });
 
 const setToolState = (toolId, state) => ({
   type: "SET_TOOL_STATE",
   payload: state,
-  meta: { id: toolId }
+  meta: { id: toolId },
 });
 
 const setSelectToolState = toolState => setToolState(SELECT_TOOL, toolState);
@@ -42,7 +42,7 @@ const getSimulatorCommittedTrack = state => state.simulator.committedEngine;
 const getCommittedTrackLayers = state => getSimulatorCommittedTrack(state).engine.state.layers;
 
 class SVGExportMod {
-  constructor (store, initState) {
+  constructor(store, initState) {
     this.store = store;
     this.state = initState;
 
@@ -62,7 +62,7 @@ class SVGExportMod {
     });
   }
 
-  onExport (useColor) {
+  onExport(useColor) {
     if (this.selectedPoints.size === 0) return 2;
 
     const selectedLines = [...getLinesFromPoints(this.selectedPoints)]
@@ -83,7 +83,7 @@ class SVGExportMod {
     }
   }
 
-  onUpdate (nextState = this.state) {
+  onUpdate(nextState = this.state) {
     if (!this.state.active && nextState.active) {
       window.previewLinesInFastSelect = true;
     }
@@ -119,22 +119,22 @@ class SVGExportMod {
   }
 }
 
-function main () {
+function main() {
   const {
     React,
-    store
+    store,
   } = window;
 
   const e = React.createElement;
 
   class SvgExportModComponent extends React.Component {
-    constructor (props) {
+    constructor(props) {
       super(props);
 
       this.state = {
         active: false,
         useColor: true,
-        success: 0
+        success: 0,
       };
 
       this.mod = new SVGExportMod(store, this.state);
@@ -148,23 +148,25 @@ function main () {
       });
     }
 
-    componentWillUpdate (nextProps, nextState) {
+    componentWillUpdate(nextProps, nextState) {
       this.mod.onUpdate(nextState);
     }
 
-    renderCheckbox (key, label) {
+    renderCheckbox(key, label) {
       const settings = {
         checked: this.state[key],
-        onChange: e => this.setState({ [key]: e.target.checked })
+        onChange: e => this.setState({ [key]: e.target.checked }),
       };
 
-      return React.createElement("div", null,
+      return React.createElement(
+        "div",
+        null,
         label + " ",
-        React.createElement("input", { type: "checkbox", ...settings })
+        React.createElement("input", { type: "checkbox", ...settings }),
       );
     }
 
-    onActivate () {
+    onActivate() {
       if (this.state.active) {
         this.setState({ active: false });
       } else {
@@ -173,27 +175,28 @@ function main () {
       }
     }
 
-    onExport () {
+    onExport() {
       const exportSuccess = this.mod.onExport(this.state.useColor);
       this.setState({ success: exportSuccess });
     }
 
-    render () {
-      return e("div", null,
-        this.state.active &&
-               e("div", null,
-                 this.state.success === 1 && e("div", null, "Error: See console"),
-                 this.state.success === 2 && e("div", null, "Error: No lines selected"),
-                 this.renderCheckbox("useColor", "Use Color"),
-                 e("button",
-                   { style: { float: "left" }, onClick: () => this.onExport() },
-                   "Export"
-                 )
-               ),
-        e("button",
-          { style: { backgroundColor: this.state.active ? "lightblue" : null }, onClick: this.onActivate.bind(this) },
-          "SVG Export Mod"
-        )
+    render() {
+      return e(
+        "div",
+        null,
+        this.state.active
+          && e(
+            "div",
+            null,
+            this.state.success === 1 && e("div", null, "Error: See console"),
+            this.state.success === 2 && e("div", null, "Error: No lines selected"),
+            this.renderCheckbox("useColor", "Use Color"),
+            e("button", { style: { float: "left" }, onClick: () => this.onExport() }, "Export"),
+          ),
+        e("button", {
+          style: { backgroundColor: this.state.active ? "lightblue" : null },
+          onClick: this.onActivate.bind(this),
+        }, "SVG Export Mod"),
       );
     }
   }
@@ -211,7 +214,7 @@ if (window.registerCustomSetting) {
   };
 }
 
-function setsEqual (a, b) {
+function setsEqual(a, b) {
   if (a === b) {
     return true;
   }
@@ -226,11 +229,11 @@ function setsEqual (a, b) {
   return true;
 }
 
-function getLinesFromPoints (points) {
+function getLinesFromPoints(points) {
   return new Set([...points].map(point => point >> 1));
 }
 
-function getColorsFromLayers (layers) {
+function getColorsFromLayers(layers) {
   const colors = [];
 
   for (const layer of layers) {
@@ -253,11 +256,14 @@ function getColorsFromLayers (layers) {
   return colors;
 }
 
-function getSVG (selectedLines, layerColors, useColor) {
+function getSVG(selectedLines, layerColors, useColor) {
   if (!selectedLines || selectedLines.length === 0) return false;
 
   const bounds = {
-    minX: 0, maxX: 0, minY: 0, maxY: 0
+    minX: 0,
+    maxX: 0,
+    minY: 0,
+    maxY: 0,
   };
 
   bounds.minX = selectedLines[0].x1;
@@ -279,10 +285,10 @@ function getSVG (selectedLines, layerColors, useColor) {
     const maxLX = Math.max(line.x1, line.x2) + line.width;
     const maxLY = Math.max(line.y1, line.y2) + line.width;
 
-    if (bounds.minX > minLX) { bounds.minX = minLX; }
-    if (bounds.minY > minLY) { bounds.minY = minLY; }
-    if (bounds.maxX < maxLX) { bounds.maxX = maxLX; }
-    if (bounds.maxY < maxLY) { bounds.maxY = maxLY; }
+    if (bounds.minX > minLX) bounds.minX = minLX;
+    if (bounds.minY > minLY) bounds.minY = minLY;
+    if (bounds.maxX < maxLX) bounds.maxX = maxLX;
+    if (bounds.maxY < maxLY) bounds.maxY = maxLY;
 
     const layerID = line.layer || 0;
     linesToAdd[layerID].push({
@@ -291,7 +297,7 @@ function getSVG (selectedLines, layerColors, useColor) {
       x2: line.x2,
       y2: line.y2,
       color: colorMap[layerID],
-      width: line.width
+      width: line.width,
     });
   }
 

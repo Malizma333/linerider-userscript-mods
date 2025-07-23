@@ -39,16 +39,16 @@ const getNumSelectedLines = (state) => {
   return 0;
 };
 
-function main () {
+function main() {
   const {
     React,
-    store
+    store,
   } = window;
 
   const e = React.createElement;
 
   class MoreControlsModComponent extends React.Component {
-    constructor () {
+    constructor() {
       super();
 
       this.state = {
@@ -64,7 +64,7 @@ function main () {
         riderRemountable: true,
         selectedRider: 0,
         selectedLines: 0,
-        numRiders: 1
+        numRiders: 1,
       };
 
       store.subscribe(() => this._mounted && this.matchState());
@@ -72,15 +72,16 @@ function main () {
 
     componentWillUnmount() {
       this._mounted = false;
+      window.removeEventListener("resize", this.updateDimensions);
     }
 
-    componentDidMount () {
+    componentDidMount() {
       this._mounted = true;
       window.addEventListener("resize", this.updateDimensions);
       this.matchState();
     }
 
-    matchState () {
+    matchState() {
       const state = store.getState();
       if (store.getState().progress.LOAD_TRACK.status) return;
 
@@ -105,7 +106,7 @@ function main () {
       }
     }
 
-    onActivate () {
+    onActivate() {
       if (this.state.active) {
         this.setState({ active: false });
       } else {
@@ -113,7 +114,7 @@ function main () {
       }
     }
 
-    onSetEditorCamX (parent, x) {
+    onSetEditorCamX(parent, x) {
       const { editorCam } = parent.state;
       const camState = { position: { x, y: editorCam[1] }, zoom: getEditorCamZoom(store.getState()) };
       editorCam[0] = x;
@@ -121,7 +122,7 @@ function main () {
       parent.setState({ editorCam });
     }
 
-    onSetEditorCamY (parent, y) {
+    onSetEditorCamY(parent, y) {
       const { editorCam } = parent.state;
       const camState = { position: { x: editorCam[0], y }, zoom: getEditorCamZoom(store.getState()) };
       editorCam[1] = y;
@@ -129,34 +130,34 @@ function main () {
       parent.setState({ editorCam });
     }
 
-    onToggleStopEnd (parent, stopAtEnd) {
+    onToggleStopEnd(parent, stopAtEnd) {
       store.dispatch({ type: "SET_PLAYER_STOP_AT_END", payload: stopAtEnd });
       parent.setState({ stopAtEnd });
     }
 
-    onToggleNextFrameLifelock (parent) {
+    onToggleNextFrameLifelock(parent) {
       store.dispatch({ type: "TOGGLE_NEXT_FRAME_LIFELOCK" });
       parent.setState({ nextFrameLifelock: !parent.state.nextFrameLifelock });
     }
 
-    onSetIndex (parent, index) {
+    onSetIndex(parent, index) {
       if (index < 0) return;
       store.dispatch({ type: "SET_PLAYER_INDEX", payload: index });
       parent.setState({ index });
     }
 
-    onSetMaxIndex (parent, maxIndex) {
+    onSetMaxIndex(parent, maxIndex) {
       if (maxIndex < 0) return;
       store.dispatch({ type: "SET_PLAYER_MAX_INDEX", payload: maxIndex });
       parent.setState({ maxIndex });
     }
 
-    onSetRiderPosX (parent, x) {
+    onSetRiderPosX(parent, x) {
       const { riderPos, selectedRider } = parent.state;
       const ridersArray = [...getRiders(store.getState())];
       ridersArray[selectedRider] = {
         ...ridersArray[selectedRider],
-        startPosition: { x, y: ridersArray[selectedRider].startPosition.y }
+        startPosition: { x, y: ridersArray[selectedRider].startPosition.y },
       };
       riderPos[0] = x;
       store.dispatch({ type: "SET_RIDERS", payload: ridersArray });
@@ -164,12 +165,12 @@ function main () {
       parent.setState({ riderPos });
     }
 
-    onSetRiderPosY (parent, y) {
+    onSetRiderPosY(parent, y) {
       const { riderPos, selectedRider } = parent.state;
       const ridersArray = [...getRiders(store.getState())];
       ridersArray[selectedRider] = {
         ...ridersArray[selectedRider],
-        startPosition: { x: ridersArray[selectedRider].startPosition.x, y }
+        startPosition: { x: ridersArray[selectedRider].startPosition.x, y },
       };
       riderPos[1] = y;
       store.dispatch({ type: "SET_RIDERS", payload: ridersArray });
@@ -177,12 +178,12 @@ function main () {
       parent.setState({ riderPos });
     }
 
-    onSetRiderVelX (parent, x) {
+    onSetRiderVelX(parent, x) {
       const { riderVel, selectedRider } = parent.state;
       const ridersArray = [...getRiders(store.getState())];
       ridersArray[selectedRider] = {
         ...ridersArray[selectedRider],
-        startVelocity: { x, y: ridersArray[selectedRider].startVelocity.y }
+        startVelocity: { x, y: ridersArray[selectedRider].startVelocity.y },
       };
       riderVel[0] = x;
       store.dispatch({ type: "SET_RIDERS", payload: ridersArray });
@@ -190,12 +191,12 @@ function main () {
       parent.setState({ riderVel });
     }
 
-    onSetRiderVelY (parent, y) {
+    onSetRiderVelY(parent, y) {
       const { riderVel, selectedRider } = parent.state;
       const ridersArray = [...getRiders(store.getState())];
       ridersArray[selectedRider] = {
         ...ridersArray[selectedRider],
-        startVelocity: { x: ridersArray[selectedRider].startVelocity.x, y }
+        startVelocity: { x: ridersArray[selectedRider].startVelocity.x, y },
       };
       riderVel[1] = y;
       store.dispatch({ type: "SET_RIDERS", payload: ridersArray });
@@ -203,31 +204,31 @@ function main () {
       parent.setState({ riderVel });
     }
 
-    onSetRiderAngle (parent, a) {
+    onSetRiderAngle(parent, a) {
       const { selectedRider } = parent.state;
       const ridersArray = [...getRiders(store.getState())];
       ridersArray[selectedRider] = {
         ...ridersArray[selectedRider],
-        startAngle: a
+        startAngle: a,
       };
       store.dispatch({ type: "SET_RIDERS", payload: ridersArray });
       store.dispatch({ type: "COMMIT_TRACK_CHANGES" });
       parent.setState({ riderAngle: a });
     }
 
-    onSetRiderRemountable (parent, r) {
+    onSetRiderRemountable(parent, r) {
       const { selectedRider } = parent.state;
       const ridersArray = [...getRiders(store.getState())];
       ridersArray[selectedRider] = {
         ...ridersArray[selectedRider],
-        remountable: r
+        remountable: r,
       };
       store.dispatch({ type: "SET_RIDERS", payload: ridersArray });
       store.dispatch({ type: "COMMIT_TRACK_CHANGES" });
       parent.setState({ riderRemountable: r });
     }
 
-    onSelectRider (parent, sr) {
+    onSelectRider(parent, sr) {
       const riders = getRiders(store.getState());
 
       if (sr < 0 || sr >= riders.length) return;
@@ -241,19 +242,19 @@ function main () {
       parent.setState({ riderRemountable: riders[selectedRider].remountable });
     }
 
-    onIncrementRiders () {
+    onIncrementRiders() {
       const ridersArray = [...getRiders(store.getState())];
       ridersArray.push({
         startPosition: { x: 0, y: -50 * ridersArray.length },
         startVelocity: { x: 0.4, y: 0 },
         startAngle: 0,
-        remountable: true
+        remountable: true,
       });
       store.dispatch({ type: "SET_RIDERS", payload: ridersArray });
       store.dispatch({ type: "COMMIT_TRACK_CHANGES" });
     }
 
-    onDecrementRiders () {
+    onDecrementRiders() {
       const ridersArray = [...getRiders(store.getState())];
 
       if (ridersArray.length === 0) return;
@@ -263,21 +264,22 @@ function main () {
       store.dispatch({ type: "COMMIT_TRACK_CHANGES" });
     }
 
-    renderDouble (key, label, sublabels, editable, actions) {
+    renderDouble(key, label, sublabels, editable, actions) {
       const props = [
         {
           id: key + "0",
           type: "number",
           readOnly: !editable,
           value: this.state[key][0],
-          onChange: e => (actions[0])(this, Number(e.target.value))
-        }, {
+          onChange: e => (actions[0])(this, Number(e.target.value)),
+        },
+        {
           id: key + "1",
           type: "number",
           readOnly: !editable,
           value: this.state[key][1],
-          onChange: e => (actions[1])(this, Number(e.target.value))
-        }
+          onChange: e => (actions[1])(this, Number(e.target.value)),
+        },
       ];
 
       const block = { marginLeft: ".5em", width: "3em" };
@@ -289,56 +291,56 @@ function main () {
         e("label", { style: block, htmlFor: key + "0" }, sublabels[0]),
         e("input", { style: block, ...props[0] }),
         e("label", { style: block, htmlFor: key + "1" }, sublabels[1]),
-        e("input", { style: block, ...props[1] })
+        e("input", { style: block, ...props[1] }),
       );
     }
 
-    renderSingle (key, label, editable, isNumber, action) {
+    renderSingle(key, label, editable, isNumber, action) {
       const props = {
         id: key,
         type: isNumber ? "number" : "text",
         readOnly: !editable,
         value: this.state[key],
-        onChange: e => action(this, isNumber ? Number(e.target.value) : e.target.value)
+        onChange: e => action(this, isNumber ? Number(e.target.value) : e.target.value),
       };
 
       return e(
         "div",
         null,
         e("label", { style: { width: "4em" }, htmlFor: key }, label),
-        e("input", { style: { marginLeft: ".5em" }, ...props })
+        e("input", { style: { marginLeft: ".5em" }, ...props }),
       );
     }
 
-    renderButton (key, label, action) {
+    renderButton(key, label, action) {
       const props = {
         id: key,
-        onClick: _ => action()
+        onClick: _ => action(),
       };
 
       return e(
         "button",
         props,
-        e("label", { htmlFor: key }, label)
+        e("label", { htmlFor: key }, label),
       );
     }
 
-    renderCheckbox (key, label, action) {
+    renderCheckbox(key, label, action) {
       const props = {
         id: key,
         checked: this.state[key],
-        onChange: e => action(this, e.target.checked)
+        onChange: e => action(this, e.target.checked),
       };
 
       return e(
         "div",
         null,
         e("label", { style: { width: "4em" }, htmlFor: key }, label),
-        e("input", { style: { marginLeft: ".5em" }, type: "checkbox", ...props })
+        e("input", { style: { marginLeft: ".5em" }, type: "checkbox", ...props }),
       );
     }
 
-    render () {
+    render() {
       return e(
         "div",
         null,
@@ -346,33 +348,41 @@ function main () {
           "div",
           { style: { width: "100%" } },
           e("text", { style: { userSelect: "none" } }, `Selected Lines: ${this.state.selectedLines}`),
-          this.renderDouble("editorCam", "Editor Camera", ["X", "Y"], true, [this.onSetEditorCamX, this.onSetEditorCamY]),
+          this.renderDouble("editorCam", "Editor Camera", ["X", "Y"], true, [
+            this.onSetEditorCamX,
+            this.onSetEditorCamY,
+          ]),
           this.renderSingle("index", "Timeline Index", true, true, this.onSetIndex),
           this.renderSingle("maxIndex", "Max Index", true, true, this.onSetMaxIndex),
           this.renderCheckbox("stopAtEnd", "Stop at End", this.onToggleStopEnd),
           this.renderCheckbox("nextFrameLifelock", "Next Frame Lifelock", this.onToggleNextFrameLifelock),
           e("hr"),
-          this.state.numRiders > 1 && this.renderSingle("selectedRider", "Selected Rider", true, true, this.onSelectRider),
+          this.state.numRiders > 1
+            && this.renderSingle("selectedRider", "Selected Rider", true, true, this.onSelectRider),
           this.state.numRiders > 0 && e(
-            "div", null,
-            this.renderDouble("riderPos", "Rider Position", ["X", "Y"], true, [this.onSetRiderPosX, this.onSetRiderPosY]),
-            this.renderDouble("riderVel", "Rider Velocity", ["X", "Y"], true, [this.onSetRiderVelX, this.onSetRiderVelY]),
+            "div",
+            null,
+            this.renderDouble("riderPos", "Rider Position", ["X", "Y"], true, [
+              this.onSetRiderPosX,
+              this.onSetRiderPosY,
+            ]),
+            this.renderDouble("riderVel", "Rider Velocity", ["X", "Y"], true, [
+              this.onSetRiderVelX,
+              this.onSetRiderVelY,
+            ]),
             this.renderSingle("riderAngle", "Rider Angle", true, true, this.onSetRiderAngle),
-            this.renderCheckbox("riderRemountable", "Remountable", this.onSetRiderRemountable)
+            this.renderCheckbox("riderRemountable", "Remountable", this.onSetRiderRemountable),
           ),
           this.state.numRiders,
           this.renderButton("incRiders", "+", this.onIncrementRiders),
           this.renderButton("decRiders", "-", this.onDecrementRiders),
         ),
-        e("button",
-          {
-            style: {
-              backgroundColor: this.state.active ? "lightblue" : null
-            },
-            onClick: this.onActivate.bind(this)
+        e("button", {
+          style: {
+            backgroundColor: this.state.active ? "lightblue" : null,
           },
-          "More Controls Mod"
-        )
+          onClick: this.onActivate.bind(this),
+        }, "More Controls Mod"),
       );
     }
   }

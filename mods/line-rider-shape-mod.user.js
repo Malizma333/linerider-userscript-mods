@@ -24,13 +24,13 @@ const EMPTY_SET = new Set();
 
 const setTool = (tool) => ({
   type: "SET_TOOL",
-  payload: tool
+  payload: tool,
 });
 
 const setToolState = (toolId, state) => ({
   type: "SET_TOOL_STATE",
   payload: state,
-  meta: { id: toolId }
+  meta: { id: toolId },
 });
 
 const setSelectToolState = toolState => setToolState(SELECT_TOOL, toolState);
@@ -38,17 +38,17 @@ const setSelectToolState = toolState => setToolState(SELECT_TOOL, toolState);
 const updateLines = (linesToRemove, linesToAdd, name) => ({
   type: "UPDATE_LINES",
   payload: { linesToRemove, linesToAdd },
-  meta: { name }
+  meta: { name },
 });
 
 const addLines = (line) => updateLines(null, line, "ADD_LINES");
 
 const commitTrackChanges = () => ({
-  type: "COMMIT_TRACK_CHANGES"
+  type: "COMMIT_TRACK_CHANGES",
 });
 
 const revertTrackChanges = () => ({
-  type: "REVERT_TRACK_CHANGES"
+  type: "REVERT_TRACK_CHANGES",
 });
 
 const getActiveTool = state => state.selectedTool;
@@ -59,7 +59,7 @@ const getTrackLinesLocked = state => state.trackLinesLocked;
 const getSelectedLineType = state => (getTrackLinesLocked(state) ? 2 : state.selectedLineType);
 
 class ShapeMod {
-  constructor (store, initState) {
+  constructor(store, initState) {
     this.store = store;
 
     this.changed = false;
@@ -82,7 +82,7 @@ class ShapeMod {
     });
   }
 
-  commitShape () {
+  commitShape() {
     if (this.changed) {
       this.store.dispatch(commitTrackChanges());
       this.store.dispatch(revertTrackChanges());
@@ -91,7 +91,7 @@ class ShapeMod {
     }
   }
 
-  onUpdate (nextState = this.state) {
+  onUpdate(nextState = this.state) {
     let shouldUpdate = false;
 
     if (!this.state.active && nextState.active) {
@@ -152,7 +152,7 @@ class ShapeMod {
             y1: p1.y,
             x2: p2.x,
             y2: p2.y,
-            type: this.lineType
+            type: this.lineType,
           });
         }
 
@@ -165,10 +165,10 @@ class ShapeMod {
   }
 }
 
-function main () {
+function main() {
   const {
     React,
-    store
+    store,
   } = window;
 
   const create = React.createElement;
@@ -176,12 +176,12 @@ function main () {
   Object.defineProperty(window.Tools.SELECT_TOOL, "usesSwatches", { value: true });
 
   class ShapeModComponent extends React.Component {
-    constructor (props) {
+    constructor(props) {
       super(props);
 
       this.state = {
         active: false,
-        sides: 3
+        sides: 3,
       };
 
       this.shapeMod = new ShapeMod(store, this.state);
@@ -205,11 +205,11 @@ function main () {
       this._mounted = false;
     }
 
-    componentWillUpdate (nextProps, nextState) {
+    componentWillUpdate(nextProps, nextState) {
       this.shapeMod.onUpdate(nextState);
     }
 
-    onActivate () {
+    onActivate() {
       if (this.state.active) {
         this.setState({ active: false });
       } else {
@@ -218,47 +218,46 @@ function main () {
       }
     }
 
-    onCommit () {
+    onCommit() {
       const committed = this.shapeMod.commitShape();
       if (committed) {
         this.setState({ active: false });
       }
     }
 
-    renderSlider (key, title, props) {
+    renderSlider(key, title, props) {
       props = {
         ...props,
         value: this.state[key],
-        onChange: create => this.setState({ [key]: parseFloat(create.target.value) })
+        onChange: create => this.setState({ [key]: parseFloat(create.target.value) }),
       };
 
-      return create("div", null,
+      return create(
+        "div",
+        null,
         title,
         create("input", { style: { width: "3em" }, type: "number", ...props }),
-        create("input", { type: "range", ...props, onFocus: create => create.target.blur() })
+        create("input", { type: "range", ...props, onFocus: create => create.target.blur() }),
       );
     }
 
-    render () {
-      return create("div", null,
-        this.state.active && create("div", null,
-
-          this.renderSlider("sides", "Sides", { min: 3, max: 1000, step: 1 }),
-
-          create("button", { style: { float: "left" }, onClick: () => this.onCommit() },
-            "Commit"
-          )
-        ),
-
-        create("button",
-          {
-            style: {
-              backgroundColor: this.state.active ? "lightblue" : null
-            },
-            onClick: this.onActivate.bind(this)
+    render() {
+      return create(
+        "div",
+        null,
+        this.state.active
+          && create(
+            "div",
+            null,
+            this.renderSlider("sides", "Sides", { min: 3, max: 1000, step: 1 }),
+            create("button", { style: { float: "left" }, onClick: () => this.onCommit() }, "Commit"),
+          ),
+        create("button", {
+          style: {
+            backgroundColor: this.state.active ? "lightblue" : null,
           },
-          "Shape Mod"
-        )
+          onClick: this.onActivate.bind(this),
+        }, "Shape Mod"),
       );
     }
   }
@@ -276,7 +275,7 @@ if (window.registerCustomSetting) {
   };
 }
 
-function * genShape (line, { sides = 3 } = {}) {
+function* genShape(line, { sides = 3 } = {}) {
   const { V2 } = window;
 
   const center = new V2(line.p1);
@@ -293,7 +292,7 @@ function * genShape (line, { sides = 3 } = {}) {
   }
 }
 
-function addAngle (center, point, angle) {
+function addAngle(center, point, angle) {
   const r = Math.sqrt(Math.pow(point.x - center.x, 2) + Math.pow(point.y - center.y, 2));
   let t = Math.atan2(point.y - center.y, point.x - center.x);
 
@@ -304,7 +303,7 @@ function addAngle (center, point, angle) {
   return newPointA;
 }
 
-function setsEqual (a, b) {
+function setsEqual(a, b) {
   if (a === b) {
     return true;
   }
@@ -319,6 +318,6 @@ function setsEqual (a, b) {
   return true;
 }
 
-function getLinesFromPoints (points) {
+function getLinesFromPoints(points) {
   return new Set([...points].map(point => point >> 1));
 }

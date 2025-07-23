@@ -26,11 +26,11 @@ const getWindowFocused = state => state.views.Main;
 const getPlayerRunning = state => state.player.running;
 const getSceneryWidth = state => state.selectedSceneryWidth;
 
-function main () {
+function main() {
   const {
     React,
     ReactDOM,
-    store
+    store,
   } = window;
 
   const e = React.createElement;
@@ -41,15 +41,15 @@ function main () {
     pointerEvents: "none",
     transition: "opacity 225ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
     top: "25px",
-    left: "65vw"
+    left: "65vw",
   };
 
   class SceneryWidthModComponent extends React.Component {
-    constructor () {
+    constructor() {
       super();
 
       this.state = {
-        sceneryWidth: 1
+        sceneryWidth: 1,
       };
 
       store.subscribe(() => this.setState({ sceneryWidth: getSceneryWidth(store.getState()) }));
@@ -59,18 +59,35 @@ function main () {
       Object.assign(sceneryWidthContainer.style, sceneryWidthContainerStyle);
     }
 
-    onChooseWidth (sceneryWidth) {
+    onChooseWidth(sceneryWidth) {
       if (sceneryWidth === 0) return;
       store.dispatch({ type: "SELECT_SCENERY_WIDTH", payload: sceneryWidth });
       this.setState({ sceneryWidth });
     }
 
-    render () {
+    render() {
       return e(
         "div",
         null,
-        e("input", { style: { width: "4em" }, type: "number", min: 0, max: 362, step: 0.01, value: this.state.sceneryWidth, onChange: e => this.onChooseWidth(parseFloat(e.target.value)) }),
-        e("input", { style: { width: "7em" }, type: "range", min: -2, max: 2.55870857, step: 0.1, value: Math.log10(this.state.sceneryWidth), onChange: e => this.onChooseWidth(Math.pow(10, parseFloat(e.target.value))), onFocus: e => e.target.blur() })
+        e("input", {
+          style: { width: "4em" },
+          type: "number",
+          min: 0,
+          max: 362,
+          step: 0.01,
+          value: this.state.sceneryWidth,
+          onChange: e => this.onChooseWidth(parseFloat(e.target.value)),
+        }),
+        e("input", {
+          style: { width: "7em" },
+          type: "range",
+          min: -2,
+          max: 2.55870857,
+          step: 0.1,
+          value: Math.log10(this.state.sceneryWidth),
+          onChange: e => this.onChooseWidth(Math.pow(10, parseFloat(e.target.value))),
+          onFocus: e => e.target.blur(),
+        }),
       );
     }
   }
@@ -79,7 +96,7 @@ function main () {
 
   ReactDOM.render(
     e(SceneryWidthModComponent),
-    sceneryWidthContainer
+    sceneryWidthContainer,
   );
 
   store.subscribe(() => {

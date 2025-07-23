@@ -24,20 +24,20 @@
 
 const setTool = (tool) => ({
   type: "SET_TOOL",
-  payload: tool
+  payload: tool,
 });
 
 const getActiveTool = state => state.selectedTool;
 const getWindowFocused = state => !!state.views.Main;
 const getPlayerRunning = state => state.player.running;
 
-function main () {
+function main() {
   window.V2 = window.V2 || window.store.getState().simulator.engine.engine.state.startPoint.constructor;
 
   const {
     React,
     ReactDOM,
-    store
+    store,
   } = window;
 
   const e = React.createElement;
@@ -54,7 +54,7 @@ function main () {
     bottom: "70px",
     right: "8px",
     height: "35vh",
-    borderRadius: "10px"
+    borderRadius: "10px",
   };
 
   const minifyButtonStyle = {
@@ -63,7 +63,7 @@ function main () {
     background: "none",
     borderRadius: "100%",
     alignItems: "center",
-    display: "flex"
+    display: "flex",
   };
 
   const expandButtonStyle = {
@@ -76,7 +76,7 @@ function main () {
     right: "8px",
     fontSize: "xx-large",
     aspectRatio: "1/1",
-    borderRadius: "100%"
+    borderRadius: "100%",
   };
 
   const rootStyle = {
@@ -88,14 +88,14 @@ function main () {
   };
 
   class CustomSettingsContainer extends React.Component {
-    constructor () {
+    constructor() {
       super();
 
       this.state = {
         customSettings: [],
         customTools: {},
         searchTerm: "",
-        activeTool: getActiveTool(store.getState())
+        activeTool: getActiveTool(store.getState()),
       };
 
       store.subscribe(() => {
@@ -110,14 +110,14 @@ function main () {
       });
     }
 
-    componentDidMount () {
+    componentDidMount() {
       let containerAssigned = false;
 
       window.registerCustomSetting = (component) => {
         console.info("Registering custom setting", component.name);
         this.setState((prevState) => {
           const customSettings = [...prevState.customSettings, component];
-          customSettings.sort(function (modA, modB) {
+          customSettings.sort(function(modA, modB) {
             const modAName = modA.name.toUpperCase();
             const modBName = modB.name.toUpperCase();
             return -((modAName < modBName) ? -1 : (modAName > modBName) ? 1 : 0);
@@ -140,8 +140,8 @@ function main () {
         this.setState((prevState) => ({
           customTools: {
             ...prevState.customTools,
-            [toolName]: { component, onDetach }
-          }
+            [toolName]: { component, onDetach },
+          },
         }));
 
         if (onDetach) {
@@ -154,7 +154,7 @@ function main () {
       }
     }
 
-    render () {
+    render() {
       return this.state.customSettings.length > 0 && e(
         "div",
         { style: { display: "flex", height: "100%", flexDirection: "column" } },
@@ -165,9 +165,12 @@ function main () {
             "button",
             {
               style: minifyButtonStyle,
-              onClick: () => { settingsContainer.style.visibility = "hidden"; expandButton.style.visibility = "visible"; }
+              onClick: () => {
+                settingsContainer.style.visibility = "hidden";
+                expandButton.style.visibility = "visible";
+              },
             },
-            "-"
+            "-",
           ),
           e(
             "input",
@@ -175,34 +178,33 @@ function main () {
               style: { width: "100%", border: "none", background: "none", marginLeft: "1em" },
               placeholder: "Search...",
               value: this.state.searchTerm,
-              onChange: (e) => this.setState({ searchTerm: e.target.value })
-            }
-          )
+              onChange: (e) => this.setState({ searchTerm: e.target.value }),
+            },
+          ),
         ),
         e(
           "div",
           { style: rootStyle },
           this.state.customSettings.filter(
-            (mod) => mod.name.toUpperCase().includes(this.state.searchTerm.toUpperCase())
+            (mod) => mod.name.toUpperCase().includes(this.state.searchTerm.toUpperCase()),
           ).map((mod) => e(mod)),
-          ...Object.keys(this.state.customTools).filter(toolName => toolName.toUpperCase().includes(this.state.searchTerm.toUpperCase())).map(toolName => {
+          ...Object.keys(this.state.customTools).filter(toolName =>
+            toolName.toUpperCase().includes(this.state.searchTerm.toUpperCase())
+          ).map(toolName => {
             return e(
               "div",
               null,
               this.state.activeTool === toolName && e(this.state.customTools[this.state.activeTool].component),
-              e("button",
-                {
-                  key: toolName,
-                  style: {
-                    backgroundColor: this.state.activeTool === toolName ? "lightblue" : null
-                  },
-                  onClick: () => store.dispatch(setTool(toolName))
+              e("button", {
+                key: toolName,
+                style: {
+                  backgroundColor: this.state.activeTool === toolName ? "lightblue" : null,
                 },
-                toolName
-              )
+                onClick: () => store.dispatch(setTool(toolName)),
+              }, toolName),
             );
-          })
-        )
+          }),
+        ),
       );
     }
   }
@@ -210,7 +212,10 @@ function main () {
   const expandButton = document.createElement("button");
   expandButton.innerHTML = "↖";
   expandButton.title = "Show ModAPI";
-  expandButton.onclick = () => { settingsContainer.style.visibility = "visible"; expandButton.style.visibility = "hidden"; };
+  expandButton.onclick = () => {
+    settingsContainer.style.visibility = "visible";
+    expandButton.style.visibility = "hidden";
+  };
   document.getElementById("content").appendChild(expandButton);
 
   const settingsContainer = document.createElement("div");
@@ -219,7 +224,7 @@ function main () {
 
   ReactDOM.render(
     e(CustomSettingsContainer),
-    settingsContainer
+    settingsContainer,
   );
 
   store.subscribe(() => {

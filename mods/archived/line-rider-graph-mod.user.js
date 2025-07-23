@@ -26,23 +26,23 @@
 const updateLines = (linesToRemove, linesToAdd, name) => ({
   type: "UPDATE_LINES",
   payload: { linesToRemove, linesToAdd },
-  meta: { name: name }
+  meta: { name: name },
 });
 
 const addLines = (line) => updateLines(null, line, "ADD_LINES");
 
 const commitTrackChanges = () => ({
-  type: "COMMIT_TRACK_CHANGES"
+  type: "COMMIT_TRACK_CHANGES",
 });
 
 const revertTrackChanges = () => ({
-  type: "REVERT_TRACK_CHANGES"
+  type: "REVERT_TRACK_CHANGES",
 });
 
 const getSimulatorCommittedTrack = state => state.simulator.committedEngine;
 
 class GraphMod {
-  constructor (store, initState) {
+  constructor(store, initState) {
     this.store = store;
     this.state = initState;
 
@@ -55,7 +55,7 @@ class GraphMod {
     });
   }
 
-  commit () {
+  commit() {
     if (this.changed) {
       this.store.dispatch(commitTrackChanges());
       this.store.dispatch(revertTrackChanges());
@@ -64,7 +64,7 @@ class GraphMod {
     }
   }
 
-  onUpdate (nextState = this.state) {
+  onUpdate(nextState = this.state) {
     let shouldUpdate = false;
 
     if (!this.state.active && nextState.active) {
@@ -89,7 +89,6 @@ class GraphMod {
     }
 
     if (shouldUpdate) {
-
       if (this.changed) {
         this.store.dispatch(revertTrackChanges());
         this.changed = false;
@@ -104,7 +103,7 @@ class GraphMod {
             y1: p1.y,
             x2: p2.x,
             y2: p2.y,
-            type: 2
+            type: 2,
           });
         }
 
@@ -117,16 +116,16 @@ class GraphMod {
   }
 }
 
-function main () {
+function main() {
   const {
     React,
-    store
+    store,
   } = window;
 
   const create = React.createElement;
 
   class GraphModComponent extends React.Component {
-    constructor (props) {
+    constructor(props) {
       super(props);
 
       this.state = {
@@ -138,43 +137,42 @@ function main () {
         rangeN: 10,
         step: .1,
         centerCamera: true,
-        connectDots: false
+        connectDots: false,
       };
 
       this.graphMod = new GraphMod(store, this.state);
     }
 
-    componentWillUpdate (nextProps, nextState) {
+    componentWillUpdate(nextProps, nextState) {
       this.graphMod.onUpdate(nextState);
     }
 
-    renderCheckbox (key, props) {
+    renderCheckbox(key, props) {
       props = {
         ...props,
         checked: this.state[key],
-        onChange: create => this.setState({ [key]: create.target.checked })
+        onChange: create => this.setState({ [key]: create.target.checked }),
       };
-      return create("div", null,
-        key,
-        create("input", { type: "checkbox", ...props })
-      );
+      return create("div", null, key, create("input", { type: "checkbox", ...props }));
     }
 
-    renderSlider (key, title, props) {
+    renderSlider(key, title, props) {
       props = {
         ...props,
         value: this.state[key],
-        onChange: create => this.setState({ [key]: parseFloat(create.target.value) })
+        onChange: create => this.setState({ [key]: parseFloat(create.target.value) }),
       };
 
-      return create("div", null,
+      return create(
+        "div",
+        null,
         title,
         create("input", { style: { width: "4em" }, type: "number", ...props }),
-        create("input", { type: "range", ...props, onFocus: create => create.target.blur() })
+        create("input", { type: "range", ...props, onFocus: create => create.target.blur() }),
       );
     }
 
-    onActivate () {
+    onActivate() {
       if (this.state.active) {
         this.setState({ active: false });
       } else {
@@ -182,45 +180,49 @@ function main () {
       }
     }
 
-    onCommit () {
+    onCommit() {
       const committed = this.graphMod.commit();
       if (committed) {
         this.setState({ active: false });
       }
     }
 
-    render () {
-      return create("div", null,
-        this.state.active && create("div", null,
-          create("div", null,
-            "Equation: ",
-            create("textArea", { style: { width: "88%" }, type: "text",
-              value: this.state.func,
-              onChange: create => this.setState({ func: create.target.value })
-            }),
-            "Domain",
-            this.renderSlider("domainM", "Min: ", { min: -100, max: this.state.domainN, step: 1 }),
-            this.renderSlider("domainN", "Max: ", { min: -100, max: 100, step: 1 }),
-            "Range",
-            this.renderSlider("rangeM", "Min: ", { min: -100, max: this.state.rangeN, step: 1 }),
-            this.renderSlider("rangeN", "Max: ", { min: -100, max: 100, step: 1 }),
-            this.renderSlider("step", "Step", { min: 0.01, max: 5, step: 0.1 }),
-            this.renderCheckbox("centerCamera"),
-            this.renderCheckbox("connectDots")
+    render() {
+      return create(
+        "div",
+        null,
+        this.state.active
+          && create(
+            "div",
+            null,
+            create(
+              "div",
+              null,
+              "Equation: ",
+              create("textArea", {
+                style: { width: "88%" },
+                type: "text",
+                value: this.state.func,
+                onChange: create => this.setState({ func: create.target.value }),
+              }),
+              "Domain",
+              this.renderSlider("domainM", "Min: ", { min: -100, max: this.state.domainN, step: 1 }),
+              this.renderSlider("domainN", "Max: ", { min: -100, max: 100, step: 1 }),
+              "Range",
+              this.renderSlider("rangeM", "Min: ", { min: -100, max: this.state.rangeN, step: 1 }),
+              this.renderSlider("rangeN", "Max: ", { min: -100, max: 100, step: 1 }),
+              this.renderSlider("step", "Step", { min: 0.01, max: 5, step: 0.1 }),
+              this.renderCheckbox("centerCamera"),
+              this.renderCheckbox("connectDots"),
+            ),
+            create("button", { style: { float: "left" }, onClick: () => this.onCommit() }, "Commit"),
           ),
-          create("button", { style: { float: "left" }, onClick: () => this.onCommit() },
-            "Commit"
-          )
-        ),
-        create("button",
-          {
-            style: {
-              backgroundColor: this.state.active ? "lightblue" : null
-            },
-            onClick: this.onActivate.bind(this)
+        create("button", {
+          style: {
+            backgroundColor: this.state.active ? "lightblue" : null,
           },
-          "Graph Mod"
-        )
+          onClick: this.onActivate.bind(this),
+        }, "Graph Mod"),
       );
     }
   }
@@ -238,7 +240,18 @@ if (window.registerCustomSetting) {
   };
 }
 
-function* genLines ({ func = "", domainM = -10, domainN = 10, rangeM = -10, rangeN = 10, step = 0.1, centerCamera = true, connectDots = false } = {}) {
+function* genLines(
+  {
+    func = "",
+    domainM = -10,
+    domainN = 10,
+    rangeM = -10,
+    rangeN = 10,
+    step = 0.1,
+    centerCamera = true,
+    connectDots = false,
+  } = {},
+) {
   const { V2 } = window;
   const camPos = window.store.getState().camera.editorPosition;
   const offset = centerCamera ? camPos : V2.from(0, 0);
@@ -267,12 +280,12 @@ function* genLines ({ func = "", domainM = -10, domainN = 10, rangeM = -10, rang
         if (connectDots && lastPos) {
           yield {
             p1: V2.from(x + offset.x, offset.y - y + .1),
-            p2: V2.from(lastPos.x + offset.x, offset.y - lastPos.y)
+            p2: V2.from(lastPos.x + offset.x, offset.y - lastPos.y),
           };
         } else {
           yield {
             p1: V2.from(x + offset.x, offset.y - y + .1),
-            p2: V2.from(x + offset.x, offset.y - y)
+            p2: V2.from(x + offset.x, offset.y - y),
           };
         }
 

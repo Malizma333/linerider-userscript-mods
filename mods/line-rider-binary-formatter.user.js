@@ -24,11 +24,32 @@
  * for now it includes all of the base definitions + definitions for web-specific features
  */
 const modDirectory = [
-  {name: "base.gridver", version: 0, flags: { optional: false, physics: false, camera: false, scenery: false, extra_data: true }},
-  {name: "base.label", version: 0, flags: { optional: true, physics: false, camera: false, scenery: false, extra_data: true }, message: "Track label not loaded (optional)"},
-  {name: "base.scnline", version: 0, flags: { optional: false, physics: false, camera: false, scenery: false, extra_data: true }},
-  {name: "base.simline", version: 0, flags: { optional: false, physics: false, camera: false, scenery: false, extra_data: true }},
-  {name: "base.startoffset", version: 0, flags: { optional: false, physics: false, camera: false, scenery: false, extra_data: true }},
+  {
+    name: "base.gridver",
+    version: 0,
+    flags: { optional: false, physics: false, camera: false, scenery: false, extra_data: true },
+  },
+  {
+    name: "base.label",
+    version: 0,
+    flags: { optional: true, physics: false, camera: false, scenery: false, extra_data: true },
+    message: "Track label not loaded (optional)",
+  },
+  {
+    name: "base.scnline",
+    version: 0,
+    flags: { optional: false, physics: false, camera: false, scenery: false, extra_data: true },
+  },
+  {
+    name: "base.simline",
+    version: 0,
+    flags: { optional: false, physics: false, camera: false, scenery: false, extra_data: true },
+  },
+  {
+    name: "base.startoffset",
+    version: 0,
+    flags: { optional: false, physics: false, camera: false, scenery: false, extra_data: true },
+  },
 ];
 
 const supportedMods = new Set(["base.gridver", "base.label", "base.scnline", "base.simline", "base.startoffset"]);
@@ -41,8 +62,8 @@ class LRBWriter {
   constructor() {}
 
   /**
-     * Converts a given .track.json to an LRB file formatted as a U8 array
-     */
+   * Converts a given .track.json to an LRB file formatted as a U8 array
+   */
   fromJson(jsonData) {
     this.#clearData();
     this.#constructLookups(jsonData);
@@ -67,7 +88,16 @@ class LRBWriter {
       this.#pushU16(mod.version);
 
       // Mod Flags
-      this.#pushFlags([false, false, false, mod.flags.extra_data, mod.flags.scenery, mod.flags.camera, mod.flags.physics, mod.flags.optional]);
+      this.#pushFlags([
+        false,
+        false,
+        false,
+        mod.flags.extra_data,
+        mod.flags.scenery,
+        mod.flags.camera,
+        mod.flags.physics,
+        mod.flags.optional,
+      ]);
 
       // Mod Data Address
       if (mod.flags.extra_data) {
@@ -88,82 +118,91 @@ class LRBWriter {
       const sectionPointer = BigInt(this.#binList.length);
 
       switch (mod.name) {
-      case "base.gridver": {
-        /**
-                     * grid version: U8 = the grid algorithm version used by the track
-                     */
+        case "base.gridver": {
+          /**
+           * grid version: U8 = the grid algorithm version used by the track
+           */
 
-        const version = jsonData.trackData.version || "6.2";
-        const versionNum = {"6.2": 0, "6.1": 1, "6.0": 2}[version];
-        this.#pushU8(versionNum);
+          const version = jsonData.trackData.version || "6.2";
+          const versionNum = { "6.2": 0, "6.1": 1, "6.0": 2 }[version];
+          this.#pushU8(versionNum);
 
-        break;
-      }
-      case "base.label": {
-        /**
-                     * label: string = the track's label
-                     */
-
-        const label = jsonData.trackData.label || "";
-        this.#pushLengthU16String(label);
-
-        break;
-      }
-      case "base.scnline": {
-        /**
-                     * count: U32 = the amount of lines written
-                     * lines: scnline[count] = [
-                     *   id: u32 = the line's ID
-                     *   x1: f64 = the x position of the 1st point
-                     *   y1: f64 = the y position of the 1st point
-                     *   x2: f64 = the x position of the 2nd point
-                     *   y2: f64 = the y position of the 2nd point
-                     * ]
-                     */
-
-        this.#pushU32(this.#lookups.sceneryLines.length);
-
-        for (const sceneryLine of this.#lookups.sceneryLines) {
-          this.#pushU32(sceneryLine.id);
-          this.#pushF64Array([sceneryLine.x1, sceneryLine.y1, sceneryLine.x2, sceneryLine.y2]);
+          break;
         }
+        case "base.label": {
+          /**
+           * label: string = the track's label
+           */
 
-        break;
-      }
-      case "base.simline": {
-        /**
-                     * count: U32 = the amount of lines written
-                     * lines: simline[count] = [
-                     *   id: u32 = the line's ID
-                     *   flags: u8 = Line flags 0000DCBA
-                     *   x1: f64 = the x position of the 1st point
-                     *   y1: f64 = the y position of the 1st point
-                     *   x2: f64 = the x position of the 2nd point
-                     *   y2: f64 = the y position of the 2nd point
-                     * ]
-                     * Line flag defs: A = Red line, B = inverted, C = left extension, D = right extension
-                     */
+          const label = jsonData.trackData.label || "";
+          this.#pushLengthU16String(label);
 
-        this.#pushU32(this.#lookups.simLines.length);
-
-        for (const simLine of this.#lookups.simLines) {
-          this.#pushU32(simLine.id);
-          this.#pushFlags([false, false, false, false, simLine.rightExtended, simLine.leftExtended, simLine.flipped, simLine.type === 1]);
-          this.#pushF64Array([simLine.x1, simLine.y1, simLine.x2, simLine.y2]);
+          break;
         }
+        case "base.scnline": {
+          /**
+           * count: U32 = the amount of lines written
+           * lines: scnline[count] = [
+           *   id: u32 = the line's ID
+           *   x1: f64 = the x position of the 1st point
+           *   y1: f64 = the y position of the 1st point
+           *   x2: f64 = the x position of the 2nd point
+           *   y2: f64 = the y position of the 2nd point
+           * ]
+           */
 
-        break;
-      }
-      case "base.startoffset": {
-        /**
-                     * X: F64 = the X coordinate of the start offset
-                     * Y: F64 = the Y coordinate of the start offset (remember +Y is down)
-                     */
+          this.#pushU32(this.#lookups.sceneryLines.length);
 
-        this.#pushF64Array([jsonData.trackData.startPosition.x, jsonData.trackData.startPosition.y]);
+          for (const sceneryLine of this.#lookups.sceneryLines) {
+            this.#pushU32(sceneryLine.id);
+            this.#pushF64Array([sceneryLine.x1, sceneryLine.y1, sceneryLine.x2, sceneryLine.y2]);
+          }
 
-        break;
-      }
+          break;
+        }
+        case "base.simline": {
+          /**
+           * count: U32 = the amount of lines written
+           * lines: simline[count] = [
+           *   id: u32 = the line's ID
+           *   flags: u8 = Line flags 0000DCBA
+           *   x1: f64 = the x position of the 1st point
+           *   y1: f64 = the y position of the 1st point
+           *   x2: f64 = the x position of the 2nd point
+           *   y2: f64 = the y position of the 2nd point
+           * ]
+           * Line flag defs: A = Red line, B = inverted, C = left extension, D = right extension
+           */
+
+          this.#pushU32(this.#lookups.simLines.length);
+
+          for (const simLine of this.#lookups.simLines) {
+            this.#pushU32(simLine.id);
+            this.#pushFlags([
+              false,
+              false,
+              false,
+              false,
+              simLine.rightExtended,
+              simLine.leftExtended,
+              simLine.flipped,
+              simLine.type === 1,
+            ]);
+            this.#pushF64Array([simLine.x1, simLine.y1, simLine.x2, simLine.y2]);
+          }
+
+          break;
+        }
+        case "base.startoffset": {
+          /**
+           * X: F64 = the X coordinate of the start offset
+           * Y: F64 = the Y coordinate of the start offset (remember +Y is down)
+           */
+
+          this.#pushF64Array([jsonData.trackData.startPosition.x, jsonData.trackData.startPosition.y]);
+
+          break;
+        }
       }
 
       const sectionLength = BigInt(this.#binList.length) - sectionPointer;
@@ -199,9 +238,9 @@ class LRBWriter {
   }
 
   /**
-     * Writes the char codes of a fixed length string. Note that, while charCodeAt supports
-     * UTF-16 values, we're only considering single byte length chars.
-     */
+   * Writes the char codes of a fixed length string. Note that, while charCodeAt supports
+   * UTF-16 values, we're only considering single byte length chars.
+   */
   #pushFixedString(string) {
     for (let i = 0; i < string.length; i++) {
       this.#pushU8(string.charCodeAt(i));
@@ -209,32 +248,32 @@ class LRBWriter {
   }
 
   /**
-     * Pushes the (U8) length of the string before pushing the string itself
-     */
+   * Pushes the (U8) length of the string before pushing the string itself
+   */
   #pushLengthU8String(string) {
     this.#pushU8(string.length);
     this.#pushFixedString(string);
   }
 
   /**
-     * Pushes the (U16) length of the string before pushing the string itself
-     */
+   * Pushes the (U16) length of the string before pushing the string itself
+   */
   #pushLengthU16String(string) {
     this.#pushU16(string.length);
     this.#pushFixedString(string);
   }
 
   /**
-     * Pushes the (U32) length of the string before pushing the string itself
-     */
+   * Pushes the (U32) length of the string before pushing the string itself
+   */
   #pushLengthU32String(string) { // TODO: Unused
     this.#pushU32(string.length);
     this.#pushFixedString(string);
   }
 
   /**
-     * Writes a list of double precision floating point values, since we're often writing more than one at a time
-     */
+   * Writes a list of double precision floating point values, since we're often writing more than one at a time
+   */
   #pushF64Array(arr) {
     const floatArray = new Float64Array(arr.length);
     for (let i = 0; i < arr.length; i++) {
@@ -242,14 +281,14 @@ class LRBWriter {
     }
 
     const byteArray = new Uint8Array(floatArray.buffer);
-    for(let i = 0; i < byteArray.length; i++) {
+    for (let i = 0; i < byteArray.length; i++) {
       this.#pushU8(byteArray[i]);
     }
   }
 
   /**
-     * Writes a list of boolean flags to a single U8, where the first flag in the list is the highest significant bit
-     */
+   * Writes a list of boolean flags to a single U8, where the first flag in the list is the highest significant bit
+   */
   #pushFlags(flagArray) {
     if (flagArray.length !== 8) {
       throw new Error("[writeFlags] flagArray was invalid length!");
@@ -267,8 +306,8 @@ class LRBWriter {
   }
 
   /**
-     * Pushes a boolean value to a full byte space
-     */
+   * Pushes a boolean value to a full byte space
+   */
   #pushBoolean(boolean) { // TODO: Unused
     if (boolean) {
       this.#binList.push(1);
@@ -278,9 +317,9 @@ class LRBWriter {
   }
 
   /**
-     * Writes mod data address information to the appropriate place in the mod table
-     * TODO: This should utilize BigIntegers/U64s when writing a full implementataion
-     */
+   * Writes mod data address information to the appropriate place in the mod table
+   * TODO: This should utilize BigIntegers/U64s when writing a full implementataion
+   */
   #writeModEntryPointer(modName, entryPointer, entryLength) {
     const index = this.#modTableEntryLocations[modName];
     for (let i = 0n; i < 8n; i++) {
@@ -290,13 +329,13 @@ class LRBWriter {
   }
 
   /**
-     * Convert the Number[] binList to a Uint8Array and return it
-     */
+   * Convert the Number[] binList to a Uint8Array and return it
+   */
   #retrieveU8Array() {
     const size = this.#binList.length;
     const binData = new Uint8Array(size);
 
-    for(let i = 0; i < size; i++) {
+    for (let i = 0; i < size; i++) {
       binData[i] = this.#binList[i];
     }
 
@@ -304,8 +343,8 @@ class LRBWriter {
   }
 
   /**
-     * Reset computed data and lookup tables
-     */
+   * Reset computed data and lookup tables
+   */
   #clearData() {
     this.#binList = [];
     this.#modTableEntryLocations = {};
@@ -313,8 +352,8 @@ class LRBWriter {
   }
 
   /**
-     * Creates lookups ahead of time for lines, line ids, and layer ids to break out among various mods
-     */
+   * Creates lookups ahead of time for lines, line ids, and layer ids to break out among various mods
+   */
   #constructLookups(jsonData) {
     this.#lookups = {
       simLines: [],
@@ -337,7 +376,7 @@ class LRBWriter {
       }
     }
   }
-};
+}
 
 /**
  * The "consume" functions in this class are written with the side effect of modifying the current index
@@ -350,8 +389,8 @@ class LRBParser {
   constructor() {}
 
   /**
-     * Converts a given LRB to a .track.json file formatted as an object
-     */
+   * Converts a given LRB to a .track.json file formatted as an object
+   */
   toJson(binData) {
     this.#view = new Uint8Array(binData);
     this.#viewPointer = 0;
@@ -365,7 +404,7 @@ class LRBParser {
       "layers": [],
       "lines": [],
       "riders": [],
-      "script": ""
+      "script": "",
     };
     let modAddressOffsets = {};
 
@@ -438,62 +477,63 @@ class LRBParser {
 
       // Extra Mod Data
       switch (modName) {
-      case "base.gridver": {
-        const versionNum = this.#consumeU8();
-        newTrack.version = ["6.2", "6.1", "6.0"][versionNum];
-        break;
-      }
-      case "base.label": {
-        newTrack.label = this.#consumeLengthU16String();
-        break;
-      }
-      case "base.scnline": {
-        const numLines = this.#consumeU32();
-        for (let i = 0; i < numLines; i++) {
-          const id = this.#consumeU32();
-          const [x1, y1, x2, y2] = this.#consumeF64Array(4);
-
-          newTrack.lines.push({
-            "id": id,
-            "type": 2,
-            "x1": x1,
-            "y1": y1,
-            "x2": x2,
-            "y2": y2
-          });
+        case "base.gridver": {
+          const versionNum = this.#consumeU8();
+          newTrack.version = ["6.2", "6.1", "6.0"][versionNum];
+          break;
         }
-
-        break;
-      }
-      case "base.simline": {
-        const numLines = this.#consumeU32();
-        for (let i = 0; i < numLines; i++) {
-          const id = this.#consumeU32();
-          // 0 0 0 0 rightExtended leftExtended flipped red
-          const lineFlags = this.#consumeFlags();
-          const [x1, y1, x2, y2] = this.#consumeF64Array(4);
-
-          newTrack.lines.push({
-            "id": id,
-            "type": lineFlags[7] ? 1 : 0,
-            "flipped": lineFlags[6],
-            "leftExtended": lineFlags[5],
-            "rightExtended": lineFlags[4],
-            "x1": x1,
-            "y1": y1,
-            "x2": x2,
-            "y2": y2
-          });
+        case "base.label": {
+          newTrack.label = this.#consumeLengthU16String();
+          break;
         }
+        case "base.scnline": {
+          const numLines = this.#consumeU32();
+          for (let i = 0; i < numLines; i++) {
+            const id = this.#consumeU32();
+            const [x1, y1, x2, y2] = this.#consumeF64Array(4);
 
-        break;
-      }
-      case "base.startpos": {
-        const [x, y] = this.#consumeF64Array(2);
-        newTrack.startPosition = {"x": x, "y": y};
-        break;
-      }
-      default: break;
+            newTrack.lines.push({
+              "id": id,
+              "type": 2,
+              "x1": x1,
+              "y1": y1,
+              "x2": x2,
+              "y2": y2,
+            });
+          }
+
+          break;
+        }
+        case "base.simline": {
+          const numLines = this.#consumeU32();
+          for (let i = 0; i < numLines; i++) {
+            const id = this.#consumeU32();
+            // 0 0 0 0 rightExtended leftExtended flipped red
+            const lineFlags = this.#consumeFlags();
+            const [x1, y1, x2, y2] = this.#consumeF64Array(4);
+
+            newTrack.lines.push({
+              "id": id,
+              "type": lineFlags[7] ? 1 : 0,
+              "flipped": lineFlags[6],
+              "leftExtended": lineFlags[5],
+              "rightExtended": lineFlags[4],
+              "x1": x1,
+              "y1": y1,
+              "x2": x2,
+              "y2": y2,
+            });
+          }
+
+          break;
+        }
+        case "base.startpos": {
+          const [x, y] = this.#consumeF64Array(2);
+          newTrack.startPosition = { "x": x, "y": y };
+          break;
+        }
+        default:
+          break;
       }
     }
 
@@ -501,9 +541,9 @@ class LRBParser {
   }
 
   /**
-     * Consumes a single byte into a number
-     * @returns {Number}
-     */
+   * Consumes a single byte into a number
+   * @returns {Number}
+   */
   #consumeU8() {
     const x = this.#view[this.#viewPointer];
     this.#viewPointer += 1;
@@ -511,9 +551,9 @@ class LRBParser {
   }
 
   /**
-     * Consumes two bytes into a number
-     * @returns {Number}
-     */
+   * Consumes two bytes into a number
+   * @returns {Number}
+   */
   #consumeU16() {
     const x = (this.#view[this.#viewPointer + 1] << 8) | this.#view[this.#viewPointer];
     this.#viewPointer += 2;
@@ -521,9 +561,9 @@ class LRBParser {
   }
 
   /**
-     * Consumes four bytes into a number
-     * @returns {Number}
-     */
+   * Consumes four bytes into a number
+   * @returns {Number}
+   */
   #consumeU32() {
     let x = 0;
     let bytes = [];
@@ -542,9 +582,9 @@ class LRBParser {
   }
 
   /**
-     * Consumes eight bytes into a BigInteger
-     * @returns {BigInt}
-     */
+   * Consumes eight bytes into a BigInteger
+   * @returns {BigInt}
+   */
   #consumeU64() {
     let x = 0n;
     let bytes = [];
@@ -563,10 +603,10 @@ class LRBParser {
   }
 
   /**
-     * Consumes a fixed UTF-8 string of a given length
-     * @param {number} length Length of the fixed string, in bytes
-     * @returns {string}
-     */
+   * Consumes a fixed UTF-8 string of a given length
+   * @param {number} length Length of the fixed string, in bytes
+   * @returns {string}
+   */
   #consumeFixedString(length) {
     let string = [];
 
@@ -578,40 +618,40 @@ class LRBParser {
   }
 
   /**
-     * Consumes a string prefixed with the U8 length
-     * @returns {string}
-     */
+   * Consumes a string prefixed with the U8 length
+   * @returns {string}
+   */
   #consumeLengthU8String() {
     const length = this.#consumeU8();
     return this.#consumeFixedString(length);
   }
 
   /**
-     * Consumes a string prefixed with the U16 length
-     * @returns {string}
-     */
+   * Consumes a string prefixed with the U16 length
+   * @returns {string}
+   */
   #consumeLengthU16String(string) {
     const length = this.#consumeU16();
     return this.#consumeFixedString(length);
   }
 
   /**
-     * Consumes a string prefixed with the U32 length
-     * @returns {string}
-     */
+   * Consumes a string prefixed with the U32 length
+   * @returns {string}
+   */
   #consumeLengthU32String(string) { // TODO: Unused
     const length = this.#consumeU32();
     return this.#consumeFixedString(length);
   }
 
   /**
-     * Consumes a list of double-precision floats into a list of numbers
-     * @param {number} length Count of floats to consume into the array
-     * @returns {Number[]}
-     */
+   * Consumes a list of double-precision floats into a list of numbers
+   * @param {number} length Count of floats to consume into the array
+   * @returns {Number[]}
+   */
   #consumeF64Array(length) {
     const byteArray = new Uint8Array(length * 8);
-    for(let i = 0; i < byteArray.length; i++) {
+    for (let i = 0; i < byteArray.length; i++) {
       byteArray[i] = this.#consumeU8();
     }
 
@@ -625,9 +665,9 @@ class LRBParser {
   }
 
   /**
-     * Consumes a boolean array of flags from a byte
-     * @returns {boolean[]}
-     */
+   * Consumes a boolean array of flags from a byte
+   * @returns {boolean[]}
+   */
   #consumeFlags() {
     let flagsIntValue = this.#consumeU8();
     let flags = [];
@@ -643,36 +683,36 @@ class LRBParser {
   }
 
   /**
-     * Consumes a single boolean value from a byte
-     * @returns {boolean}
-     */
+   * Consumes a single boolean value from a byte
+   * @returns {boolean}
+   */
   #consumeBoolean() { // TODO: Unused
     const boolIntValue = this.#consumeU8();
     return boolIntValue === 1;
   }
-};
+}
 
-function main () {
+function main() {
   const {
     React,
-    store
+    store,
   } = window;
 
   const e = React.createElement;
 
   class BinaryFormatterModComponent extends React.Component {
-    constructor (props) {
+    constructor(props) {
       super(props);
 
       this.state = {
-        active: false
+        active: false,
       };
 
       this.writer = new LRBWriter();
       this.parser = new LRBParser();
     }
 
-    onFileChange () {
+    onFileChange() {
       return new Promise((resolve) => {
         const file = event.target.files[0];
         const fileReader = new FileReader();
@@ -686,7 +726,7 @@ function main () {
       });
     }
 
-    onSave () {
+    onSave() {
       try {
         const binData = this.writer.fromJson({
           trackData: store.getState().trackData,
@@ -695,7 +735,7 @@ function main () {
           duration: store.getState().player.maxIndex,
         });
         const a = document.createElement("a");
-        const blob = new Blob([binData], {type: "octet/stream"});
+        const blob = new Blob([binData], { type: "octet/stream" });
         const url = window.URL.createObjectURL(blob);
         const name = store.getState().trackData.label || "new_track";
         a.href = url;
@@ -708,7 +748,7 @@ function main () {
       }
     }
 
-    onLoad () {
+    onLoad() {
       this.onFileChange().then(result => {
         const track = this.parser.toJson(result);
         const a = document.createElement("a");
@@ -724,7 +764,7 @@ function main () {
       });
     }
 
-    onActivate () {
+    onActivate() {
       if (this.state.active) {
         this.setState({ active: false });
       } else {
@@ -732,7 +772,7 @@ function main () {
       }
     }
 
-    render () {
+    render() {
       return e(
         "div",
         null,
@@ -743,18 +783,18 @@ function main () {
             "div",
             { style: { display: "flex", flexDirection: "row", alignItems: "center" } },
             "Load",
-            e("input", { type: "file", onChange: () => this.onLoad() })
+            e("input", { type: "file", onChange: () => this.onLoad() }),
           ),
-          e("button", { style: { width: "3em" }, onClick: () => this.onSave() }, "Save")
+          e("button", { style: { width: "3em" }, onClick: () => this.onSave() }, "Save"),
         ),
         e(
           "button",
           {
             style: { backgroundColor: this.state.active ? "lightblue" : null },
-            onClick: this.onActivate.bind(this)
+            onClick: this.onActivate.bind(this),
           },
-          "Binary Formatter"
-        )
+          "Binary Formatter",
+        ),
       );
     }
   }
