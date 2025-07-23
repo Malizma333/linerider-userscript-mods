@@ -11,8 +11,8 @@
 // @match        https://*.official-linerider.com/*
 // @match        https://*.surge.sh/*
 
-// @downloadURL  https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-rider-preview-mod.user.js
-// @updateURL    https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-rider-preview-mod.user.js
+// @downloadURL  https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-rider-preview.user.js
+// @updateURL    https://github.com/Malizma333/linerider-userscript-mods/raw/master/mods/line-rider-rider-preview.user.js
 // @homepageURL  https://github.com/Malizma333/linerider-userscript-mods
 // @supportURL   https://github.com/Malizma333/linerider-userscript-mods/issues
 // @grant        none
