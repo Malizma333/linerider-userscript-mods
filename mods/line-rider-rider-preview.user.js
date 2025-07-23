@@ -109,6 +109,7 @@ function main() {
       this.state = {
         active: false,
         activeRider: 0,
+        numRiders: 1,
       };
 
       store.subscribe(() => this._mounted && this.matchState());
@@ -140,54 +141,58 @@ function main() {
       this.setState({ numRiders: riders.length });
 
       if (riders.length > 0 && this.canvas !== undefined) {
-        this.canvas.lines = [];
-        this.canvas.points = [];
-        const canvas = this.canvasRef.current;
-
         const activeRider = Math.min(this.state.activeRider, riders.length - 1);
         this.setState({ activeRider });
-        const riderPoints = normalizePoints(
-          Selectors
-            .getSimulatorTrack()
-            .getFrame(Math.floor(Selectors.getPlayerIndex()))
-            .snapshot.entities[0].entities[activeRider].points
-            .slice(0, 10)
-            .map(point => point.pos),
-          canvas.width,
-          canvas.height,
-        );
-        const bones = [
-          [0, 1],
-          [1, 2],
-          [2, 3],
-          [3, 0],
-          [0, 2],
-          [3, 1],
-          [0, 4],
-          [1, 4],
-          [2, 4],
-          [5, 4],
-          [5, 7],
-          [5, 6],
-          [4, 8],
-          [4, 9],
-          [5, 6],
-          [5, 0],
-          [3, 7],
-          [3, 6],
-          [8, 2],
-          [9, 2],
-          [5, 8],
-          [5, 9],
-        ];
-        bones.forEach(([i, j]) => this.canvas.addLine(riderPoints[i], riderPoints[j]));
-
-        for (let i = 0; i < riderPoints.length; i++) {
-          this.canvas.addPoint(riderPoints[i]);
-        }
-
-        this.canvas.redraw();
+        this.updateCanvas(activeRider);
       }
+    }
+
+    updateCanvas(activeRider) {
+      this.canvas.lines = [];
+      this.canvas.points = [];
+      const canvas = this.canvasRef.current;
+
+      const riderPoints = normalizePoints(
+        Selectors
+          .getSimulatorTrack()
+          .getFrame(Math.floor(Selectors.getPlayerIndex()))
+          .snapshot.entities[0].entities[activeRider].points
+          .slice(0, 10)
+          .map(point => point.pos),
+        canvas.width,
+        canvas.height,
+      );
+      const bones = [
+        [0, 1],
+        [1, 2],
+        [2, 3],
+        [3, 0],
+        [0, 2],
+        [3, 1],
+        [0, 4],
+        [1, 4],
+        [2, 4],
+        [5, 4],
+        [5, 7],
+        [5, 6],
+        [4, 8],
+        [4, 9],
+        [5, 6],
+        [5, 0],
+        [3, 7],
+        [3, 6],
+        [8, 2],
+        [9, 2],
+        [5, 8],
+        [5, 9],
+      ];
+      bones.forEach(([i, j]) => this.canvas.addLine(riderPoints[i], riderPoints[j]));
+
+      for (let i = 0; i < riderPoints.length; i++) {
+        this.canvas.addPoint(riderPoints[i]);
+      }
+
+      this.canvas.redraw();
     }
 
     renderSingle(key, label, editable, isNumber, action) {
@@ -222,6 +227,7 @@ function main() {
 
       const activeRider = parseInt(sr);
       parent.setState({ activeRider });
+      parent.updateCanvas(activeRider);
     }
 
     render() {
@@ -233,7 +239,7 @@ function main() {
             "div",
             null,
             this.state.numRiders > 1
-              && this.renderSingle("selectedRider", "Selected Rider", true, true, this.onSelectRider),
+              && this.renderSingle("activeRider", "Selected Rider", true, true, this.onSelectRider),
           ),
         e("canvas", {
           ref: this.canvasRef,

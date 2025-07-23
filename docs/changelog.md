@@ -11,6 +11,10 @@ permalink: /changelog/
   }
 </style>
 
+### 2025-07-23
+#### Rider Preview
+- Added mod to preview rider in mod window
+
 ### 2025-06-26
 #### Command Editor
 - Added exact camera bounds offset suppport
