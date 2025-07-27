@@ -11,6 +11,10 @@ permalink: /changelog/
   }
 </style>
 
+### 2025-07-27
+#### Chain Select
+Optimized chain selection to use grid selection functions
+
 ### 2025-07-23
 #### Rider Preview
 - Added mod to preview rider in mod window
