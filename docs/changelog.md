@@ -11,6 +11,10 @@ permalink: /changelog/
   }
 </style>
 
+### 2025-08-09
+#### Transform Mod
+Fixed physics line properties from not being preserved
+
 ### 2025-07-27
 #### Chain Select
 Optimized chain selection to use grid selection functions
