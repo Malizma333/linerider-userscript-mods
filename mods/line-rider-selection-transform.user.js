@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       David Lu, Ethan Li & Tobias Bessler
 // @description  Adds ability to transform selections
-// @version      0.8.3
+// @version      0.8.4
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -181,6 +181,9 @@ class TransformMod {
           type: line.type,
           width: line.width,
           layer: line.layer,
+          flipped: line.flipped,
+          leftExtended: line.leftExtended,
+          rightExtended: line.rightExtended,
         });
       }
     }
@@ -220,6 +223,9 @@ class TransformMod {
           type: line.type,
           width: line.width,
           layer: line.layer,
+          flipped: line.flipped,
+          leftExtended: line.leftExtended,
+          rightExtended: line.rightExtended,
         });
       }
 
@@ -313,6 +319,9 @@ class TransformMod {
           p2,
           width,
           layer: line.layer,
+          flipped: line.flipped,
+          leftExtended: line.leftExtended,
+          rightExtended: line.rightExtended,
         });
       }
 
@@ -335,6 +344,9 @@ class TransformMod {
           width: line.width,
           type: line.type,
           layer: line.layer,
+          flipped: line.flipped,
+          leftExtended: line.leftExtended,
+          rightExtended: line.rightExtended,
         });
         pretransformedLines.push({
           p1: new V2(line.p1),
@@ -342,6 +354,9 @@ class TransformMod {
           width: line.width,
           type: line.type,
           layer: line.layer,
+          flipped: line.flipped,
+          leftExtended: line.leftExtended,
+          rightExtended: line.rightExtended,
         });
       }
 
