@@ -184,6 +184,7 @@ class TransformMod {
           flipped: line.flipped,
           leftExtended: line.leftExtended,
           rightExtended: line.rightExtended,
+          multiplier: line.multiplier
         });
       }
     }
@@ -226,6 +227,7 @@ class TransformMod {
           flipped: line.flipped,
           leftExtended: line.leftExtended,
           rightExtended: line.rightExtended,
+          multiplier: line.multiplier
         });
       }
 
@@ -322,6 +324,7 @@ class TransformMod {
           flipped: line.flipped,
           leftExtended: line.leftExtended,
           rightExtended: line.rightExtended,
+          multiplier: line.multiplier
         });
       }
 
@@ -347,6 +350,7 @@ class TransformMod {
           flipped: line.flipped,
           leftExtended: line.leftExtended,
           rightExtended: line.rightExtended,
+          multiplier: line.multiplier
         });
         pretransformedLines.push({
           p1: new V2(line.p1),
@@ -357,6 +361,7 @@ class TransformMod {
           flipped: line.flipped,
           leftExtended: line.leftExtended,
           rightExtended: line.rightExtended,
+          multiplier: line.multiplier
         });
       }
 
