@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Tobias Bessler
 // @description  Removes duplicate lines from a selection
-// @version      1.1.1
+// @version      1.2.0
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -27,17 +27,17 @@ const SELECT_TOOL = "SELECT_TOOL";
 const updateLines = (linesToRemove, linesToAdd, name) => ({
   type: "UPDATE_LINES",
   payload: { linesToRemove, linesToAdd },
-  meta: { name },
+  meta: { name }
 });
 
 const removeLines = (lineIds) => updateLines(lineIds, null, "REMOVE_LINES");
 
 const commitTrackChanges = () => ({
-  type: "COMMIT_TRACK_CHANGES",
+  type: "COMMIT_TRACK_CHANGES"
 });
 
 const revertTrackChanges = () => ({
-  type: "REVERT_TRACK_CHANGES",
+  type: "REVERT_TRACK_CHANGES"
 });
 
 const getActiveTool = state => state.selectedTool;
@@ -45,82 +45,59 @@ const getToolState = (state, toolId) => state.toolState[toolId];
 const getSelectToolState = state => getToolState(state, SELECT_TOOL);
 const getSimulatorCommittedTrack = state => state.simulator.committedEngine;
 
-function main() {
+function main () {
   const {
     React,
-    store,
+    store
   } = window;
 
   const e = React.createElement;
 
   class RemoveDuplicatesModComponent extends React.Component {
-    constructor(props) {
+    constructor (props) {
       super(props);
     }
 
-    onRemove() {
-      const selectToolActive = getActiveTool(store.getState()) === SELECT_TOOL;
-
-      if (!selectToolActive) {
-        return;
-      }
-
-      const selectedPoints = getSelectToolState(store.getState()).selectedPoints;
-
-      if (selectedPoints.size === 0) {
-        return;
-      }
-
+    onRemove () {
       const t = performance.now();
 
-      const linesToRemove = [];
-      const selectedLines = new Set(
-        [...new Set([...selectedPoints].map(point => point >> 1))]
-          .map(id => getSimulatorCommittedTrack(store.getState()).getLine(id)).filter(l => l),
-      );
-      const preserve = new Set();
+      const linesToRemove = new Set();
+      const track = store.getState().simulator.engine
 
-      for (const line of selectedLines) {
-        if (line.type !== 2) continue;
+      for (const line of track.linesList.toArray()) {
+        if (line.type !== 2 || linesToRemove.has(line.id)) {
+          continue;
+        }
 
-        const orderA = [line.x1, line.y1, line.x2, line.y2];
-        const orderB = [line.x2, line.y2, line.x1, line.y1];
-        let inPreserve = false;
+        const touchingP1 = new Set();
 
-        for (const order of preserve) {
-          if (
-            Math.abs(order[0] - orderA[0]) <= 0.001 && Math.abs(order[1] - orderA[1]) <= 0.001
-            && Math.abs(order[2] - orderA[2]) <= 0.001 && Math.abs(order[3] - orderA[3]) <= 0.001
-          ) {
-            inPreserve = true;
-            break;
-          }
-
-          if (
-            Math.abs(order[0] - orderB[0]) <= 0.001 && Math.abs(order[1] - orderB[1]) <= 0.001
-            && Math.abs(order[2] - orderB[2]) <= 0.001 && Math.abs(order[3] - orderB[3]) <= 0.001
-          ) {
-            inPreserve = true;
-            break;
+        for (const line2 of track.selectLinesInRadius(line.p1, Number.EPSILON)) {
+          if (line2.id !== line.id) {
+            touchingP1.add(line2.id)
           }
         }
 
-        if (!inPreserve) {
-          preserve.add(orderA);
-        } else {
-          linesToRemove.push(line.id);
+        for (const line2 of track.selectLinesInRadius(line.p2, Number.EPSILON)) {
+          if (touchingP1.has(line2.id) && line2.type === 2) {
+            linesToRemove.add(line2.id)
+          }
         }
       }
 
-      store.dispatch(removeLines(linesToRemove));
+      store.dispatch(removeLines([...linesToRemove]));
       store.dispatch(commitTrackChanges());
       store.dispatch(revertTrackChanges());
 
       console.log("Took", Math.round(performance.now() - t), "ms");
     }
 
-    render() {
-      return e("div", null, e("button", { onClick: this.onRemove.bind(this) }, "Remove Duplicates Select Mod"));
+    render () {
+      return e("div", null,
+        e("button",
+          { onClick: this.onRemove.bind(this) },
+          "Remove Duplicates Select Mod"
+        )
+      );
     }
   }
 
