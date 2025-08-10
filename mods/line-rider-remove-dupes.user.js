@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Tobias Bessler
 // @description  Removes duplicate lines from a selection
-// @version      1.2.0
+// @version      1.2.1
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -64,7 +64,7 @@ function main () {
       const linesToRemove = new Set();
       const track = store.getState().simulator.engine
 
-      for (const line of track.linesList.toArray()) {
+      for (const line of track.linesList.toArray().sort((l1, l2) => l2.width || 1 - l1.width || 1)) {
         if (line.type !== 2 || linesToRemove.has(line.id)) {
           continue;
         }
@@ -78,7 +78,7 @@ function main () {
         }
 
         for (const line2 of track.selectLinesInRadius(line.p2, Number.EPSILON)) {
-          if (touchingP1.has(line2.id) && line2.type === 2) {
+          if (touchingP1.has(line2.id) && line2.type === 2 && line.layer === line2.layer) {
             linesToRemove.add(line2.id)
           }
         }
