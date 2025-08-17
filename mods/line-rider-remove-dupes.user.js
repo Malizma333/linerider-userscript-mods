@@ -27,17 +27,17 @@ const SELECT_TOOL = "SELECT_TOOL";
 const updateLines = (linesToRemove, linesToAdd, name) => ({
   type: "UPDATE_LINES",
   payload: { linesToRemove, linesToAdd },
-  meta: { name }
+  meta: { name },
 });
 
 const removeLines = (lineIds) => updateLines(lineIds, null, "REMOVE_LINES");
 
 const commitTrackChanges = () => ({
-  type: "COMMIT_TRACK_CHANGES"
+  type: "COMMIT_TRACK_CHANGES",
 });
 
 const revertTrackChanges = () => ({
-  type: "REVERT_TRACK_CHANGES"
+  type: "REVERT_TRACK_CHANGES",
 });
 
 const getActiveTool = state => state.selectedTool;
@@ -45,24 +45,24 @@ const getToolState = (state, toolId) => state.toolState[toolId];
 const getSelectToolState = state => getToolState(state, SELECT_TOOL);
 const getSimulatorCommittedTrack = state => state.simulator.committedEngine;
 
-function main () {
+function main() {
   const {
     React,
-    store
+    store,
   } = window;
 
   const e = React.createElement;
 
   class RemoveDuplicatesModComponent extends React.Component {
-    constructor (props) {
+    constructor(props) {
       super(props);
     }
 
-    onRemove () {
+    onRemove() {
       const t = performance.now();
 
       const linesToRemove = new Set();
-      const track = store.getState().simulator.engine
+      const track = store.getState().simulator.engine;
 
       for (const line of track.linesList.toArray().sort((l1, l2) => l2.width || 1 - l1.width || 1)) {
         if (line.type !== 2 || linesToRemove.has(line.id)) {
@@ -73,13 +73,13 @@ function main () {
 
         for (const line2 of track.selectLinesInRadius(line.p1, Number.EPSILON)) {
           if (line2.id !== line.id) {
-            touchingP1.add(line2.id)
+            touchingP1.add(line2.id);
           }
         }
 
         for (const line2 of track.selectLinesInRadius(line.p2, Number.EPSILON)) {
           if (touchingP1.has(line2.id) && line2.type === 2 && line.layer === line2.layer) {
-            linesToRemove.add(line2.id)
+            linesToRemove.add(line2.id);
           }
         }
       }
@@ -91,13 +91,8 @@ function main () {
       console.log("Took", Math.round(performance.now() - t), "ms");
     }
 
-    render () {
-      return e("div", null,
-        e("button",
-          { onClick: this.onRemove.bind(this) },
-          "Remove Duplicates Select Mod"
-        )
-      );
+    render() {
+      return e("div", null, e("button", { onClick: this.onRemove.bind(this) }, "Remove Duplicates Select Mod"));
     }
   }
 

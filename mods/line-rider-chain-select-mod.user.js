@@ -24,7 +24,7 @@ const SELECT_TOOL = "SELECT_TOOL";
 const setToolState = (toolId, state) => ({
   type: "SET_TOOL_STATE",
   payload: state,
-  meta: { id: toolId }
+  meta: { id: toolId },
 });
 
 const setSelectToolState = toolState => setToolState(SELECT_TOOL, toolState);
@@ -34,20 +34,20 @@ const getToolState = (state, toolId) => state.toolState[toolId];
 const getSelectToolState = state => getToolState(state, SELECT_TOOL);
 const getSimulatorCommittedTrack = state => state.simulator.committedEngine;
 
-function main () {
+function main() {
   const {
     React,
-    store
+    store,
   } = window;
 
   const e = React.createElement;
 
   class ChainSelectModComponent extends React.Component {
-    constructor (props) {
+    constructor(props) {
       super(props);
     }
 
-    onChain () {
+    onChain() {
       const selectToolActive = getActiveTool(store.getState()) === SELECT_TOOL;
 
       if (!selectToolActive) {
@@ -66,16 +66,27 @@ function main () {
       const lineQueue = [...selectedPoints].map(point => point >> 1);
 
       const linesShareOnePoint = (lineA, lineB) => (
-        lineA.p1.x === lineB.p1.x && lineA.p1.y === lineB.p1.y && !(lineA.p2.x === lineB.p2.x && lineA.p2.y === lineB.p2.y) ||
-        lineA.p1.x === lineB.p2.x && lineA.p1.y === lineB.p2.y && !(lineA.p2.x === lineB.p1.x && lineA.p2.y === lineB.p1.y) ||
-        lineA.p2.x === lineB.p1.x && lineA.p2.y === lineB.p1.y && !(lineA.p1.x === lineB.p2.x && lineA.p1.y === lineB.p2.y) ||
-        lineA.p2.x === lineB.p2.x && lineA.p2.y === lineB.p2.y && !(lineA.p1.x === lineB.p1.x && lineA.p1.y === lineB.p1.y)
+        lineA.p1.x === lineB.p1.x && lineA.p1.y === lineB.p1.y
+          && !(lineA.p2.x === lineB.p2.x && lineA.p2.y === lineB.p2.y)
+        || lineA.p1.x === lineB.p2.x && lineA.p1.y === lineB.p2.y
+          && !(lineA.p2.x === lineB.p1.x && lineA.p2.y === lineB.p1.y)
+        || lineA.p2.x === lineB.p1.x && lineA.p2.y === lineB.p1.y
+          && !(lineA.p1.x === lineB.p2.x && lineA.p1.y === lineB.p2.y)
+        || lineA.p2.x === lineB.p2.x && lineA.p2.y === lineB.p2.y
+          && !(lineA.p1.x === lineB.p1.x && lineA.p1.y === lineB.p1.y)
       );
 
       while (lineQueue.length > 0) {
         const currentLine = track.getLine(lineQueue.pop());
-        for (const line of track.selectLinesInRadius(currentLine.p1, 0).concat(track.selectLinesInRadius(currentLine.p2, 0))) {
-          if (!(selectedPoints.has(line.id * 2) || selectedPoints.has(line.id * 2 + 1)) && linesShareOnePoint(currentLine, line)) {
+        for (
+          const line of track.selectLinesInRadius(currentLine.p1, 0).concat(
+            track.selectLinesInRadius(currentLine.p2, 0),
+          )
+        ) {
+          if (
+            !(selectedPoints.has(line.id * 2) || selectedPoints.has(line.id * 2 + 1))
+            && linesShareOnePoint(currentLine, line)
+          ) {
             lineQueue.push(line.id);
             selectedPoints.add(line.id * 2);
             selectedPoints.add(line.id * 2 + 1);
@@ -88,13 +99,8 @@ function main () {
       console.log("Took", Math.round(performance.now() - t), "ms");
     }
 
-    render () {
-      return e("div", null,
-        e("button",
-          { onClick: this.onChain.bind(this) },
-          "Chain Select Mod"
-        )
-      );
+    render() {
+      return e("div", null, e("button", { onClick: this.onChain.bind(this) }, "Chain Select Mod"));
     }
   }
 
