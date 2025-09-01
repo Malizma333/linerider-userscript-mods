@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       David Lu & Tobias Bessler
 // @description  Adds ability to slice lines with a selection
-// @version      0.5.3
+// @version      0.6.0
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -46,7 +46,7 @@ const setToolState = (toolId, state) => ({
   meta: { id: toolId },
 });
 
-const setSelectToolState = toolState => setToolState(SELECT_TOOL, toolState);
+const setSelectToolState = (toolState) => setToolState(SELECT_TOOL, toolState);
 
 const updateLines = (linesToRemove, linesToAdd, name) => ({
   type: "UPDATE_LINES",
@@ -70,12 +70,12 @@ const revertTrackChanges = () => ({
 });
 
 /* selectors */
-const getActiveTool = state => state.selectedTool;
+const getActiveTool = (state) => state.selectedTool;
 const getToolState = (state, toolId) => state.toolState[toolId];
-const getSelectToolState = state => getToolState(state, SELECT_TOOL);
-const getSimulatorCommittedTrack = state => state.simulator.committedEngine;
-const getSimulatorTrack = state => state.simulator.engine;
-const getTrackLinesLocked = state => state.trackLinesLocked;
+const getSelectToolState = (state) => getToolState(state, SELECT_TOOL);
+const getSimulatorCommittedTrack = (state) => state.simulator.committedEngine;
+const getSimulatorTrack = (state) => state.simulator.engine;
+const getTrackLinesLocked = (state) => state.trackLinesLocked;
 
 class SliceMod {
   constructor(store, initState) {
@@ -91,7 +91,9 @@ class SliceMod {
       if (this.state.active) {
         const selectToolState = getSelectToolState(this.store.getState());
         if (selectToolState && selectToolState.status.pressed) {
-          this.store.dispatch(setSelectToolState({ status: { inactive: true } }));
+          this.store.dispatch(
+            setSelectToolState({ status: { inactive: true } }),
+          );
         }
       }
 
@@ -149,15 +151,15 @@ class SliceMod {
       if (this.state.active && this.selectedPoints.size > 0) {
         const selectedLines = new Set(
           [...getLinesFromPoints(this.selectedPoints)]
-            .map(id => this.track.getLine(id))
-            .filter(l => l),
+            .map((id) => this.track.getLine(id))
+            .filter((l) => l),
         );
 
         let track = this.track;
-        const selectLinesInRect = rect => {
+        const selectLinesInRect = (rect) => {
           const lines = track.selectLinesInRect(rect);
           if (getTrackLinesLocked(this.store.getState())) {
-            return lines.filter(line => !line.collidable);
+            return lines.filter((line) => !line.collidable);
           } else {
             return lines;
           }
@@ -166,21 +168,25 @@ class SliceMod {
         this.changed = performSlice(
           selectedLines,
           selectLinesInRect,
-          line => {
+          (line) => {
             this.store.dispatch(setLines([line]));
             track = getSimulatorTrack(this.store.getState());
           },
-          line => {
+          (line) => {
             this.store.dispatch(newLines([line]));
             track = getSimulatorTrack(this.store.getState());
           },
         );
 
-        const linesToRemove = [...genRemove(selectedLines, selectLinesInRect, this.state)];
+        if (this.state.remove) {
+          const linesToRemove = [
+            ...genRemove(selectedLines, selectLinesInRect, this.state),
+          ];
 
-        if (linesToRemove.length > 0) {
-          this.store.dispatch(removeLines(linesToRemove));
-          this.changed = true;
+          if (linesToRemove.length > 0) {
+            this.store.dispatch(removeLines(linesToRemove));
+            this.changed = true;
+          }
         }
       }
     }
@@ -188,10 +194,7 @@ class SliceMod {
 }
 
 function main() {
-  const {
-    React,
-    store,
-  } = window;
+  const { React, store } = window;
 
   const e = React.createElement;
 
@@ -201,6 +204,7 @@ function main() {
 
       this.state = {
         active: false,
+        remove: true,
         angle: 0,
       };
 
@@ -245,18 +249,37 @@ function main() {
       }
     }
 
+    renderCheckbox(key, label, action) {
+      const props = {
+        id: key,
+        checked: this.state[key],
+        onChange: (e) => action(this, e.target.checked),
+      };
+
+      return e(
+        "div",
+        null,
+        e("label", { style: { width: "4em" }, htmlFor: key }, label),
+        e("input", {
+          style: { marginLeft: ".5em" },
+          type: "checkbox",
+          ...props,
+        }),
+      );
+    }
+
     renderSlider(key, props) {
       props = {
         ...props,
         value: this.state[key],
-        onChange: e => this.setState({ [key]: parseFloat(e.target.value) }),
+        onChange: (e) => this.setState({ [key]: parseFloat(e.target.value) }),
       };
       return e(
         "div",
         null,
         key,
         e("input", { style: { width: "3em" }, type: "number", ...props }),
-        e("input", { type: "range", ...props, onFocus: e => e.target.blur() }),
+        e("input", { type: "range", ...props, onFocus: (e) => e.target.blur() }),
       );
     }
 
@@ -268,15 +291,24 @@ function main() {
           && e(
             "div",
             null,
+            this.renderCheckbox("remove", "Remove", () => this.setState({ remove: !this.state.remove })),
             this.renderSlider("angle", { min: 0, max: 360, step: 1 }),
-            e("button", { style: { float: "left" }, onClick: () => this.onCommit() }, "Commit"),
+            e(
+              "button",
+              { style: { float: "left" }, onClick: () => this.onCommit() },
+              "Commit",
+            ),
           ),
-        e("button", {
-          style: {
-            backgroundColor: this.state.active ? "lightblue" : null,
+        e(
+          "button",
+          {
+            style: {
+              backgroundColor: this.state.active ? "lightblue" : null,
+            },
+            onClick: this.onActivate.bind(this),
           },
-          onClick: this.onActivate.bind(this),
-        }, "Slice Mod"),
+          "Slice Mod",
+        ),
       );
     }
   }
@@ -313,7 +345,7 @@ function setsEqual(a, b) {
 }
 
 function getLinesFromPoints(points) {
-  return new Set([...points].map(point => point >> 1));
+  return new Set([...points].map((point) => point >> 1));
 }
 
 function performSlice(selectedLines, selectLinesInRect, setLine, addLine) {
@@ -332,7 +364,16 @@ function performSlice(selectedLines, selectLinesInRect, setLine, addLine) {
       // skip lines in selection
       if (selectedLines.has(line)) continue;
 
-      const t = lineLineIntersection(p1.x, p1.y, p2.x, p2.y, line.p1.x, line.p1.y, line.p2.x, line.p2.y);
+      const t = lineLineIntersection(
+        p1.x,
+        p1.y,
+        p2.x,
+        p2.y,
+        line.p1.x,
+        line.p1.y,
+        line.p2.x,
+        line.p2.y,
+      );
 
       if (t != null && t !== true) {
         const json = line.toJSON();
@@ -363,7 +404,7 @@ function* genRemove(selectedLines, selectLinesInRect, { angle = 0 } = {}) {
   /* prep */
 
   // degrees to radians
-  const rads = angle / 180 * Math.PI;
+  const rads = (angle / 180) * Math.PI;
 
   // create angle basis
   const toAngle = rotateTransform(rads);
@@ -377,7 +418,12 @@ function* genRemove(selectedLines, selectLinesInRect, { angle = 0 } = {}) {
   const points = [];
 
   // sort by x
-  const insertSorted = point => points.splice(sortedIndexBy(points, point, p => p.x), 0, point);
+  const insertSorted = (point) =>
+    points.splice(
+      sortedIndexBy(points, point, (p) => p.x),
+      0,
+      point,
+    );
 
   for (let line of selectedLines) {
     // TODO: probably don't need id or point.y
@@ -432,7 +478,7 @@ function* genRemove(selectedLines, selectLinesInRect, { angle = 0 } = {}) {
 
       // check where point-to-remove lies
       const i = sortedIndex(ys, point.y);
-      if (i < ys.length && (i % 2) === 1) {
+      if (i < ys.length && i % 2 === 1) {
         yield point.id;
       }
 
@@ -478,7 +524,8 @@ function lineLineIntersection(x0, y0, x1, y1, x2, y2, x3, y3, inclusive) {
   const y23 = y3 - y2;
 
   const _01cross23 = x01 * y23 - x23 * y01;
-  if (_01cross23 === 0) { // collinear
+  if (_01cross23 === 0) {
+    // collinear
     return inclusive ? true : null;
   }
   const orientation = _01cross23 > 0;
@@ -486,19 +533,27 @@ function lineLineIntersection(x0, y0, x1, y1, x2, y2, x3, y3, inclusive) {
   const x02 = x2 - x0;
   const y02 = y2 - y0;
   const _02cross01 = x02 * y01 - y02 * x01;
-  if ((_02cross01 === 0) ? !inclusive : (_02cross01 < 0) === orientation) {
+  if (_02cross01 === 0 ? !inclusive : _02cross01 < 0 === orientation) {
     return null;
   }
 
   const _02cross23 = x02 * y23 - y02 * x23;
-  if ((_02cross23 === 0) ? !inclusive : (_02cross23 < 0) === orientation) {
+  if (_02cross23 === 0 ? !inclusive : _02cross23 < 0 === orientation) {
     return null;
   }
 
-  if ((_02cross01 === _01cross23) ? !inclusive : (_02cross01 > _01cross23) === orientation) {
+  if (
+    _02cross01 === _01cross23
+      ? !inclusive
+      : _02cross01 > _01cross23 === orientation
+  ) {
     return null;
   }
-  if ((_02cross23 === _01cross23) ? !inclusive : (_02cross23 > _01cross23) === orientation) {
+  if (
+    _02cross23 === _01cross23
+      ? !inclusive
+      : _02cross23 > _01cross23 === orientation
+  ) {
     return null;
   }
 

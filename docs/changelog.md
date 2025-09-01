@@ -11,6 +11,10 @@ permalink: /changelog/
   }
 </style>
 
+### 2025-09-01
+#### Slice Mod
+Added back remove toggle
+
 ### 2025-08-09
 #### Transform Mod
 Fixed physics line properties from not being preserved
