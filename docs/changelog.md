@@ -11,17 +11,21 @@ permalink: /changelog/
   }
 </style>
 
+### 2025-09-12
+#### Scenery Width
+- Fixed input not accepting partial numbers
+
 ### 2025-09-01
 #### Slice Mod
-Added back remove toggle
+- Added back remove toggle
 
 ### 2025-08-09
 #### Transform Mod
-Fixed physics line properties from not being preserved
+- Fixed physics line properties from not being preserved
 
 ### 2025-07-27
 #### Chain Select
-Optimized chain selection to use grid selection functions
+- Optimized chain selection to use grid selection functions
 
 ### 2025-07-23
 #### Rider Preview
