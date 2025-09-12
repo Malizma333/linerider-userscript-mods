@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Tobias Bessler
 // @description  Scenery slider component
-// @version      0.2.1
+// @version      0.2.2
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -25,6 +25,8 @@
 const getWindowFocused = state => state.views.Main;
 const getPlayerRunning = state => state.player.running;
 const getSceneryWidth = state => state.selectedSceneryWidth;
+const MIN_WIDTH = 0.01;
+const MAX_WIDTH = 362;
 
 function main() {
   const {
@@ -50,6 +52,7 @@ function main() {
 
       this.state = {
         sceneryWidth: 1,
+        textWidth: "1",
       };
 
       store.subscribe(() => this.setState({ sceneryWidth: getSceneryWidth(store.getState()) }));
@@ -60,9 +63,17 @@ function main() {
     }
 
     onChooseWidth(sceneryWidth) {
-      if (sceneryWidth === 0) return;
+      if (isNaN(sceneryWidth)) {
+        sceneryWidth = 1;
+      }
+      if (sceneryWidth < MIN_WIDTH) {
+        sceneryWidth = MIN_WIDTH;
+      }
+      if (sceneryWidth > MAX_WIDTH) {
+        sceneryWidth = MAX_WIDTH;
+      }
       store.dispatch({ type: "SELECT_SCENERY_WIDTH", payload: sceneryWidth });
-      this.setState({ sceneryWidth });
+      this.setState({ sceneryWidth, textWidth: sceneryWidth.toString() });
     }
 
     render() {
@@ -72,21 +83,20 @@ function main() {
         e("input", {
           style: { width: "4em" },
           type: "number",
-          min: 0,
-          max: 362,
-          step: 0.01,
-          value: this.state.sceneryWidth,
-          onChange: e => this.onChooseWidth(parseFloat(e.target.value)),
+          min: MIN_WIDTH,
+          max: MAX_WIDTH,
+          value: this.state.textWidth,
+          onChange: e => this.setState({ textWidth: e.target.value }),
+          onBlur: e => this.onChooseWidth(parseFloat(e.target.value)),
         }),
         e("input", {
           style: { width: "7em" },
           type: "range",
-          min: -2,
-          max: 2.55870857,
+          min: Math.log10(MIN_WIDTH)-0.1,
+          max: Math.log10(MAX_WIDTH)+0.1,
           step: 0.1,
           value: Math.log10(this.state.sceneryWidth),
           onChange: e => this.onChooseWidth(Math.pow(10, parseFloat(e.target.value))),
-          onFocus: e => e.target.blur(),
         }),
       );
     }
