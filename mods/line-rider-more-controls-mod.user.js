@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Tobias Bessler
 // @description  Provides a menu for viewing and editing specific track data
-// @version      1.3.1
+// @version      1.4.0
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -65,6 +65,8 @@ function main() {
         selectedRider: 0,
         selectedLines: 0,
         numRiders: 1,
+        minZoom: window.$Zoom.MIN,
+        maxZoom: window.$Zoom.MAX,
       };
 
       store.subscribe(() => this._mounted && this.matchState());
@@ -150,6 +152,18 @@ function main() {
       if (maxIndex < 0) return;
       store.dispatch({ type: "SET_PLAYER_MAX_INDEX", payload: maxIndex });
       parent.setState({ maxIndex });
+    }
+
+    onSetMinZoom(parent, minZoom) {
+      if (minZoom <= 0 || minZoom > parent.state.maxZoom) return;
+      window.$Zoom.MIN = minZoom;
+      parent.setState({ minZoom });
+    }
+
+    onSetMaxZoom(parent, maxZoom) {
+      if (maxZoom < parent.state.minZoom) return;
+      window.$Zoom.MAX = maxZoom;
+      parent.setState({ maxZoom });
     }
 
     onSetRiderPosX(parent, x) {
@@ -356,6 +370,8 @@ function main() {
           this.renderSingle("maxIndex", "Max Index", true, true, this.onSetMaxIndex),
           this.renderCheckbox("stopAtEnd", "Stop at End", this.onToggleStopEnd),
           this.renderCheckbox("nextFrameLifelock", "Next Frame Lifelock", this.onToggleNextFrameLifelock),
+          this.renderSingle("minZoom", "Minimum Zoom", true, true, this.onSetMinZoom),
+          this.renderSingle("maxZoom", "Maximum Zoom", true, true, this.onSetMaxZoom),
           e("hr"),
           this.state.numRiders > 1
             && this.renderSingle("selectedRider", "Selected Rider", true, true, this.onSelectRider),
