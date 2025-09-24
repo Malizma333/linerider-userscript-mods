@@ -11,6 +11,10 @@ permalink: /changelog/
   }
 </style>
 
+### 2025-09-24
+#### More Controls
+- Added minimum and maximum zoom settings
+
 ### 2025-09-12
 #### Scenery Width
 - Fixed input not accepting partial numbers
