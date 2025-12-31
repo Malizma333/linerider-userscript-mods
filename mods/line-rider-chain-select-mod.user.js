@@ -4,7 +4,7 @@
 // @namespace    https://www.linerider.com/
 // @author       Tobias Bessler
 // @description  Adds lines to selection that are connected in a chain
-// @version      1.1.0
+// @version      1.1.1
 // @icon         https://www.linerider.com/favicon.ico
 
 // @match        https://www.linerider.com/*
@@ -94,7 +94,7 @@ function main() {
         }
       }
 
-      store.dispatch(setSelectToolState({ selectedPoints }));
+      store.dispatch(setSelectToolState({ selectedPoints, multi: true }));
 
       console.log("Took", Math.round(performance.now() - t), "ms");
     }
